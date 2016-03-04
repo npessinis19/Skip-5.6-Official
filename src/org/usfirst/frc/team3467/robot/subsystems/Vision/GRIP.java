@@ -19,6 +19,11 @@ public class GRIP {
 	
 	//Camera angles are different for different camera
 	public static final double M1011FOVx = 47.0;
+	public static final double M1011Height = 11.75; //Inches
+	public static final double M1011Pitch = 57.0; //Degrees
+	
+	
+	
 	public static final double M1013FOVx = 0.0;
 	
 	final double targetx = 150.1;
