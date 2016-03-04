@@ -13,6 +13,7 @@ import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.SetBrakeMode
 import org.usfirst.frc.team3467.robot.subsystems.Intake.Intake;
 import org.usfirst.frc.team3467.robot.subsystems.Intake.commands.IntakeDrive;
 import org.usfirst.frc.team3467.robot.subsystems.Intake.commands.Roller_Actuate;
+import org.usfirst.frc.team3467.robot.subsystems.NavX_MXP.command.ResetGyro;
 import org.usfirst.frc.team3467.robot.subsystems.Shooter.commands.*;
 import org.usfirst.frc.team3467.robot.subsystems.utilitybar.Pnumatic_system;
 import org.usfirst.frc.team3467.robot.subsystems.utilitybar.commands.*;
@@ -193,7 +194,8 @@ public class OI {
 		
 		// SmartDashboard Buttons
 		SmartDashboard.putData("Drivebase: Reset Encoders", new ResetDriveEncoders());
-		SmartDashboard.putData("Shooter Calibrate", new ShooterOneWayCalibrate());
+		SmartDashboard.putData("Shooter: Calibrate", new ShooterOneWayCalibrate());
+		SmartDashboard.putData("AHRS: Reset Gryo", new ResetGyro());
 	}
 }
 

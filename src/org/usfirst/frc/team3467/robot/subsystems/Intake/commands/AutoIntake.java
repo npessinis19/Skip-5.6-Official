@@ -4,11 +4,11 @@ import org.usfirst.frc.team3467.robot.commands.CommandBase;
 
 public class AutoIntake extends CommandBase {
 
-	boolean Out;
+	boolean autoIntakeIn;
 	
 	public AutoIntake(boolean driveOut) {
 		requires(intake);
-		Out = driveOut;
+		autoIntakeIn = driveOut;
 		setTimeout(1);
 	}
 	
@@ -16,7 +16,7 @@ public class AutoIntake extends CommandBase {
 	}
 	
 	protected void execute() {
-		if (Out) {
+		if (autoIntakeIn) {
 			intake.driveManual(intake.kIntakeFast);
 		}
 		else {

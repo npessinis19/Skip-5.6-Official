@@ -14,6 +14,7 @@ import org.usfirst.frc.team3467.robot.subsystems.utilitybar.Pnumatic_system;
 import org.usfirst.frc.team3467.robot.subsystems.Intake.Intake;
 import org.usfirst.frc.team3467.robot.subsystems.Shooter.Shooter;
 import org.usfirst.frc.team3467.robot.subsystems.Vision.Flashlight;
+import org.usfirst.frc.team3467.robot.subsystems.Vision.GRIP;
 import org.usfirst.frc.team3467.robot.subsystems.Vision.Video;
 
 public abstract class CommandBase extends Command {
@@ -27,7 +28,10 @@ public abstract class CommandBase extends Command {
 	public static Pnumatic_system utilitybar;
 	public static Shooter pultaCat;
 	public static Intake intake;
+	
+	//Vision Classes
 	public static Flashlight light;
+	public static GRIP grip;
 	public static Video video;
 	
 	public static boolean ISCompBot = true;
@@ -58,10 +62,11 @@ public abstract class CommandBase extends Command {
 		light = new Flashlight();
 		subsystemList.addElement(light);
 		
+		//Non-Subsystem Classes
 		video = new Video();
+		grip = new GRIP();
 		oi = new OI();
-//		oi.BindCommands(oi.getUserlogin());
-//		oi.getUserlogin();
+
 		oi.BindCommands();
 	}
 	
