@@ -58,9 +58,7 @@ public class Robot extends IterativeRobot {
 */     
 
         // Initialize all subsystems
-    	CommandBase.init();
-
-    	
+    	CommandBase.init();	
     	
     	// Add autonomous selector
 		autoChooser = new SendableChooser();
@@ -71,7 +69,6 @@ public class Robot extends IterativeRobot {
 		autoChooser.addObject("Drive for 5 secs", new JustDriveFor5());
 		autoChooser.addObject("Auto Cheval", new AutoCheval());
 		autoChooser.addObject("Auto Low Bar", new AutoLowBar());
-		autoChooser.addObject("Shoot", new Shoot());
 		
 		SmartDashboard.putData("Auto", autoChooser);
     }
@@ -109,12 +106,13 @@ public class Robot extends IterativeRobot {
         	continue until interrupted by another command, remove
          	this line or comment it out.
          */
-    	SmartDashboard.putString("Robot", "Teleop Inabled");
         if (autonomousCommand != null) autonomousCommand.cancel();
     
-        if(CommandBase.pultaCat != null) {
+    	SmartDashboard.putString("Robot", "Teleop Enabled");
+
+    	if(CommandBase.pultaCat != null) {
         	//If the Shooter has not been calibrated, will calibrate
-        	if (CommandBase.pultaCat.HasBeenCalibrated() == false) {
+        	if (CommandBase.pultaCat.hasBeenCalibrated() == false) {
         		Scheduler.getInstance().add(new ShooterOneWayCalibrate());
         	}
         }

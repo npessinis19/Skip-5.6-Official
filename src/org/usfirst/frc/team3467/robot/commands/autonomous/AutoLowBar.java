@@ -8,6 +8,7 @@ import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.AutoRotateTo
 import org.usfirst.frc.team3467.robot.subsystems.Intake.commands.AutoIntake;
 import org.usfirst.frc.team3467.robot.subsystems.Intake.commands.Roller_Actuate;
 import org.usfirst.frc.team3467.robot.subsystems.Shooter.commands.Shoot;
+import org.usfirst.frc.team3467.robot.subsystems.Shooter.commands.ShooterOneWayCalibrate;
 import org.usfirst.frc.team3467.robot.subsystems.Shooter.commands.ShooterPrepare;
 import org.usfirst.frc.team3467.robot.subsystems.utilitybar.Pnumatic_system;
 import org.usfirst.frc.team3467.robot.subsystems.utilitybar.commands.Bar_actuate;
@@ -16,11 +17,8 @@ import org.usfirst.frc.team3467.robot.subsystems.utilitybar.commands.Finger_actu
 public class AutoLowBar extends CommandGroup {
 	
 	public AutoLowBar() {
+
 		addSequential(new Roller_Actuate(true));
-		
-		//if (CommandBase.utilitybar.getFingerState() == Pnumatic_system.kIn) {
-		//	addSequential(new Finger_actuate(Pnumatic_system.kOut));
-		//}
 		addSequential(new Bar_actuate(Pnumatic_system.kIn));
 		addSequential(new Finger_actuate(Pnumatic_system.kOut));
 		addSequential(new Bar_actuate(Pnumatic_system.kOut));
@@ -28,12 +26,9 @@ public class AutoLowBar extends CommandGroup {
 		addSequential(new Roller_Actuate(false));
 		addSequential(new AutoIntake(false));
 		addSequential(new AutoRotateToAngle(60.0, 0.3));
+		addSequential(new ShooterOneWayCalibrate());
 		addSequential(new Shoot());
 		addSequential(new ShooterPrepare());
 
-		//addSequential(new TurnAndShoot(1));
-		//addSequential(new Shoot());
-		//addSequential(new ShooterPrepare());
-		//end();
 	}
 }
