@@ -23,7 +23,7 @@ public class AutoRotateToAngle extends CommandBase {
 	private double m_degrees = 0.0;
 	
 	private double KP = 1.0;
-	private double KI = 0.0;
+	private double KI = 1.0;
 	private double KD = 0.0;
     	
     public AutoRotateToAngle(double degrees, double maxSpeed, double kp, double ki, double kd) {
