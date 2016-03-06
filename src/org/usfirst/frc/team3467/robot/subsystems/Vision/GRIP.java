@@ -10,84 +10,101 @@ public class GRIP {
 //Vision Processing Constants
 	//Is the goal on target
 	public boolean imageOnTarget = false;
+	public boolean oneContour = false;
 	
 	boolean onTargetx = false;
 	boolean onTargety = false;
 	
 	//Height of of the top of the Top Target
-	public static final int TOP_TARGET_HEIGHT = 97;
+	private static final int TOP_TARGET_HEIGHT = 97;
 	
-	//Camera angles are different for different camera
-	public static final double M1011FOVx = 47.0;
-	public static final double M1011Height = 11.75; //Inches
-	public static final double M1011Pitch = 57.0; //Degrees
+	//Camera Variables (Axis M1011) Origional Camera
+	private static final double M1011_FOVx_deg = 47.0; //Degrees
+	private static final double M1011_FOVx_px = 240; //Pixels
+	private static final double M1011_Height_ft = 0.979; //Feet
+	private static final double M1011_Pitch_deg = 57.0; //Degrees
 	
+	//Camera Variables (Axis M1013) Second Camera 
+	private static final double M1013FOVx = 0.0;
 	
+	//Target Variables
+	private static final double Target_Length_ft = 1.667; //Feet
+	private static final double Target_Height_ft = 1.0; //Feet
 	
-	public static final double M1013FOVx = 0.0;
+	//Calculated Values
+	double angle_theta;
+	double distance_delta;
 	
 	final double targetx = 150.1;
 	final double targety = 0.0;
+	private static final double target_distance = 0.0;
+	private static final double target_angle = 0.0;
 	
-	private final double TOLERANCEx = 0.0;
-	private final double TOLERANCEy = 0.0;
+	//Tolerance values
+	private static final double TOLERANCE_distance = 5.0;;
+	private static final double TOLERANCE_angle = 0.0;
 	
-	//Image Matricies
-	double[] functionx = new double [0];
-	double[] functiony = new double [0];
+	//Image Matricies and Values
 	double[] defaultValue = new double[0];
 	
+	double Centerx;
+	double Centery;
+	double Height;
+	double Width;
+	
 	public void createImage () {
-			
+		
 			double[] centerx = table.getNumberArray("centerX", defaultValue);
 			double[] centery = table.getNumberArray("centerY", defaultValue);
-		
-		if  (centerx.length == 1) {
-				functionx[0] = centerx[0];
-				functiony[0] = centery[0];
-				
-				if(functionx[0] >= targetx - TOLERANCEx && functionx[0] <= targetx + TOLERANCEx) {
-					onTargetx = true;
-				}
-				
-				if (functiony[0] >= targety - TOLERANCEy && functiony[0] <= targety + TOLERANCEy) {
-					onTargety = true;
-				}
-			}
+			double[] width = table.getNumberArray("width", defaultValue);
+			double[] height = table.getNumberArray("height", defaultValue);
 			
-			if (onTargetx && onTargety) {
-				imageOnTarget = true;
+			if (centerx.length == 1) {
+				oneContour = true;
+				
+				Centerx = centerx[0];
+				Centery = centery[0];
+				Width = width[0];
+				Height = height[0];
 			}
 		}
 	
 	public double getCenterX() {
-		return functionx[0];
+		return Centerx;
 	}
 	
 	public double getCenterY() {
-		return functiony[0];
+		return Centery;
 	}
 	
-	public double calcDistnace() {
-		return 0.0;
+	public double getHeight() {
+		return Height;
 	}
 	
-	public double calcAngle1() {
-		double angle;
-		angle = 47 * Math.cos(120 - (double) functionx[0]);
-		SmartDashboard.putNumber("Vision Angle", angle);
-		return angle;;
-	}
-	public double calcAngle() {
-		double angle;
-		return 0.0;
+	public double getWidth() {
+		return Width;
 	}
 	
-	public boolean onGoalx() {
-		return onTargetx;
+	public double calcDistnace( double targetWidth) {
+		distance_delta = (Target_Length_ft * M1011_FOVx_px)/(2 * targetWidth * Math.tan(angle_theta));
+		SmartDashboard.putNumber("Vision Distance", distance_delta); 
+		return distance_delta;
 	}
 	
-	public boolean onGoaly() {
-		return onTargety;
+	public double calcAngle(double centerX) {
+		angle_theta = 47 * Math.cos(120 - (double) centerX);
+		SmartDashboard.putNumber("Vision Angle", angle_theta);
+		return angle_theta;
+	}
+	
+	public boolean isOnTarget( double distance, double angle) {
+		double deltaDistance = Math.abs(distance - target_distance);
+		double deltaAngle = Math.abs(angle - target_angle);
+		if ((deltaDistance >= 0 && deltaDistance <= TOLERANCE_distance) &&
+				deltaAngle >= 0 && deltaAngle <= TOLERANCE_angle) {
+			imageOnTarget = true;
+		}
+		SmartDashboard.putBoolean("Image On Target", imageOnTarget);
+		return imageOnTarget;
 	}
 }	
