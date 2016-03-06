@@ -8,6 +8,7 @@ import com.ni.vision.NIVision.ShapeMode;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.vision.AxisCamera;
+import edu.wpi.first.wpilibj.vision.AxisCamera.Resolution;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Timer;
 
@@ -22,7 +23,7 @@ public class Video {
 		
 		//Activates Axis Camera on the following IP Address
 		//Camera = new AxisCamera("169.254.44.56");
-	
+		
 		//session = NIVision.
 	}
 	
@@ -40,4 +41,9 @@ public class Video {
 		}
 		return false;
 	}
+	
+	public Resolution getCameraRes() {
+		return Camera.getResolution();
+	}
+	
 }
