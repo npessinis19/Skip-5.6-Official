@@ -32,8 +32,8 @@ public class GRIP {
 	private static final double Target_Height_ft = 1.0; //Feet
 	
 	//Calculated Values
-	double angle_theta;
-	double distance_delta;
+	public double angle_theta;
+	public double distance_delta;
 	
 	final double targetx = 150.1;
 	final double targety = 0.0;

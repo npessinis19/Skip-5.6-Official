@@ -12,7 +12,6 @@ public class TargetGoal extends CommandBase {
 	double angle;
 	
 	public TargetGoal() {
-
 		setTimeout(1);
 	}
 	
