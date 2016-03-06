@@ -72,6 +72,12 @@ public class GRIP {
 		return 0.0;
 	}
 	
+	public double calcAngle1() {
+		double angle;
+		angle = 47 * Math.cos(120 - (double) functionx[0]);
+		SmartDashboard.putNumber("Vision Angle", angle);
+		return angle;;
+	}
 	public double calcAngle() {
 		double angle;
 		return 0.0;
