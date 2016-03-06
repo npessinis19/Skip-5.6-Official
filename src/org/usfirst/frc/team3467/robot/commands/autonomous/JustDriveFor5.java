@@ -2,15 +2,14 @@ package org.usfirst.frc.team3467.robot.commands.autonomous;
 
 import org.usfirst.frc.team3467.robot.commands.CommandBase;
 
-
 /**
  *
  */
 public class JustDriveFor5 extends CommandBase {
 
-    public JustDriveFor5() {
+    public JustDriveFor5(double time) {
         requires(driveBase);
-        setTimeout(5.0);
+        setTimeout(time);
     }
 
     // Called just before this Command runs the first time

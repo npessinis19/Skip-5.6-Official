@@ -9,7 +9,7 @@ public class LightSwitch extends CommandBase {
 	public LightSwitch(boolean onORoff) {
 		requires(light);
 		On = onORoff;
-		this.setTimeout(6);
+		this.setTimeout(10);
 	}
 	
 	protected void initialize() {
