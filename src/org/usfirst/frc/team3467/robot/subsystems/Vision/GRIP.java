@@ -42,7 +42,7 @@ public class GRIP {
 			double[] centerx = table.getNumberArray("centerX", defaultValue);
 			double[] centery = table.getNumberArray("centerY", defaultValue);
 		
-		if  (centerx.length == 0) {
+		if  (centerx.length == 1) {
 				functionx[0] = centerx[0];
 				functiony[0] = centery[0];
 				

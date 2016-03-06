@@ -22,7 +22,7 @@ public class AutoRotateToAngle extends CommandBase {
 	private double m_maxSpeed = 0.3;
 	private double m_degrees = 0.0;
 	
-	private double KP = 5.0;
+	private double KP = 2.0;
 	private double KI = 1.0;
 	private double KD = 1.0;
     	
@@ -42,7 +42,6 @@ public class AutoRotateToAngle extends CommandBase {
     	m_maxSpeed = maxSpeed;
     	m_degrees = degrees;
     	buildController();
-    	setTimeout(2);
 	}
     	
 	public AutoRotateToAngle(double degrees) {
@@ -50,7 +49,6 @@ public class AutoRotateToAngle extends CommandBase {
     	requires(driveBase);
     	m_degrees = degrees;
     	buildController();
-    	setTimeout(2);
 	}
     	
     private void buildController() {
@@ -92,13 +90,14 @@ public class AutoRotateToAngle extends CommandBase {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
+    	SmartDashboard.putNumber("Gyro Angle", ahrs.getGyroAngle());
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
     	double e = m_pid.getError();
 
-    	return ((e >= 0 && e <= TOLERANCE) || isTimedOut() || m_pid.onTarget());
+    	return ((e >= 0 && e <= TOLERANCE) || m_pid.onTarget());
     }
 
     // Called once after isFinished returns true

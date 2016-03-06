@@ -33,6 +33,7 @@ public class Shooter extends PIDSubsystem implements PowerConsumer {
 	
 	// Brownout power level
 	private Brownout.PowerLevel powerlevel = Brownout.PowerLevel.Normal;
+	boolean dontShoot = false;
 	
 	//Catapult Objects
 	private CANTalon m_resetBar;
@@ -40,8 +41,8 @@ public class Shooter extends PIDSubsystem implements PowerConsumer {
 	private AnalogPotentiometer m_resetAngle;
 	
 	//PID Constants
-	private static final double SHOOT_P = 20.0;
-	private static final double SHOOT_I = 0.5;
+	private static final double SHOOT_P = 25.0;
+	private static final double SHOOT_I = 0.0;
 	private static final double SHOOT_D = 0.0;
 	
 	private static final double TOLERANCE = 0.01;
@@ -53,12 +54,12 @@ public class Shooter extends PIDSubsystem implements PowerConsumer {
 	// Reset bar setpoints
 	private double m_clearPoint = 0.69;  // bar is out of the way of catapult
 	private double m_latchPoint = 0.30; // bar is holding catapult so it can be latched
-
+	private double m_deltaPot = 0.40; //Change in pot signal between clear and latch points
 	// The roboRio Preferences
 	Preferences m_prefs = Preferences.getInstance();
 	
 	// If true, reverse solenoid outputs (3 is release, 4 is latch)
-	private boolean m_isCompBot = true;
+	private boolean m_isCompBot = false;
 	
 	// Has the robot been calibrated
 	private boolean m_hasBeenCalibrated = false;
@@ -73,12 +74,15 @@ public class Shooter extends PIDSubsystem implements PowerConsumer {
 		m_resetAngle = new AnalogPotentiometer(new AnalogInput(RobotMap.catapult_potentiometer_port));
 		m_resetBar = new CANTalon(RobotMap.catapult_Talon);
 		
-		if (m_isCompBot) {
+		m_resetBar.enableBrakeMode(true);
+		
+	//	if (m_isCompBot) {
 			m_catLatch = new DoubleSolenoid(RobotMap.catapult_solenoid_latch, RobotMap.catapult_solenoid_release);
-		}
-		else {
-			m_catLatch = new DoubleSolenoid(RobotMap.catapult_solenoid_release, RobotMap.catapult_solenoid_latch);
-		}
+		//}
+	//	else {
+		//	m_catLatch = new DoubleSolenoid(RobotMap.catapult_solenoid_release, RobotMap.catapult_solenoid_latch);
+	//	}
+		//	m_cataLatch = new DoubleSolenoid(RobotMap.catapult_solenoid_latch, ,)
 		
 		// Start with setpoint at the current potentiometer reading 
 		m_resetBarSetpoint = m_resetAngle.get();
@@ -195,21 +199,28 @@ public class Shooter extends PIDSubsystem implements PowerConsumer {
 	public void callbackAlert(Brownout.PowerLevel level) {
 		switch (level) {
 		case Chill:
+								dontShoot = true;
 			break;
 			
 		case Critical:
+								dontShoot = true;
 			break;
 			
 		default:
+							dontShoot = false;
 			break;
 		}
+	}
+	
+	public boolean checkBrownOut() {
+		return dontShoot;
 	}
 	
 	// This is called during RobotInit
 	public void cataCalibrate() {
 		
 		m_clearPoint = m_resetAngle.get();
-		m_latchPoint = m_clearPoint - 0.39;
+		m_latchPoint = m_clearPoint - m_deltaPot;
 		m_hasBeenCalibrated = true;
 	}
 	

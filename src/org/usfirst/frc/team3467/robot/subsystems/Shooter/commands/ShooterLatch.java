@@ -21,6 +21,9 @@ public class ShooterLatch extends CommandBase {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
+    	if (pultaCat.checkBrownOut()) {
+    		end();
+    	}
     }
 
     // Make this return true when this Command no longer needs to run execute()
@@ -31,7 +34,12 @@ public class ShooterLatch extends CommandBase {
     // Called once after isFinished returns true
     protected void end() {
     	pultaCat.cataStop();
-    	System.out.println("Shooter Latched");
+    	if (pultaCat.checkBrownOut()) {
+    		System.out.println("Shooter Brownout");
+    	}
+    	else {
+    		System.out.println("Shooter Latched");
+    	}
     }
 
     // Called when another command which requires one or more of the same

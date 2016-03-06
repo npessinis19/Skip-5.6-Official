@@ -25,7 +25,6 @@ public class TargetGoal extends CommandBase {
 		SmartDashboard.putNumber("Vision: CenterY", y);
 	}
 
-	@Override
 	protected boolean isFinished() {
 		// TODO Auto-generated method stub
 		return false;
