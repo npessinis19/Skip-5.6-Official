@@ -16,23 +16,14 @@ public class TargetGoal extends CommandBase {
 	}
 	
 	protected void initialize() {
-	/*	x = grip.getCenterX();
-		w = grip.getWidth();
-		
-		grip.isOnTarget(grip.calcDistnace(w), grip.calcAngle(x));
-		*/
+		grip.createImage();
 	}
 
 	protected void execute() {
 		x = grip.getCenterX();
 		w = grip.getWidth();
 		
-		grip.isOnTarget(grip.calcDistnace(w), grip.calcAngle(x));
-		
-		SmartDashboard.putNumber("Vision: CenterX", x);
-		SmartDashboard.putNumber("Vision: Width", w);
-		SmartDashboard.putNumber("Vision: Distnace", grip.calcDistnace(w));
-		SmartDashboard.putNumber("Vision: Angle", grip.calcAngle(x));
+		grip.isOnTarget();
 	}
 
 	protected boolean isFinished() {
