@@ -5,7 +5,9 @@ import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.usfirst.frc.team3467.robot.subsystems.Vision.commands.LightSwitch;
+import org.usfirst.frc.team3467.robot.subsystems.Vision.commands.TargetGoal;
 import org.usfirst.frc.team3467.robot.commands.CommandBase;
+import org.usfirst.frc.team3467.robot.commands.autonomous.AutoTarget;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.ArcadeDrive;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.PreciseRotateToAngle;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.ResetDriveEncoders;
@@ -106,6 +108,9 @@ public class OI {
 		new JoystickButton(PrimaryStick, 12)
 		.whenPressed(new ArcadeDrive());
 		
+		new JoystickButton(PrimaryStick, 7)
+		.whenPressed(new AutoTarget());
+		
 	//Intake
 		//Eject Slow
 		new JoystickButton(operator, Gamepad.xButton)
@@ -196,6 +201,7 @@ public class OI {
 		SmartDashboard.putData("Drivebase: Reset Encoders", new ResetDriveEncoders());
 		SmartDashboard.putData("Shooter: Calibrate", new ShooterOneWayCalibrate());
 		SmartDashboard.putData("AHRS: Reset Gryo", new ResetGyro());
+		SmartDashboard.putData("Vision: Target Goal", new TargetGoal());
 	}
 }
 
