@@ -100,10 +100,10 @@ public class OI {
 		
 	//DriveBase
 		//Toggle in and out of precision angle mode
-		new JoystickButton(PrimaryStick, 5)
+		new JoystickButton(PrimaryStick, 11)
 		.whenPressed(new PreciseRotateToAngle());
 		
-		new JoystickButton(PrimaryStick, 6)
+		new JoystickButton(PrimaryStick, 12)
 		.whenPressed(new ArcadeDrive());
 		
 	//Intake
