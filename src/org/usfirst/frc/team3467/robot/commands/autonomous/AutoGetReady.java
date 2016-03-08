@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.command.CommandGroup;
 public class AutoGetReady extends CommandGroup {
 
 	public AutoGetReady() {
-		addSequential(new Roller_Actuate(true));
+		//addSequential(new Roller_Actuate(true));
 		//addSequential(new ShooterPrepare());
 		addSequential(new Bar_actuate(Pnumatic_system.kIn));
 		addSequential(new Finger_actuate(Pnumatic_system.kOut));
