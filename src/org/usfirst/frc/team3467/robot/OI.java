@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.usfirst.frc.team3467.robot.subsystems.Vision.commands.LightSwitch;
 import org.usfirst.frc.team3467.robot.subsystems.Vision.commands.TargetGoal;
+import org.usfirst.frc.team3467.robot.subsystems.Vision.commands.VisionCalibrate;
 import org.usfirst.frc.team3467.robot.commands.CommandBase;
 import org.usfirst.frc.team3467.robot.commands.autonomous.AutoTarget;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.ArcadeDrive;
@@ -138,7 +139,7 @@ public class OI {
 	
 	//Catapult
 		// Halt Reset Bar PID and switch to manual mode
-		new JoystickButton(operator, Gamepad.leftStickPress)
+		new JoystickButton(operator, Gamepad.leftTrigger_Axis)
 			.whileHeld(new ShooterReset());
 		
 		//Reload Catapult
@@ -202,6 +203,7 @@ public class OI {
 		SmartDashboard.putData("Shooter: Calibrate", new ShooterOneWayCalibrate());
 		SmartDashboard.putData("AHRS: Reset Gryo", new ResetGyro());
 		SmartDashboard.putData("Vision: Target Goal", new TargetGoal());
+		SmartDashboard.putData("Vision: Calibrate", new VisionCalibrate());
 	}
 }
 
