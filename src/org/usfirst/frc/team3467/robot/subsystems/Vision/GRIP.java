@@ -35,8 +35,8 @@ public class GRIP {
 	
 	private static final double targetx = 150.1;
 	private static final double targety = 0.0;
-	private static final double target_distance = 0.0;
-	private static final double target_angle = 0.0;
+	private static double target_distance = 0.0;
+	private static double target_angle = 0.0;
 	
 	//Tolerance values
 	private static final double TOLERANCE_distance = 5.0;;
@@ -80,6 +80,22 @@ public class GRIP {
 	
 	public double getWidth() {
 		return Width;
+	}
+	
+	public double getAngle_theta() {
+		return angle_theta;
+	}
+	
+	public double getDistance_delta() {
+		return distance_delta;
+	}
+	
+	public void setTarget_distnce(double distance) {
+		target_distance = distance;
+	}
+	
+	public void setTarget_angle(double angle) {
+		target_angle = angle;
 	}
 	
 	public boolean isOnPixel() {

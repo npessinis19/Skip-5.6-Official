@@ -1,44 +1,43 @@
 package org.usfirst.frc.team3467.robot.subsystems.Vision.commands;
 
 import org.usfirst.frc.team3467.robot.commands.CommandBase;
-import org.usfirst.frc.team3467.robot.subsystems.Vision.GRIP;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class TargetGoal extends CommandBase {
+public class VisionCalibrate extends CommandBase {
 
-	double x;
-	double w;
-	double angle;
-	
-	public TargetGoal() {
-		setTimeout(1);
+	public VisionCalibrate() {
+		setTimeout(0.5);
 	}
 	
 	protected void initialize() {
 		grip.createImage();
+		grip.setTarget_angle(grip.getAngle_theta());
+		grip.setTarget_distnce(grip.getDistance_delta());
 	}
-
+	
 	protected void execute() {
-		x = grip.getCenterX();
-		w = grip.getWidth();
-		
 		grip.isOnTarget();
-		
 		SmartDashboard.putNumber("Target Distance", grip.changeinDistance);
 		SmartDashboard.putNumber("Target Angle", grip.changeinAngle);
 	}
 
+	@Override
 	protected boolean isFinished() {
-		return isTimedOut();
+		// TODO Auto-generated method stub
+		return false;
 	}
 
+	@Override
 	protected void end() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
 	protected void interrupted() {
-		end();
+		// TODO Auto-generated method stub
+		
 	}
 
 }
