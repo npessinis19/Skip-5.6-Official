@@ -20,7 +20,6 @@ public class Pnumatic_system extends Subsystem {
 	//Objects in Pnumatic_system
 	public static DoubleSolenoid barSolenoid;
 	public static DoubleSolenoid fingerSolenoid;
-	public static Compressor scorpioncompressor;
 	private static Pnumatic_system instance; 
 	
 	//Variables in Pnumatic_system
@@ -40,9 +39,6 @@ public class Pnumatic_system extends Subsystem {
 											RobotMap.utilitybar_solenoid_retract);
 		fingerSolenoid = new DoubleSolenoid(RobotMap.utilityfinger_solenoid_out, 
 											RobotMap.utilityfinger_solenoid_in);
-		
-		scorpioncompressor = new Compressor();
-		scorpioncompressor.start();
 	}
 	
 	//Use Class Constants
@@ -60,26 +56,6 @@ public class Pnumatic_system extends Subsystem {
 	
 	public Value getFingerState() {
 		return fingerSolenoid.get();
-	}
-	
-	//Turns compressor on or off based on a boolean
-	public void setCompressorEnabled() {
-		scorpioncompressor.start();
-	}
-	
-	//Gets value of compressor (Is it on?)
-	public boolean getcompressor(){
-		return scorpioncompressor.enabled();
-	}
-	
-	public boolean getpressureSwitch(){
-		CompressorSwitch = scorpioncompressor.getPressureSwitchValue();
-		return CompressorSwitch;
-	}
-	
-	public float getcurrent() {
-		CompressorCurrent = scorpioncompressor.getCompressorCurrent();
-		return CompressorCurrent;
 	}
 
 	protected void initDefaultCommand() {
