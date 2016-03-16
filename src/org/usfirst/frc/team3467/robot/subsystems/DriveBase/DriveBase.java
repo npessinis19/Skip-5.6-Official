@@ -91,7 +91,6 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 		t_drive.setMaxOutput(1.0);
 		//t_drive.setInvertedMotor(MotorType.kFrontLeft, false);
 		//t_drive.setInvertedMotor(MotorType.kFrontRight, false);
-		
 	}
 	
 	//Called for a PowerLevel update (See Brownout)
@@ -148,6 +147,26 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 		}
 	}
 
+	public void setSlaveMode(boolean Emancipate) {
+		if (Emancipate == true) {
+			leftTalon2.changeControlMode(TalonControlMode.PercentVbus);
+			leftTalon3.changeControlMode(TalonControlMode.PercentVbus);
+			rightTalon2.changeControlMode(TalonControlMode.PercentVbus);
+			rightTalon3.changeControlMode(TalonControlMode.PercentVbus);
+		}
+		else {
+			leftTalon2.changeControlMode(TalonControlMode.Follower);
+			leftTalon3.changeControlMode(TalonControlMode.Follower);
+			rightTalon2.changeControlMode(TalonControlMode.Follower);
+			rightTalon3.changeControlMode(TalonControlMode.Follower);
+		
+			leftTalon2.set(RobotMap.drivebase_LeftTalon);
+			leftTalon3.set(RobotMap.drivebase_LeftTalon);
+			rightTalon2.set(RobotMap.drivebase_RightTalon);
+			rightTalon3.set(RobotMap.drivebase_RightTalon);
+		}
+	}
+	
 	// pass-thru to RobotDrive drive() method (used in autonomous)
 	public void drive(double outputMagnitude, double curve) {
 
@@ -173,6 +192,9 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 	public void setTalonBrakes(boolean setBrake) {
 		leftTalon.enableBrakeMode(setBrake);
 		rightTalon.enableBrakeMode(setBrake);
+		leftTalon2.enableBrakeMode(setBrake);
+		rightTalon2.enableBrakeMode(setBrake);
+		leftTalon3.enableBrakeMode(setBrake);
+		rightTalon3.enableBrakeMode(setBrake);
 	}
-	
 }
