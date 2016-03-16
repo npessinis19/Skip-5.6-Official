@@ -45,17 +45,24 @@ public class GRIP {
 	//Image Matricies and Values
 	private double[] defaultValue = new double[0];
 	
-	private double Centerx;
-	private double Centery;
-	private double Height;
-	private double Width;
+	private double Centerx = 0.0;;
+	private double Centery = 0.0;
+	private double Height = 0.0;
+	private double Width = 0.0;
 	
-	public void createImage () {
+	public GRIP() {
+		table = NetworkTable.getTable("GRIP/myContoursReport");
+	}
+	
+	public boolean createImage () {
 		
 			double[] centerx = table.getNumberArray("centerX", defaultValue);
 			double[] centery = table.getNumberArray("centerY", defaultValue);
 			double[] width = table.getNumberArray("width", defaultValue);
 			double[] height = table.getNumberArray("height", defaultValue);
+			
+			System.out.println("CenterX" + centerx[0]);
+			SmartDashboard.putNumber("CenterXX", centerx[0]);
 			
 			if (centerx.length == 1) {
 				
@@ -63,6 +70,11 @@ public class GRIP {
 				Centery = centery[0];
 				Width = width[0];
 				Height = height[0];
+				
+				return true;
+			}
+			else {
+				return false;
 			}
 		}
 	
@@ -109,6 +121,9 @@ public class GRIP {
 	}
 	
 	public boolean isOnTarget() {
+		
+		imageOnTarget = false;
+		
 		//Calculates The Distance From the Target
 		distance_delta = (Target_Length_ft * M1011_FOVx_px)/(2 * Width * Math.tan(angle_theta));
 		

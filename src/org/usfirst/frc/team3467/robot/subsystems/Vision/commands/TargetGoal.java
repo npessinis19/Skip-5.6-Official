@@ -7,36 +7,34 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class TargetGoal extends CommandBase {
 
-	double x;
-	double w;
-	double angle;
+	boolean onTarget;
 	
 	public TargetGoal() {
 		setTimeout(1);
 	}
 	
 	protected void initialize() {
-		grip.createImage();
 	}
 
 	protected void execute() {
-		x = grip.getCenterX();
-		w = grip.getWidth();
 		
-		grip.isOnTarget();
+		if (!grip.createImage()) {
+			return;
+		}
+		
+		onTarget = grip.isOnTarget();
 		
 		SmartDashboard.putNumber("Target Distance", grip.changeinDistance);
 		SmartDashboard.putNumber("Target Angle", grip.changeinAngle);
 	}
 
 	protected boolean isFinished() {
-		return isTimedOut();
+		return isTimedOut() || onTarget;
 	}
 
 	protected void end() {
 	}
 
-	@Override
 	protected void interrupted() {
 		end();
 	}
