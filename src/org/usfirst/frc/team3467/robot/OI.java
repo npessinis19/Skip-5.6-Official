@@ -204,6 +204,7 @@ public class OI {
 		SmartDashboard.putData("AHRS: Reset Gryo", new ResetGyro());
 		SmartDashboard.putData("Vision: Target Goal", new TargetGoal());
 		SmartDashboard.putData("Vision: Calibrate", new VisionCalibrate());
+		SmartDashboard.putData("Move on Target", new AutoTarget());
 	}
 }
 
