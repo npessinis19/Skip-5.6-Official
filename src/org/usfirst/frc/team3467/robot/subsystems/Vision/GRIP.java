@@ -7,6 +7,7 @@ public class GRIP {
 	
 	public NetworkTable table;
 
+	
 //Vision Processing Constants
 	//Is the goal on target
 	public boolean imageOnTarget = false;
@@ -35,8 +36,8 @@ public class GRIP {
 	
 	private static final double targetx = 150.1;
 	private static final double targety = 0.0;
-	private static final double target_distance = 0.0;
-	private static final double target_angle = 0.0;
+	private static double target_distance = 0.0;
+	private static double target_angle = 0.0;
 	
 	//Tolerance values
 	private static final double TOLERANCE_distance = 5.0;;
@@ -45,17 +46,22 @@ public class GRIP {
 	//Image Matricies and Values
 	private double[] defaultValue = new double[0];
 	
-	private double Centerx;
-	private double Centery;
-	private double Height;
-	private double Width;
+	private double Centerx = 0.0;;
+	private double Centery = 0.0;
+	private double Height = 0.0;
+	private double Width = 0.0;
 	
-	public void createImage () {
-		
+	public GRIP() {
+		table = NetworkTable.getTable("GRIP/myContoursReport");
+	}
+	
+	public boolean createImage () {
 			double[] centerx = table.getNumberArray("centerX", defaultValue);
 			double[] centery = table.getNumberArray("centerY", defaultValue);
 			double[] width = table.getNumberArray("width", defaultValue);
 			double[] height = table.getNumberArray("height", defaultValue);
+			
+			SmartDashboard.putNumber("Vision: Contours", centerx.length);
 			
 			if (centerx.length == 1) {
 				
@@ -63,23 +69,45 @@ public class GRIP {
 				Centery = centery[0];
 				Width = width[0];
 				Height = height[0];
+				
+				return true;
+			}
+			else {
+				return false;
 			}
 		}
 	
+	//Get the specific values from the network table
 	public double getCenterX() {
-		return Centerx;
+		return this.Centerx;
 	}
 	
 	public double getCenterY() {
-		return Centery;
+		return this.Centery;
 	}
 	
 	public double getHeight() {
-		return Height;
+		return this.Height;
 	}
 	
 	public double getWidth() {
-		return Width;
+		return this.Width;
+	}
+	
+	public double getAngle_theta() {
+		return angle_theta;
+	}
+	
+	public double getDistance_delta() {
+		return distance_delta;
+	}
+	
+	public void setTarget_distnce(double distance) {
+		target_distance = distance;
+	}
+	
+	public void setTarget_angle(double angle) {
+		target_angle = angle;
 	}
 	
 	public boolean isOnPixel() {
@@ -93,6 +121,9 @@ public class GRIP {
 	}
 	
 	public boolean isOnTarget() {
+		
+		imageOnTarget = false;
+		
 		//Calculates The Distance From the Target
 		distance_delta = (Target_Length_ft * M1011_FOVx_px)/(2 * Width * Math.tan(angle_theta));
 		

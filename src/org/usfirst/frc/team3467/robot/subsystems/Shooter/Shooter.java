@@ -41,8 +41,8 @@ public class Shooter extends PIDSubsystem implements PowerConsumer {
 	private AnalogPotentiometer m_resetAngle;
 	
 	//PID Constants
-	private static final double SHOOT_P = 25.0;
-	private static final double SHOOT_I = 0.0;
+	private static final double SHOOT_P = 20.0;
+	private static final double SHOOT_I = 0.5;
 	private static final double SHOOT_D = 0.0;
 	
 	private static final double TOLERANCE = 0.01;
