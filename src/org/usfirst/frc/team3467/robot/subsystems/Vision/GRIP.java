@@ -7,6 +7,7 @@ public class GRIP {
 	
 	public NetworkTable table;
 
+	
 //Vision Processing Constants
 	//Is the goal on target
 	public boolean imageOnTarget = false;
@@ -55,14 +56,12 @@ public class GRIP {
 	}
 	
 	public boolean createImage () {
-		
 			double[] centerx = table.getNumberArray("centerX", defaultValue);
 			double[] centery = table.getNumberArray("centerY", defaultValue);
 			double[] width = table.getNumberArray("width", defaultValue);
 			double[] height = table.getNumberArray("height", defaultValue);
 			
-			System.out.println("CenterX" + centerx[0]);
-			SmartDashboard.putNumber("CenterXX", centerx[0]);
+			SmartDashboard.putNumber("Vision: Contours", centerx.length);
 			
 			if (centerx.length == 1) {
 				
@@ -78,20 +77,21 @@ public class GRIP {
 			}
 		}
 	
+	//Get the specific values from the network table
 	public double getCenterX() {
-		return Centerx;
+		return this.Centerx;
 	}
 	
 	public double getCenterY() {
-		return Centery;
+		return this.Centery;
 	}
 	
 	public double getHeight() {
-		return Height;
+		return this.Height;
 	}
 	
 	public double getWidth() {
-		return Width;
+		return this.Width;
 	}
 	
 	public double getAngle_theta() {
