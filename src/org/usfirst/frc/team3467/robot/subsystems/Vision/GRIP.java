@@ -132,13 +132,12 @@ public class GRIP {
 		
 		//Calculate the distances and angles needed to move
 		changeinDistance = distance_delta - target_distance;
-		 changeinAngle = target_angle - angle_theta;
+		changeinAngle = angle_theta - target_angle;
 		
 		//Prints Values to SmartDashBoard
 		SmartDashboard.putNumber("Vision: Distance", distance_delta);
 		SmartDashboard.putNumber("Vision: Angle", angle_theta);
-		
-		 
+
 		if ((Math.abs(changeinDistance) >= 0 && Math.abs(changeinDistance) <= TOLERANCE_distance) &&
 				Math.abs(changeinAngle) >= 0 && Math.abs(changeinAngle) <= TOLERANCE_angle) {
 			imageOnTarget = true;
