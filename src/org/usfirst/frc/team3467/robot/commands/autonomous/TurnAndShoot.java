@@ -12,13 +12,15 @@ import org.usfirst.frc.team3467.robot.subsystems.utilitybar.commands.Bar_actuate
 
 public class TurnAndShoot extends CommandGroup {
 	
-	//Position of defense, relative to the dirver Station (1 = Left), (5 = Right)
+	//Position of defense, relative to the driver Station (1 = Left), (5 = Right)
 	int RobotPosition;
 	boolean complete = false;
 	
+	protected void initialize() {
+	}
+	
 	//Constructor for TurnAndShoot
 	public TurnAndShoot(int Position) {
-		
 		addSequential(new AutoRotateToAngle(60.0, 0.3));
 		System.out.println("Successful AutoRotation");
 		addSequential(new Shoot());
