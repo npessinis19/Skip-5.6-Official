@@ -17,12 +17,12 @@ public class GRIP {
 	
 	//Camera Variables (Axis M1011) Origional Camera
 	private static final double M1011_FOVx_deg = 47.0; //Degrees
-	private static final double M1011_FOVx_px = 240; //Pixels
+	private static final double M1011_FOVx_px = 320; //Pixels
 	private static final double M1011_Height_ft = 0.979; //Feet
 	private static final double M1011_Pitch_deg = 57.0; //Degrees
 	
 	//Camera Variables (Axis M1013) Second Camera 
-	private static final double M1013FOVx = 0.0;
+	private static final double M1013_FOVx_deg = 0.0;
 	
 	//Target Variables
 	private static final double Target_Length_ft = 1.667; //Feet
@@ -128,7 +128,7 @@ public class GRIP {
 		distance_delta = (Target_Length_ft * M1011_FOVx_px)/(2 * Width * Math.tan(angle_theta));
 		
 		//Calculates The Angle of the Target
-		angle_theta = 47 * Math.cos(120 - Centerx);
+		angle_theta = ((Centerx - M1011_FOVx_px)/M1011_FOVx_px) * M1011_FOVx_deg;
 		
 		//Calculate the distances and angles needed to move
 		changeinDistance = distance_delta - target_distance;
