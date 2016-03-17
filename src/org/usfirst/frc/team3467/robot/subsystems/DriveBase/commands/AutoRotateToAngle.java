@@ -82,6 +82,10 @@ public class AutoRotateToAngle extends CommandBase {
 
     // Called just before this Command runs the first time
     protected void initialize() {
+    	//Brake mode on
+		driveBase.setSlaveMode(true);
+		driveBase.setTalonBrakes(true);
+    	
     	// Get everything in a safe starting state.
     	m_pid.reset();
         m_pid.enable();
