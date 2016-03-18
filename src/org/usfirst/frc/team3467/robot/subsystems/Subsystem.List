@@ -4,9 +4,9 @@ Subsystems called by Operator Interface:
 	- DriveBase (PIDSubsystem directed by Gyro)
 		* Drive
 		- CANTalon (left)
-			- Quadrature Encoder [SIM Encoder] (left)
+			- Quadrature Encoder [CIM Encoder] (left)
 		- CANTalon (right)
-			- Quadrature Encoder [SIM Encoder] (Right)
+			- Quadrature Encoder [CIM Encoder] (Right)
 
     - Intake
         * Ball Control
@@ -30,9 +30,9 @@ Utility/Sensor Subsystems:
 	
 	- Gyro
 		* Gyroscope
-		- MXP IMU (or ADIS16448)
+		- MXP IMU
 	
-	-Brownout
+	- Brownout
         * Power Management
         - Registration interface for Subsystems
         - Callback vector for subsystem notification
@@ -44,8 +44,12 @@ Utility/Sensor Subsystems:
     
     - Compressor
         * Intelligent compressor control
-        -Use inline pressure sensor to make decisions about how long to run, etc.
+        - Provides a way to turn off compressor during critical moments (e.g. shooter reset)
+        - Use inline pressure sensor to make decisions about how long to run, etc.
         
-    - LEDs
-        * On Robot Signals / Feedback for driver
-	
+Brownout Management Strategies:
+
+    - Drivebase: Throttle back max speed when battery starts to get low
+    - Shooter: Turn off compressor when resetting; don't attempt to reset when power is very low
+    - Intake: ???
+    - 
