@@ -61,21 +61,15 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 		
 		//Set default control Modes for CANTalons
 		leftTalon.changeControlMode(TalonControlMode.PercentVbus);
-		leftTalon2.changeControlMode(TalonControlMode.Follower);
-		leftTalon3.changeControlMode(TalonControlMode.Follower);
 		rightTalon.changeControlMode(TalonControlMode.PercentVbus);
-		rightTalon2.changeControlMode(TalonControlMode.Follower);
-		rightTalon3.changeControlMode(TalonControlMode.Follower);
 		
-		leftTalon2.set(RobotMap.drivebase_LeftTalon);
-		leftTalon3.set(RobotMap.drivebase_LeftTalon);
-		rightTalon2.set(RobotMap.drivebase_RightTalon);
-		rightTalon3.set(RobotMap.drivebase_RightTalon);
-		
-		t_controlMode = CANTalon.TalonControlMode.PercentVbus;
+		//Slave extra talons on each side
+		setSlaveMode(true);
 		
 		// Turn off Brake mode
 		setTalonBrakes(false);
+		
+		t_controlMode = CANTalon.TalonControlMode.PercentVbus;
 		
 		//Set SIM encoders as feedback devices
 		leftTalon.setFeedbackDevice(CANTalon.FeedbackDevice.QuadEncoder);
@@ -89,8 +83,7 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 		t_drive.setExpiration(1.0);
 		t_drive.setSensitivity(0.5);
 		t_drive.setMaxOutput(1.0);
-		//t_drive.setInvertedMotor(MotorType.kFrontLeft, false);
-		//t_drive.setInvertedMotor(MotorType.kFrontRight, false);
+
 	}
 	
 	//Called for a PowerLevel update (See Brownout)
@@ -103,12 +96,18 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 		t_useTank = usetank;
 	}
 		
-	//Set up for Tank Drive
-	public void initTank () {
+	//Set up for normal Drive mode
+	public void initDrive () {
 		if (t_controlMode != TalonControlMode.PercentVbus); {
 				leftTalon.changeControlMode(TalonControlMode.PercentVbus);
 				rightTalon.changeControlMode(TalonControlMode.PercentVbus);
 				
+				// Extra CIMs are slaves
+				setSlaveMode(true);
+				
+				// Brakes are off
+				setTalonBrakes(false);
+
 				t_controlMode = TalonControlMode.PercentVbus;
 		}
 		// Don't need to invert because the sticks give negative values
@@ -116,6 +115,7 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 		leftTalon.setInverted(false);
 		rightTalon.setInverted(false);
 	}
+	
 	
 	//Use Standard Tank Drive method
 	public void driveTank (double LeftTalon, double RightTalon, boolean squared) {
@@ -125,21 +125,7 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 		}
 	}
 
-	//Initiate Arcade Drive with PercentVBus
-	public void initArcade() {
-			//Check if Control mode is not PercentVbus
-		if (t_controlMode != TalonControlMode.PercentVbus) {
-			leftTalon.changeControlMode(TalonControlMode.PercentVbus);
-			rightTalon.changeControlMode(TalonControlMode.PercentVbus);
-		
-			t_controlMode = TalonControlMode.PercentVbus;
-		}
-		// Don't need to invert because the sticks give negative values
-		// in the forward direction
-		leftTalon.setInverted(false);
-		rightTalon.setInverted(false);
-	}
-	
+	// Use single-stick Arcade Drive method
 	public void driveArcade(double move, double rotate, boolean square) {
 		t_drive.arcadeDrive(move, rotate, square);
 		if (true) {
@@ -147,12 +133,23 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 		}
 	}
 
-	public void setSlaveMode(boolean Emancipate) {
-		if (Emancipate == true) {
+	// pass-thru to RobotDrive drive() method (used in autonomous)
+	public void drive(double outputMagnitude, double curve) {
+
+		t_drive.drive(outputMagnitude, curve);
+	}
+
+	public void setSlaveMode(boolean enslave) {
+		if (enslave == false) {
 			leftTalon2.changeControlMode(TalonControlMode.PercentVbus);
 			leftTalon3.changeControlMode(TalonControlMode.PercentVbus);
 			rightTalon2.changeControlMode(TalonControlMode.PercentVbus);
 			rightTalon3.changeControlMode(TalonControlMode.PercentVbus);
+
+			leftTalon2.set(0.0);
+			leftTalon3.set(0.0);
+			rightTalon2.set(0.0);
+			rightTalon3.set(0.0);
 		}
 		else {
 			leftTalon2.changeControlMode(TalonControlMode.Follower);
@@ -167,12 +164,6 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 		}
 	}
 	
-	// pass-thru to RobotDrive drive() method (used in autonomous)
-	public void drive(double outputMagnitude, double curve) {
-
-		t_drive.drive(outputMagnitude, curve);
-	}
-
 	// return the distance driven (average of left and right encoders).
 	public double getDistance() {
 		return ((leftTalon.getPosition()) + (rightTalon.getPosition()))/2;
