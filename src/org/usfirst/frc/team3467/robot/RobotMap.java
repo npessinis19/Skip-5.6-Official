@@ -8,8 +8,10 @@ package org.usfirst.frc.team3467.robot;
  */
 public class RobotMap {
 	
-	//Important Drivebase Values
+	// Pneumatics
+		public static final int pneumatics_sensor_port = 1;
 	
+	//Important Drivebase Values
 		//CANTalon Ports
 		public static final int drivebase_LeftTalon = 1;
 		public static final int drivebase_RightTalon = 2;
@@ -37,7 +39,7 @@ public class RobotMap {
 	//Important Utility Bar Variables
 		public static final int utilitybar_solenoid_deploy = 5;
 		public static final int utilitybar_solenoid_retract = 2;
-		public static final int utilitybar_compressor = 0;
+
 		
 	//Important Utility Finger Variables
 		public static final int utilityfinger_solenoid_in = 7;

@@ -12,7 +12,7 @@ public class TankDrive extends CommandBase {
 	}
 	
 	protected void initialize() {
-		driveBase.initTank();
+		driveBase.initDrive();
 	}
 
 	protected void execute() {

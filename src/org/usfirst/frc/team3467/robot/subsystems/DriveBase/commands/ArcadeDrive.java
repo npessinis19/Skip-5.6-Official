@@ -12,7 +12,7 @@ public class ArcadeDrive extends CommandBase {
 	}
 	
 	protected void initialize() {
-		driveBase.initArcade();
+		driveBase.initDrive();
 	}
 
 	@Override

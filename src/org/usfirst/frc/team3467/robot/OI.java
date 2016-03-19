@@ -18,7 +18,7 @@ import org.usfirst.frc.team3467.robot.subsystems.Intake.commands.IntakeDrive;
 import org.usfirst.frc.team3467.robot.subsystems.Intake.commands.Roller_Actuate;
 import org.usfirst.frc.team3467.robot.subsystems.NavX_MXP.command.ResetGyro;
 import org.usfirst.frc.team3467.robot.subsystems.Shooter.commands.*;
-import org.usfirst.frc.team3467.robot.subsystems.utilitybar.Pnumatic_system;
+import org.usfirst.frc.team3467.robot.subsystems.utilitybar.UtilityBar;
 import org.usfirst.frc.team3467.robot.subsystems.utilitybar.commands.*;
 import org.usfirst.frc.team3467.robot.control.Gamepad;
 import org.usfirst.frc.team3467.robot.triggers.DPadDown;
@@ -184,19 +184,19 @@ public class OI {
 	//Utility Bar/Finger
 			//Extend Using the Right Joystick Trigger
 		new JoystickButton(PrimaryStick, 1)
-			.whenPressed(new Bar_actuate(Pnumatic_system.kOut));
+			.whenPressed(new Bar_actuate(UtilityBar.kOut));
 		
 			//Retract Using the Right Shoulder Button
 		new JoystickButton(PrimaryStick, 2)
-			.whenPressed(new Bar_actuate(Pnumatic_system.kIn));
+			.whenPressed(new Bar_actuate(UtilityBar.kIn));
 		
 			//Extend Finger using Top left button
 		new JoystickButton(PrimaryStick, 3)
-			.whenPressed(new Finger_actuate(Pnumatic_system.kOut));
+			.whenPressed(new Finger_actuate(UtilityBar.kOut));
 		
 			//Retract Finger using Top Right Button
 		new JoystickButton(PrimaryStick, 4)
-			.whenActive(new Finger_actuate(Pnumatic_system.kIn));
+			.whenActive(new Finger_actuate(UtilityBar.kIn));
 		
 		// SmartDashboard Buttons
 		SmartDashboard.putData("Drivebase: Reset Encoders", new ResetDriveEncoders());

@@ -1,50 +1,85 @@
 package org.usfirst.frc.team3467.robot.subsystems.compressor;
 
+import org.usfirst.frc.team3467.robot.RobotMap;
 import org.usfirst.frc.team3467.robot.subsystems.Brownout.Brownout;
-import org.usfirst.frc.team3467.robot.subsystems.Brownout.Brownout.PowerLevel;
 import org.usfirst.frc.team3467.robot.subsystems.Brownout.PowerConsumer;
+import org.usfirst.frc.team3467.robot.subsystems.compressor.commands.Compressor_Update;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Pneumatics extends Subsystem implements PowerConsumer {
 
-	public Compressor scorpionCompressor;
-	public AnalogInput pressureSwitch;
+	private Compressor scorpionCompressor;
+	private AnalogInput pressureSensor;
+	private boolean compressorActive = false;
 	
-	private Pneumatics instance;
-	
-	public Pneumatics getInstance() {
-		return instance;
+	// Pneumatics is a singleton
+	private static Pneumatics instance = new Pneumatics();
+
+	public static Pneumatics getInstance() {
+		return Pneumatics.instance;
 	}
-	
-	public Pneumatics() {
+
+	/*
+	 * Pneumatics Class Constructor
+	 *
+	 * The singleton instance is created statically with
+	 * the instance static member variable.
+	 */
+	protected Pneumatics() {
 		instance = this;
 		
 		scorpionCompressor = new Compressor();
-		pressureSwitch = new AnalogInput(0);
+		pressureSensor = new AnalogInput(RobotMap.pneumatics_sensor_port);
 		scorpionCompressor.start();
+		compressorActive = true;
+		
+		Brownout.getInstance().registerCallback(this);
 	}
 	
 	public double getPressure() {
-		return pressureSwitch.getVoltage();
+		return pressureSensor.getVoltage();
 	}
 	
-	protected void initDefaultCommand() {
+	public void compressorStop() {
+		scorpionCompressor.stop();
+		compressorActive = false;
 	}
-
+	
+	public void compressorStart() {
+		scorpionCompressor.start();
+		compressorActive = true;
+	}
+	
 	public void callbackAlert(Brownout.PowerLevel level) {
 		switch (level) {
-		case Normal:
-								scorpionCompressor.start();
-			break;
 		case Critical:
-								scorpionCompressor.stop();
+			if (compressorActive) {
+				scorpionCompressor.stop();
+				compressorActive = false;
+			}
 			break;
+		
+		case Normal:
 		default:
-								scorpionCompressor.start();
+			if (!compressorActive) {
+				scorpionCompressor.start();
+				compressorActive = true;
+			}
 			break;
 		}
+	}
+
+	// Set up a default command to regularly call reportPressure()
+	protected void initDefaultCommand() {
+		this.setDefaultCommand(new Compressor_Update());
+	}
+
+	public void reportPressure() {
+		SmartDashboard.putBoolean("Compressor Active?", compressorActive);
+		SmartDashboard.putNumber("Pressure (voltage)", pressureSensor.getVoltage());		
 	}
 }

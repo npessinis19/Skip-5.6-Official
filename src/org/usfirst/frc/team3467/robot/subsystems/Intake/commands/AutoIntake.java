@@ -1,6 +1,7 @@
 package org.usfirst.frc.team3467.robot.subsystems.Intake.commands;
 
 import org.usfirst.frc.team3467.robot.commands.CommandBase;
+import org.usfirst.frc.team3467.robot.subsystems.Intake.Intake;
 
 public class AutoIntake extends CommandBase {
 
@@ -17,10 +18,10 @@ public class AutoIntake extends CommandBase {
 	
 	protected void execute() {
 		if (autoIntakeIn) {
-			intake.driveManual(intake.kIntakeFast);
+			intake.driveManual(Intake.kIntakeFast);
 		}
 		else {
-			intake.driveManual((intake.kEjectFast));
+			intake.driveManual((Intake.kEjectFast));
 		}
 	}
 

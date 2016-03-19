@@ -7,7 +7,7 @@ import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.DriveStraigh
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.AutoRotateToAngle;
 import org.usfirst.frc.team3467.robot.subsystems.Shooter.commands.Shoot;
 import org.usfirst.frc.team3467.robot.subsystems.Shooter.commands.ShooterPrepare;
-import org.usfirst.frc.team3467.robot.subsystems.utilitybar.Pnumatic_system;
+import org.usfirst.frc.team3467.robot.subsystems.utilitybar.UtilityBar;
 import org.usfirst.frc.team3467.robot.subsystems.utilitybar.commands.Bar_actuate;
 
 public class TurnAndShoot extends CommandGroup {
@@ -21,14 +21,15 @@ public class TurnAndShoot extends CommandGroup {
 	
 	//Constructor for TurnAndShoot
 	public TurnAndShoot(int Position) {
+		
 		addSequential(new AutoRotateToAngle(60.0, 0.3));
 		System.out.println("Successful AutoRotation");
 		addSequential(new Shoot());
 		addSequential(new ShooterPrepare());
 		complete = true;
 		/*
-		if (CommandBase.utilitybar.getBarState() == Pnumatic_system.kIn) {
-			addSequential(new Bar_actuate(Pnumatic_system.kOut));
+		if (CommandBase.utilitybar.getBarState() == UtilityBar.kIn) {
+			addSequential(new Bar_actuate(UtilityBar.kOut));
 		}
 		
 		RobotPosition = Position;
