@@ -10,7 +10,7 @@ public class TargetGoal extends CommandBase {
 	boolean onTarget;
 	
 	public TargetGoal() {
-		setTimeout(1);
+		setTimeout(2);
 	}
 	
 	protected void initialize() {
