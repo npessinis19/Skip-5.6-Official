@@ -10,7 +10,7 @@ public class TargetGoal extends CommandBase {
 	boolean onTarget;
 	
 	public TargetGoal() {
-		setTimeout(2);
+		setTimeout(4);
 	}
 	
 	protected void initialize() {
@@ -24,8 +24,8 @@ public class TargetGoal extends CommandBase {
 		
 		onTarget = grip.isOnTarget();
 		
-		SmartDashboard.putNumber("Target Distance", grip.changeinDistance);
-		SmartDashboard.putNumber("Target Angle", grip.changeinAngle);
+	SmartDashboard.putNumber("Target Distance", grip.getChangeinAngle());
+	SmartDashboard.putNumber("Target Angle", grip.getChangeinDistance());
 	}
 
 	protected boolean isFinished() {

@@ -37,6 +37,7 @@ public class ShooterClear extends CommandBase {
     	pultaCat.cataStop();
     	//pultaCat.cataCalibrate();
     	System.out.println("Shooter Cleared");
+    	System.out.println("Stuff");
     }
 
     // Called when another command which requires one or more of the same
