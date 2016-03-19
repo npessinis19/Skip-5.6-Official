@@ -25,6 +25,8 @@ public class ShooterLatch extends CommandBase {
     protected void execute() {
     	if (pultaCat.checkBrownOut()) {
     		end();
+    		SmartDashboard.putBoolean("Limit Switch", pultaCat.checkLatchLimit());
+    		System.out.println("Shooter Browned Out");
     	}
     }
 
@@ -41,6 +43,7 @@ public class ShooterLatch extends CommandBase {
     	}
     	else {
     		System.out.println("Shooter Latched");
+    		System.out.println("More stuff");
     	}
     }
 
