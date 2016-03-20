@@ -70,7 +70,9 @@ public abstract class CommandBase extends Command {
 		grip = new GRIP();
 		oi = new OI();
 
+		//Initial Commands
 		oi.BindCommands();
+		
 	}
 	
 	public CommandBase() {
