@@ -25,8 +25,8 @@ public class VisionCalibrate extends CommandBase {
 		grip.setTarget_angle(grip.getAngle_theta());
 		grip.setTarget_distnce(grip.getDistance_delta());
 		
-		SmartDashboard.putNumber("Target Distance", grip.changeinDistance);
-		SmartDashboard.putNumber("Target Angle", grip.changeinAngle);
+		SmartDashboard.putNumber("Target Distance", grip.getChangeinDistance());
+		SmartDashboard.putNumber("Target Angle", grip.getChangeinAngle());
 	}
 
 	@Override

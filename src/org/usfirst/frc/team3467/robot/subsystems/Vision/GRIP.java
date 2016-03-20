@@ -29,19 +29,19 @@ public class GRIP {
 	private static final double Target_Height_ft = 1.0; //Feet
 	
 	//Calculated Values
-	public double angle_theta = 0.0;
-	public double distance_delta = 0.0;
-	public double changeinDistance = 0.0;
-	public double changeinAngle = 0.0;
+	private double angle_theta = 0.0;
+	private double distance_delta = 0.0;
+	private double changeinDistance = 0.0;
+	private double changeinAngle = 0.0;
 	
 	private static final double targetx = 150.1;
 	private static final double targety = 0.0;
-	private static double target_distance = 0.0;
+	private static double target_distance = 13.0;
 	private static double target_angle = 0.0;
 	
 	//Tolerance values
 	private static final double TOLERANCE_distance = 5.0;;
-	private static final double TOLERANCE_angle = 0.0;
+	private static final double TOLERANCE_angle = 0.5;
 	
 	//Image Matricies and Values
 	private double[] defaultValue = new double[0];
@@ -69,6 +69,9 @@ public class GRIP {
 				Centery = centery[0];
 				Width = width[0];
 				Height = height[0];
+				
+				SmartDashboard.putNumber("Centerx", Centerx);
+				SmartDashboard.putNumber("Width", Width);
 				
 				return true;
 			}
@@ -102,6 +105,14 @@ public class GRIP {
 		return distance_delta;
 	}
 	
+	public double getChangeinAngle() {
+		return changeinAngle;
+	}
+	
+	public double getChangeinDistance() {
+		return changeinDistance;
+	}
+	
 	public void setTarget_distnce(double distance) {
 		target_distance = distance;
 	}
@@ -128,15 +139,16 @@ public class GRIP {
 		distance_delta = (Target_Length_ft * M1011_FOVx_px)/(2 * Width * Math.tan(angle_theta));
 		
 		//Calculates The Angle of the Target
-		angle_theta = ((Centerx - M1011_FOVx_px)/M1011_FOVx_px) * M1011_FOVx_deg;
+		angle_theta = ((Centerx - M1011_FOVx_px/2)/(M1011_FOVx_px/2)) * M1011_FOVx_deg;
 		
 		//Calculate the distances and angles needed to move
 		changeinDistance = distance_delta - target_distance;
-		changeinAngle = angle_theta - target_angle;
+		changeinAngle = target_angle - angle_theta;
 		
 		//Prints Values to SmartDashBoard
 		SmartDashboard.putNumber("Vision: Distance", distance_delta);
 		SmartDashboard.putNumber("Vision: Angle", angle_theta);
+		System.out.println("Vision: Change in Angle" + changeinAngle);
 
 		if ((Math.abs(changeinDistance) >= 0 && Math.abs(changeinDistance) <= TOLERANCE_distance) &&
 				Math.abs(changeinAngle) >= 0 && Math.abs(changeinAngle) <= TOLERANCE_angle) {

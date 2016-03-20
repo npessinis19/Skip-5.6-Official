@@ -188,6 +188,8 @@ public class Shooter extends PIDSubsystem implements PowerConsumer {
 	public void callbackAlert(Brownout.PowerLevel level) {
 		switch (level) {
 		case Chill:
+			dontShoot = false;
+			break;
 		case Critical:
 			dontShoot = true;
 			break;
@@ -209,6 +211,7 @@ public class Shooter extends PIDSubsystem implements PowerConsumer {
 		m_latchPoint = m_clearPoint - m_deltaPot;
 		m_hasBeenCalibrated = true;
 	}
+	
 	
 	// Has the robot been calibrated before?
 	public boolean hasBeenCalibrated() {
