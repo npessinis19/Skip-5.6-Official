@@ -173,6 +173,8 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 	public void setControlMode(TalonControlMode controlMode) {
 		leftTalon.changeControlMode(controlMode);
 		rightTalon.changeControlMode(controlMode);
+		// Save control mode so we will know if we have to set it back later
+		t_controlMode = controlMode;
 	}
 	
 	// return the distance driven (average of left and right encoders).
