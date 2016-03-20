@@ -13,21 +13,28 @@ public class SuperAutoRotate extends CommandBase {
 
 	private PIDController	GyroPID;;
 	private PIDF_CANTalon  leftpidf_drive;
+	private PIDF_CANTalon rightpidf_drive;
 	
-	//PID Constnat for Position
+	//PID Variables for Position
 	private static final double Posit_P = 0.0;
 	private static final double Posit_I = 0.0;
 	private static final double Posit_D = 0.0;
 	private static final double Posit_TOLERANCE = 0.0;
+	double Position = 0.0;
 	
 	//PID Constants for Angle
 	private static final double Gyro_P = 0.0;
 	private static final double Gyro_I = 0.0;
 	private static final double Gyro_D = 0.0;
+	private static final double Gyro_TOLERANCE = 0.0;
+	double angle;
+	int mode = 0;
 	
-	public SuperAutoRotate() {
+	public SuperAutoRotate(double angle, int mode) {
 		requires(driveBase);
 		buildGyroController();
+		this.angle = angle;
+		this.mode = mode;
 	}
 	
 	public void buildGyroController() {
@@ -51,32 +58,70 @@ public class SuperAutoRotate extends CommandBase {
 		new PIDOutput() {
 				
 				public void pidWrite(double angle) {
-					double position = angle;
+					//Calculates the output of the motor needed to rotate a certain number of degrees
+					Position = angle;
 				}});	
+		
+		GyroPID.setAbsoluteTolerance(Gyro_TOLERANCE);
 	}
 
 	public void buildPositController() {
 		leftpidf_drive = new PIDF_CANTalon("Left Position", driveBase.getLeftTalon(), Posit_TOLERANCE, false, false);
 		leftpidf_drive.setPID(Posit_P, Posit_I, Posit_D);
+		
+		rightpidf_drive = new PIDF_CANTalon("Right Position", driveBase.getRightTalon(), Posit_TOLERANCE, false, false);
+		rightpidf_drive.setPID(Posit_P, Posit_I, Posit_D);
+	}
+	
+	public void startPID() {
+		GyroPID.enable();
+		leftpidf_drive.enable();
+		rightpidf_drive.enable();
+		
+		GyroPID.setSetpoint(angle);
+		switch (mode) {
+		case 1:
+				leftpidf_drive.setSetpoint(Position);
+			break;
+		case 2:
+				rightpidf_drive.setSetpoint(Position);
+				break;
+		default:
+				leftpidf_drive.setSetpoint(Position);
+				rightpidf_drive.setSetpoint(Position);
+			break;
+		}
+	}
+	
+	public void stopPID() {
+		GyroPID.disable();
+		GyroPID.reset();
+		
+		leftpidf_drive.disable();
+		leftpidf_drive.reset();
+		rightpidf_drive.disable();
+		rightpidf_drive.reset();
 	}
 	
 	protected void initialize() {
 		driveBase.setSlaveMode(false);
 		driveBase.setControlMode(TalonControlMode.Position);
+		startPID();
 	}
 
 	protected void execute() {
 	}
 
 	protected boolean isFinished() {
-		return false;
+		double error = GyroPID.getError();
+		return (error >= 0 && error <= Gyro_TOLERANCE) || isTimedOut();
 	}
 
 	protected void end() {
+		stopPID();
 	}
 
 	protected void interrupted() {
-
 	}
 	
 	
