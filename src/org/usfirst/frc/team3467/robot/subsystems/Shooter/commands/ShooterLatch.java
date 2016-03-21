@@ -4,7 +4,6 @@ import org.usfirst.frc.team3467.robot.commands.CommandBase;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-
 /**
  *
  */

@@ -261,6 +261,14 @@ public class PIDF_CANTalon {
     	return m_talon.isControlEnabled();
     }
 
+    /**
+     * Resets PIDController
+     */
+    
+    public synchronized void reset() {
+    	m_talon.reset();
+    }
+    
 	/*
 	 * Code to support update of PIDF constants from a button on the SmartDashboard
 	 */
