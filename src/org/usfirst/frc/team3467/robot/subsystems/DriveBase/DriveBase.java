@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.usfirst.frc.team3467.robot.RobotMap;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.TankDrive;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.ArcadeDrive;
+import org.usfirst.frc.team3467.robot.subsystems.Brownout.Brownout;
 import org.usfirst.frc.team3467.robot.subsystems.Brownout.Brownout.PowerLevel;
 import org.usfirst.frc.team3467.robot.subsystems.Brownout.PowerConsumer;
 
@@ -93,8 +94,21 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 	}
 	
 	//Called for a PowerLevel update (See Brownout)
-	public void callbackAlert(PowerLevel newLevel) {
-		
+	public void callbackAlert(Brownout.PowerLevel level) {
+		switch (level) {
+		case Normal:
+				leftTalon.configMaxOutputVoltage(12.0);
+				rightTalon.configMaxOutputVoltage(12.0);
+			break;
+		case Chill:
+				leftTalon.configMaxOutputVoltage(9.0);
+				rightTalon.configMaxOutputVoltage(9.0);
+			break;
+		case Critical:
+				leftTalon.configMaxOutputVoltage(6.0);
+				rightTalon.configMaxOutputVoltage(6.0);
+			break;
+		}
 	}
 	
 	// Set drive mode
@@ -173,6 +187,8 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 	public void setControlMode(TalonControlMode controlMode) {
 		leftTalon.changeControlMode(controlMode);
 		rightTalon.changeControlMode(controlMode);
+		// Save control mode so we will know if we have to set it back later
+		t_controlMode = controlMode;
 	}
 	
 	// return the distance driven (average of left and right encoders).
