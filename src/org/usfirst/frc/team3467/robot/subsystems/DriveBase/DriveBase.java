@@ -34,6 +34,14 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 		return instance;
 	}
 
+	public CANTalon getLeftTalon() {
+		return leftTalon;
+	}
+	
+	public CANTalon getRightTalon() {
+		return rightTalon;
+	}
+	
 	//Initializing the Default Command
 	public void initDefaultCommand() {
 		if (t_useTank) {
@@ -48,7 +56,6 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 	
 	//DriveBase class constructor
 	public DriveBase() {
-
 		//DriveBase instance = the current instance
 		instance = this;
 		
@@ -84,7 +91,6 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 		t_drive.setExpiration(1.0);
 		t_drive.setSensitivity(0.5);
 		t_drive.setMaxOutput(1.0);
-
 	}
 	
 	//Called for a PowerLevel update (See Brownout)
@@ -109,7 +115,7 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 	public void setDriveMode(boolean usetank) {
 		t_useTank = usetank;
 	}
-		
+	
 	//Set up for normal Drive mode
 	public void initDrive () {
 		if (t_controlMode != TalonControlMode.PercentVbus); {
@@ -178,11 +184,17 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 		}
 	}
 	
+	public void setControlMode(TalonControlMode controlMode) {
+		leftTalon.changeControlMode(controlMode);
+		rightTalon.changeControlMode(controlMode);
+		// Save control mode so we will know if we have to set it back later
+		t_controlMode = controlMode;
+	}
+	
 	// return the distance driven (average of left and right encoders).
 	public double getDistance() {
 		return ((leftTalon.getPosition()) + (rightTalon.getPosition()))/2;
 	}
-
 
 	public void reportEncoders() {
 		SmartDashboard.putNumber("Left Encoder", leftTalon.getPosition());

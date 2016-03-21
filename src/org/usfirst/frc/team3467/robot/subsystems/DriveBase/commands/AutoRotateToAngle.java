@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class AutoRotateToAngle extends CommandBase {
 
-	private static final double TOLERANCE = 1.0;
+	private static final double TOLERANCE = 0.0;
 	
 	private PIDController m_pid;
 	private double m_maxSpeed = 0.3;
