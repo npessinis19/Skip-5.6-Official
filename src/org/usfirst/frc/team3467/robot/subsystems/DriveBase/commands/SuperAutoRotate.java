@@ -14,7 +14,7 @@ public class SuperAutoRotate extends CommandBase {
 	private PIDController	GyroPID;;
 	private PIDF_CANTalon  leftpidf_drive;
 	
-	//PID Constnat for Position
+	//PID Constant for Position
 	private static final double Posit_P = 0.0;
 	private static final double Posit_I = 0.0;
 	private static final double Posit_D = 0.0;
