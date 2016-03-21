@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.PIDSource;
 import edu.wpi.first.wpilibj.PIDSourceType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class SuperAutoRotate extends CommandBase {
 
@@ -38,7 +39,6 @@ public class SuperAutoRotate extends CommandBase {
 	}
 	
 	public void buildGyroController() {
-		
 		GyroPID = new PIDController(Gyro_P, Gyro_I, Gyro_D, 
 				new PIDSource() {
 					PIDSourceType m_gyroSourceType = PIDSourceType.kDisplacement;
@@ -63,6 +63,7 @@ public class SuperAutoRotate extends CommandBase {
 				}});	
 		
 		GyroPID.setAbsoluteTolerance(Gyro_TOLERANCE);
+		GyroPID.setSetpoint(angle);
 	}
 
 	public void buildPositController() {
@@ -71,26 +72,25 @@ public class SuperAutoRotate extends CommandBase {
 		
 		rightpidf_drive = new PIDF_CANTalon("Right Position", driveBase.getRightTalon(), Posit_TOLERANCE, false, false);
 		rightpidf_drive.setPID(Posit_P, Posit_I, Posit_D);
+		
+		switch (mode) {
+		case 1:
+						leftpidf_drive.setSetpoint(Position);
+			break;
+		case 2:
+						rightpidf_drive.setSetpoint(-Position);
+			break;
+		default:
+						leftpidf_drive.setSetpoint(Position);
+						rightpidf_drive.setSetpoint(-Position);
+			break;
+		}
 	}
 	
 	public void startPID() {
 		GyroPID.enable();
 		leftpidf_drive.enable();
 		rightpidf_drive.enable();
-		
-		GyroPID.setSetpoint(angle);
-		switch (mode) {
-		case 1:
-				leftpidf_drive.setSetpoint(Position);
-			break;
-		case 2:
-				rightpidf_drive.setSetpoint(Position);
-				break;
-		default:
-				leftpidf_drive.setSetpoint(Position);
-				rightpidf_drive.setSetpoint(Position);
-			break;
-		}
 	}
 	
 	public void stopPID() {
@@ -103,18 +103,29 @@ public class SuperAutoRotate extends CommandBase {
 		rightpidf_drive.reset();
 	}
 	
+	public void resetPID() {
+		GyroPID.reset();
+		leftpidf_drive.reset();
+		rightpidf_drive.reset();
+	}
+	
 	protected void initialize() {
 		driveBase.setSlaveMode(false);
 		driveBase.setControlMode(TalonControlMode.Position);
+		
+		//Get everything in safe starting state
+		resetPID();
 		startPID();
 	}
 
 	protected void execute() {
+		SmartDashboard.putNumber("Gyro Angle", ahrs.getGyroAngle());
+		driveBase.reportEncoders();
 	}
 
 	protected boolean isFinished() {
 		double error = GyroPID.getError();
-		return (error >= 0 && error <= Gyro_TOLERANCE) || isTimedOut();
+		return (error >= 0 && error <= Gyro_TOLERANCE) || isTimedOut() || GyroPID.onTarget();
 	}
 
 	protected void end() {
@@ -122,6 +133,7 @@ public class SuperAutoRotate extends CommandBase {
 	}
 
 	protected void interrupted() {
+		end();
 	}
 	
 	
