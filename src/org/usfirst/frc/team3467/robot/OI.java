@@ -27,7 +27,6 @@ import org.usfirst.frc.team3467.robot.triggers.DPadRight;
 import org.usfirst.frc.team3467.robot.triggers.DPadUp;
 import org.usfirst.frc.team3467.robot.triggers.DoubleButton;
 
-
 public class OI {
 	
 	public static Joystick PrimaryStick;
