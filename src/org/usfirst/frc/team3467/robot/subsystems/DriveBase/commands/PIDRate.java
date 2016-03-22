@@ -5,20 +5,21 @@ import org.usfirst.frc.team3467.robot.commands.CommandBase;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDSource;
 import edu.wpi.first.wpilibj.PIDSourceType;
+import edu.wpi.first.wpilibj.buttons.JoystickButton;
 
 import org.usfirst.frc.team3467.robot.OI;
 
 public class PIDRate extends CommandBase {
 
-	private PIDController AnglePIDController;
-	private static final double Angle_KP = 0.0;
-	private static final double Angle_KI = 0.0;
-	private static final double Angle_KD = 0.0;
-	
+	/*private PIDController AnglePIDController;
+	//private static final double Angle_KP = 0.0;
+	//private static final double Angle_KI = 0.0;
+	//private static final double Angle_KD = 0.0;
+	*/
 	public PIDRate() {
 		requires(driveBase);
 	}
-	
+	/*
 	public void BuildAnglePIDController() {
 		AnglePIDController = new PIDController(Angle_KP, Angle_KI, Angle_KD);
 		
@@ -34,7 +35,7 @@ public class PIDRate extends CommandBase {
             }
             
 		}}
-	
+	*/
 	protected void initialize() {
 		
 	}
