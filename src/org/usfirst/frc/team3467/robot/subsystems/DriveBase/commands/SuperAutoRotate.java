@@ -60,7 +60,7 @@ public class SuperAutoRotate extends CommandBase {
 		new PIDOutput() {
 				
 				public void pidWrite(double angle) {
-					double position = angle;
+					position = angle * 13.75; //Encoder ticks required to rotate 1 degree
 				}});
 		
 		leftpidf_drive = new PIDF_CANTalon("Left Position", driveBase.getLeftTalon(), Posit_TOLERANCE, false, false);
