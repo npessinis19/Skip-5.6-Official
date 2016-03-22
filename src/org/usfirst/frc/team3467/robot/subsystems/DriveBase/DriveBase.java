@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.usfirst.frc.team3467.robot.RobotMap;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.TankDrive;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.ArcadeDrive;
+import org.usfirst.frc.team3467.robot.subsystems.Brownout.Brownout;
 import org.usfirst.frc.team3467.robot.subsystems.Brownout.Brownout.PowerLevel;
 import org.usfirst.frc.team3467.robot.subsystems.Brownout.PowerConsumer;
 
@@ -33,6 +34,14 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 		return instance;
 	}
 
+	public CANTalon getLeftTalon() {
+		return leftTalon;
+	}
+	
+	public CANTalon getRightTalon() {
+		return rightTalon;
+	}
+	
 	//Initializing the Default Command
 	public void initDefaultCommand() {
 		if (t_useTank) {
@@ -47,7 +56,6 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 	
 	//DriveBase class constructor
 	public DriveBase() {
-
 		//DriveBase instance = the current instance
 		instance = this;
 		
@@ -83,19 +91,31 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 		t_drive.setExpiration(1.0);
 		t_drive.setSensitivity(0.5);
 		t_drive.setMaxOutput(1.0);
-
 	}
 	
 	//Called for a PowerLevel update (See Brownout)
-	public void callbackAlert(PowerLevel newLevel) {
-		
+	public void callbackAlert(Brownout.PowerLevel level) {
+		switch (level) {
+		case Normal:
+				leftTalon.configMaxOutputVoltage(12.0);
+				rightTalon.configMaxOutputVoltage(12.0);
+			break;
+		case Chill:
+				leftTalon.configMaxOutputVoltage(9.0);
+				rightTalon.configMaxOutputVoltage(9.0);
+			break;
+		case Critical:
+				leftTalon.configMaxOutputVoltage(6.0);
+				rightTalon.configMaxOutputVoltage(6.0);
+			break;
+		}
 	}
 	
 	// Set drive mode
 	public void setDriveMode(boolean usetank) {
 		t_useTank = usetank;
 	}
-		
+	
 	//Set up for normal Drive mode
 	public void initDrive () {
 		if (t_controlMode != TalonControlMode.PercentVbus); {
@@ -164,11 +184,17 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 		}
 	}
 	
+	public void setControlMode(TalonControlMode controlMode) {
+		leftTalon.changeControlMode(controlMode);
+		rightTalon.changeControlMode(controlMode);
+		// Save control mode so we will know if we have to set it back later
+		t_controlMode = controlMode;
+	}
+	
 	// return the distance driven (average of left and right encoders).
 	public double getDistance() {
 		return ((leftTalon.getPosition()) + (rightTalon.getPosition()))/2;
 	}
-
 
 	public void reportEncoders() {
 		SmartDashboard.putNumber("Left Encoder", leftTalon.getPosition());
