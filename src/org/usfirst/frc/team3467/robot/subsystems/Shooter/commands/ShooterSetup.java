@@ -24,6 +24,11 @@ public class ShooterSetup extends CommandBase {
 	}
 
 	protected void execute() {
+		
+		if (pultaCat.checkBrownOut()) {
+			end();
+		}
+		
 		if (pultaCat.checkLatchLimit() || pultaCat.resetBarIsLatched()) {
 			pultaCat.clear();
 			isClear = true;
