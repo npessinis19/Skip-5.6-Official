@@ -171,6 +171,10 @@ public class Shooter extends PIDSubsystem implements PowerConsumer {
 		return ((m_resetAngle.get() >= m_clearPoint) || m_resetBar.isFwdLimitSwitchClosed());
 	}
 	
+	public boolean resetBarIsLatched() {
+		return (m_resetAngle.get() <= m_latchPoint || m_resetBar.isReverseSoftLimitEnabled());
+	}
+	
 	// Control the solenoid that latches the catapult
 	public void cataLatch() {
 		m_catLatch.set(DoubleSolenoid.Value.kForward);
