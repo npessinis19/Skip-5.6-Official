@@ -37,6 +37,7 @@ public class ShooterLatch extends CommandBase {
     // Called once after isFinished returns true
     protected void end() {
     	pultaCat.cataStop();
+    	pultaCat.initManualMode();
     	if (pultaCat.checkBrownOut()) {
     		System.out.println("Shooter Brownout");
     	}
