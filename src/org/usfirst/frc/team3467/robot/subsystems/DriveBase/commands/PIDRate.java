@@ -33,11 +33,19 @@ public class PIDRate extends CommandBase {
 	public void buildControllers() {
 		leftpidf_drive = new PIDF_CANTalon("Drive Left", driveBase.getLeftTalon(), TOLERANCE, false, false);
 		leftpidf_drive.setPID(KP, KI, KD);
+		
 		rightpidf_drive = new PIDF_CANTalon("Drive Right", driveBase.getLeftTalon(), TOLERANCE, false, false);
 		rightpidf_drive.setPID(KP, KI, KD);
-		
 	}
 	
+	public void enablePID() {
+		rightpidf_drive.enable();
+		leftpidf_drive.enable();
+	}
+	
+	public void setStartPID(double angle) {
+		
+	}
 	
 	/*
 	public void BuildAnglePIDController() {
