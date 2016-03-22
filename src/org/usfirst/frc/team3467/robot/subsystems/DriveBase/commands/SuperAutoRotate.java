@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj.PIDSourceType;
 
 public class SuperAutoRotate extends CommandBase {
 
+	//Test Comment
+	
 	private PIDController	GyroPID;;
 	private PIDF_CANTalon  leftpidf_drive;
 	private PIDF_CANTalon  rightpidf_drive;
@@ -58,7 +60,7 @@ public class SuperAutoRotate extends CommandBase {
 		new PIDOutput() {
 				
 				public void pidWrite(double angle) {
-					double position = angle;
+					position = angle * 13.75; //Encoder ticks required to rotate 1 degree
 				}});
 		
 		leftpidf_drive = new PIDF_CANTalon("Left Position", driveBase.getLeftTalon(), Posit_TOLERANCE, false, false);
