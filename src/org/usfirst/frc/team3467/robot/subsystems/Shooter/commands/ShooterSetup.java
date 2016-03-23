@@ -9,11 +9,13 @@ public class ShooterSetup extends CommandBase {
 	
 	public ShooterSetup() {
 		requires(pultaCat);
+		requires(pneumatics);
 	}
 	
 	//Called just before this command runs for the first time 
 	protected void initialize() {
 		pultaCat.cataLatch();
+		pneumatics.compressorStop();
 		pultaCat.initPIDMode();
 		pultaCat.latch();
 		
@@ -43,6 +45,7 @@ public class ShooterSetup extends CommandBase {
 
 	protected void end() {
 		pultaCat.cataStop();
+		pneumatics.compressorStart();
 		pultaCat.initManualMode();
 		System.out.println("Shooter is setup");
 	}
