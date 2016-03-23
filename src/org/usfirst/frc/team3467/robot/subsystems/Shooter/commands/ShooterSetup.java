@@ -4,12 +4,12 @@ import org.usfirst.frc.team3467.robot.commands.CommandBase;
 
 public class ShooterSetup extends CommandBase {
 
-	boolean isClear = false;
+	boolean isClear;
+	boolean latching;
 	
 	public ShooterSetup() {
 		requires(pultaCat);
 	}
-	
 	
 	//Called just before this command runs for the first time 
 	protected void initialize() {
@@ -17,35 +17,38 @@ public class ShooterSetup extends CommandBase {
 		pultaCat.initPIDMode();
 		pultaCat.latch();
 		
-		if (pultaCat.checkLatchLimit() == true || pultaCat.onTarget()) {
+		System.out.println("Shooter Setup: Latching");
+		
+		isClear = false;
+		latching = true;
+	}
+
+	protected void execute() {
+		
+		if (pultaCat.checkBrownOut()) {
+			end();
+		}
+		
+		if (pultaCat.checkLatchLimit() || pultaCat.resetBarIsLatched()) {
 			pultaCat.clear();
 			isClear = true;
-			System.out.println("Shooter is setup");
+			
+			System.out.println("Shooter Setup: Clearing");
 		}
 	}
 
-	@Override
-	protected void execute() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	protected boolean isFinished() {
-		// TODO Auto-generated method stub
-		return isClear;
+		return isClear && pultaCat.resetBarIsClear();
 	}
 
-	@Override
 	protected void end() {
 		pultaCat.cataStop();
 		pultaCat.initManualMode();
+		System.out.println("Shooter is setup");
 	}
 
 	protected void interrupted() {
 		end();
 	}
 	
-	
-
 }

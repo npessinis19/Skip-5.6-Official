@@ -11,32 +11,59 @@ import edu.wpi.first.wpilibj.PIDSourceType;
 
 public class SuperAutoRotate extends CommandBase {
 
-	//Test Comment
-	
 	private PIDController	GyroPID;;
 	private PIDF_CANTalon  leftpidf_drive;
 	private PIDF_CANTalon  rightpidf_drive;
 	
 	//PID Constant for Position
-	private static final double Posit_P = 0.0;
-	private static final double Posit_I = 0.0;
-	private static final double Posit_D = 0.0;
-	private static final double Posit_TOLERANCE = 0.0;
+	private static double Posit_P = 1.0;
+	private static double Posit_I = 0.0;
+	private static double Posit_D = 0.0;
+	private static double Posit_TOLERANCE = 5.0;
 	double  position = 0.0;
 	
 	//PID Constants for Angle
-	private static final double Gyro_P = 0.0;
-	private static final double Gyro_I = 0.0;
-	private static final double Gyro_D = 0.0;
+	private static double Gyro_P = 1.0;
+	private static double Gyro_I = 0.0;
+	private static double Gyro_D = 0.0;
 	double angle;
 	int mode = 0;
 	
 	public SuperAutoRotate(double angle, int mode) {
 		requires(driveBase);
 		buildControllers();
+		setTimeout(2);
 		
 		this.angle = angle;
 		this.mode = mode;
+	}
+	
+	public SuperAutoRotate(double angle, int mode, double p, double i, double d) {
+		requires(driveBase);
+		this.angle = angle;
+		this.mode = mode;
+		
+		Gyro_P = p;
+		Gyro_I = i;
+		Gyro_D = d;
+		
+		buildControllers();
+	}
+
+	public SuperAutoRotate(double angle, int mode, double Gp, double Gi, double Gd,
+													double Pp, double Pi, double Pd) {
+		requires(driveBase);
+		
+		this.angle = angle;
+		this.mode = mode;
+		
+		Gyro_P = Gp;
+		Gyro_I = Gi;
+		Gyro_D = Gd;
+		
+		Posit_P = Pp;
+		Posit_I = Pi;
+		Posit_D = Pd;
 	}
 	
 	public void buildControllers() {
@@ -61,6 +88,19 @@ public class SuperAutoRotate extends CommandBase {
 				
 				public void pidWrite(double angle) {
 					position = angle * 13.75; //Encoder ticks required to rotate 1 degree
+				
+					switch(mode) {
+						case 1:
+								leftpidf_drive.setSetpoint(position);
+							break;
+						case 2:
+								rightpidf_drive.setSetpoint(-position);
+							break;
+						default:
+								leftpidf_drive.setSetpoint(position/2);
+								rightpidf_drive.setSetpoint(-position/2);
+							break;
+					}
 				}});
 		
 		leftpidf_drive = new PIDF_CANTalon("Left Position", driveBase.getLeftTalon(), Posit_TOLERANCE, false, false);
@@ -74,18 +114,6 @@ public class SuperAutoRotate extends CommandBase {
 		GyroPID.setSetpoint(angle);
 		GyroPID.enable();
 		
-		switch (mode) {
-		case 1: 
-				leftpidf_drive.setSetpoint(position);	
-			break;
-		case 2:
-				rightpidf_drive.setSetpoint(-position);
-			break;
-		default:
-				leftpidf_drive.setSetpoint(position);
-				rightpidf_drive.setSetpoint(-position);
-			break;
-		}
 		leftpidf_drive.enable();
 		rightpidf_drive.enable();
 	}
@@ -110,7 +138,7 @@ public class SuperAutoRotate extends CommandBase {
 	}
 
 	protected boolean isFinished() {
-		return false;
+		return GyroPID.onTarget() || isTimedOut();
 	}
 
 	protected void end() {
@@ -120,7 +148,5 @@ public class SuperAutoRotate extends CommandBase {
 	protected void interrupted() {
 		end();
 	}
-	
-	
 
 }
