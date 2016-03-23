@@ -10,6 +10,7 @@ public class ShooterSetup extends CommandBase {
 	public ShooterSetup() {
 		requires(pultaCat);
 		requires(pneumatics);
+		setTimeout(2);
 	}
 	
 	//Called just before this command runs for the first time 
@@ -28,6 +29,7 @@ public class ShooterSetup extends CommandBase {
 	protected void execute() {
 		
 		if (pultaCat.checkBrownOut()) {
+			System.out.println("Shooter Browned Out");
 			end();
 		}
 		
@@ -40,7 +42,12 @@ public class ShooterSetup extends CommandBase {
 	}
 
 	protected boolean isFinished() {
-		return isClear && pultaCat.resetBarIsClear();
+		// Only timeout on the latching portion of setup
+		if ((!isClear && isTimedOut()) || (isClear && pultaCat.resetBarIsClear())) {
+			return(true);
+		}
+		else
+			return(false);
 	}
 
 	protected void end() {
