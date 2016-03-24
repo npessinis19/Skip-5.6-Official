@@ -12,11 +12,14 @@ public class ShooterLatch extends CommandBase {
 
     public ShooterLatch() {
         requires(pultaCat);
+        requires(pneumatics);
+        setTimeout(2);
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
     	pultaCat.cataLatch();    // Close the pneumatic latch ...
+    	pneumatics.compressorStop(); // stop the compressor ...
     	pultaCat.initPIDMode();  // and use PID...
     	pultaCat.latch();		 // to drive the reset arm to the latch point
     }
@@ -32,12 +35,13 @@ public class ShooterLatch extends CommandBase {
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-        return (pultaCat.onTarget() || pultaCat.checkLatchLimit());
+        return (pultaCat.onTarget() || pultaCat.checkLatchLimit() || isTimedOut());
     }
 
     // Called once after isFinished returns true
     protected void end() {
     	pultaCat.cataStop();
+    	pneumatics.compressorStart();
     	pultaCat.initManualMode();
     	if (pultaCat.checkBrownOut()) {
     		System.out.println("Shooter Brownout");

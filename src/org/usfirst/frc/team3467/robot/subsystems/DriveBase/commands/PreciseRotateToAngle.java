@@ -14,13 +14,13 @@ public class PreciseRotateToAngle extends CommandBase {
 	}
 	
 	protected void initialize() {
-		driveBase.setSlaveMode(false);
+		driveBase.setSlaveMode(true);
 		driveBase.setTalonBrakes(true);
 	}
 
 	protected void execute() {
 //		PreciseInput = oi.getPrimeTwist()/5;
-		PreciseInput = oi.getPrimeTwist()/10;
+		PreciseInput = oi.getPrimeX()/4.5;
 		driveBase.driveTank(-PreciseInput, PreciseInput, false);
 		SmartDashboard.putNumber("Gyro Angle", ahrs.getGyroAngle());
 	}

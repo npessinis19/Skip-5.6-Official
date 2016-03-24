@@ -16,14 +16,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class AutoRotateToAngle extends CommandBase {
 
-	private static final double TOLERANCE = 0.5;
+	private static final double TOLERANCE = 0.3;
 	
 	private PIDController m_pid;
 	private double m_maxSpeed = 0.3;
 	private double m_degrees = 0.0;
 	
 	private double KP = 2.0;
-	private double KI = 1.0;
+	private double KI = 2.0;
 	private double KD = 1.0;
     	
     public AutoRotateToAngle(double degrees, double maxSpeed, double kp, double ki, double kd) {
@@ -85,7 +85,7 @@ public class AutoRotateToAngle extends CommandBase {
     	//Brake mode on
 		driveBase.setSlaveMode(false);
 		driveBase.setTalonBrakes(true);
-    	
+		
     	// Get everything in a safe starting state.
     	m_pid.reset();
         m_pid.enable();
