@@ -143,7 +143,7 @@ public class OI {
 		
 		//Reload Catapult
 		new JoystickButton(operator, Gamepad.leftBumper)
-			.whenPressed(new ShooterPrepare());
+			.whenPressed(new ShooterSetup());
 		
 		//Fire Catapult
 		new JoystickButton(operator, Gamepad.rightBumper)
@@ -204,6 +204,7 @@ public class OI {
 		SmartDashboard.putData("Vision: Target Goal", new TargetGoal());
 		SmartDashboard.putData("Vision: Calibrate", new VisionCalibrate());
 		SmartDashboard.putData("Move on Target", new AutoTarget());
+		SmartDashboard.putData("Shooter Setup", new ShooterSetup());
 	}
 }
 

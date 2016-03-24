@@ -143,7 +143,7 @@ public class GRIP {
 		
 		//Calculate the distances and angles needed to move
 		changeinDistance = distance_delta - target_distance;
-		changeinAngle = (target_angle - angle_theta) - 20;
+		changeinAngle = (target_angle - angle_theta) - 10;
 		
 		//Prints Values to SmartDashBoard
 		SmartDashboard.putNumber("Vision: Distance", distance_delta);
