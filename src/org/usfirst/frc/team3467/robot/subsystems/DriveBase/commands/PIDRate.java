@@ -20,14 +20,20 @@ public class PIDRate extends CommandBase {
 	
 	private  PIDF_CANTalon leftpidf_drive;
 	private PIDF_CANTalon rightpidf_drive;
+	double angle;
+	int mode = 0;
 	
 	private static final double TOLERANCE = 0.0;
 	private static final double KP = 0.0;
 	private static final double KI = 0.0;
 	private static final double KD = 0.0;
 	
-	public PIDRate() {
+	public PIDRate(double angle, int mode) {
 		requires(driveBase);
+		buildControllers();
+		
+		this.angle = angle;
+		this.mode = mode;
 	}
 	
 	public void buildControllers() {
@@ -41,10 +47,32 @@ public class PIDRate extends CommandBase {
 	public void enablePID() {
 		rightpidf_drive.enable();
 		leftpidf_drive.enable();
+		
+		rightpidf_drive.reset();
+		leftpidf_drive.reset();
 	}
 	
-	public void setStartPID(double angle) {
+	public void setStartPID() {	
+		switch (mode) {
+		case 1:
+				leftpidf_drive.setSetpoint(angle * 13.75);
+			break;
+		case 2:
+				rightpidf_drive.setSetpoint(angle * -13.75);
+			break;
+		default:
+				leftpidf_drive.setSetpoint( (angle * 13.75) / 2 );
+				rightpidf_drive.setSetpoint( (angle * -13.75) / 2 );
+			break;
+		}
+	}
+	
+	public void stopPID() {
+		leftpidf_drive.reset();
+		rightpidf_drive.reset();
 		
+		leftpidf_drive.disable();
+		rightpidf_drive.disable();
 	}
 	
 	/*
@@ -64,8 +92,16 @@ public class PIDRate extends CommandBase {
             
 		}}
 	*/
+	
 	protected void initialize() {
+		driveBase.resetEncoders();
+		ahrs.gyroReset();
 		
+		driveBase.setSlaveMode(false);
+		driveBase.setTalonBrakes(true);
+		
+		enablePID();
+		setStartPID();
 	}
 
 	protected void execute() {

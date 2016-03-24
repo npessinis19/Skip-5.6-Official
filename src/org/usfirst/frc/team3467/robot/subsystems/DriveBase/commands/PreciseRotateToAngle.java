@@ -20,7 +20,7 @@ public class PreciseRotateToAngle extends CommandBase {
 
 	protected void execute() {
 //		PreciseInput = oi.getPrimeTwist()/5;
-		PreciseInput = oi.getPrimeTwist()/10;
+		PreciseInput = oi.getPrimeTwist()/4.5;
 		driveBase.driveTank(-PreciseInput, PreciseInput, false);
 		SmartDashboard.putNumber("Gyro Angle", ahrs.getGyroAngle());
 	}
