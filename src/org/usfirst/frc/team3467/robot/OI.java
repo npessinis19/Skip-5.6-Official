@@ -204,7 +204,6 @@ public class OI {
 		SmartDashboard.putData("Vision: Target Goal", new TargetGoal());
 		SmartDashboard.putData("Vision: Calibrate", new VisionCalibrate());
 		SmartDashboard.putData("Move on Target", new AutoTarget());
-		SmartDashboard.putData("Shooter Setup", new ShooterSetup());
 	}
 }
 
