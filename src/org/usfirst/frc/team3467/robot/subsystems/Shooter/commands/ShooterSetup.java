@@ -28,6 +28,9 @@ public class ShooterSetup extends CommandBase {
 
 	protected void execute() {
 		
+		pultaCat.callbackAlert(CommandBase.brownout.getLevel());
+		pultaCat.checkCurrent();
+		
 		if (pultaCat.checkBrownOut()) {
 			System.out.println("Shooter Browned Out");
 			end();
