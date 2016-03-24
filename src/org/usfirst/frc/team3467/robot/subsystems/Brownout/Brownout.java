@@ -53,6 +53,11 @@ public class Brownout extends Subsystem {
 	    return Brownout.instance;
 	}
 
+	//Get instance of PDP
+	public PowerDistributionPanel getPDP() {
+		return pdp;
+	}
+	
 	/*
 	 * Brownout Class Constructor
 	 *
