@@ -44,6 +44,7 @@ public class PIDRate extends CommandBase {
 		rightpidf_drive.setPID(KP, KI, KD);
 	}
 	
+	//Enable PID in the drive base
 	public void enablePID() {
 		rightpidf_drive.enable();
 		leftpidf_drive.enable();
@@ -52,6 +53,7 @@ public class PIDRate extends CommandBase {
 		leftpidf_drive.reset();
 	}
 	
+	//Different ways of turning that we need
 	public void setStartPID() {	
 		switch (mode) {
 		case 1:
@@ -67,6 +69,7 @@ public class PIDRate extends CommandBase {
 		}
 	}
 	
+	//Stop running PID in the drive base
 	public void stopPID() {
 		leftpidf_drive.reset();
 		rightpidf_drive.reset();
@@ -93,6 +96,7 @@ public class PIDRate extends CommandBase {
 		}}
 	*/
 	
+	//Sets everything up so that the drive base is ready to run
 	protected void initialize() {
 		driveBase.resetEncoders();
 		ahrs.gyroReset();
