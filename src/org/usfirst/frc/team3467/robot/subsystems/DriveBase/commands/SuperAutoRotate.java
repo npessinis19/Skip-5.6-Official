@@ -87,7 +87,7 @@ public class SuperAutoRotate extends CommandBase {
 		new PIDOutput() {
 				
 				public void pidWrite(double angle) {
-					position = angle * 13.75; //Encoder ticks required to rotate 1 degree
+					position = angle * 14.75; //Encoder ticks required to rotate 1 degree
 				
 					switch(mode) {
 						case 1:
