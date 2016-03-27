@@ -14,7 +14,7 @@ public class PreciseRotateToAngle extends CommandBase {
 	}
 	
 	protected void initialize() {
-		driveBase.setSlaveMode(false);
+		driveBase.setSlaveMode(true);
 		driveBase.setTalonBrakes(true);
 	}
 

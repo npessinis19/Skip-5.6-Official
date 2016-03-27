@@ -27,10 +27,11 @@ public class ShooterSetup extends CommandBase {
 	}
 
 	protected void execute() {
+		pultaCat.checkCurrent();
 		
 		if (pultaCat.checkBrownOut()) {
 			System.out.println("Shooter Browned Out");
-			end();
+			pultaCat.clear();
 		}
 		
 		if (pultaCat.checkLatchLimit() || pultaCat.resetBarIsLatched()) {

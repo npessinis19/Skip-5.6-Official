@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.command.PIDSubsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.usfirst.frc.team3467.robot.RobotMap;
+import org.usfirst.frc.team3467.robot.commands.CommandBase;
 import org.usfirst.frc.team3467.robot.subsystems.Brownout.Brownout;
 import org.usfirst.frc.team3467.robot.subsystems.Brownout.PowerConsumer;
 import org.usfirst.frc.team3467.robot.subsystems.Shooter.commands.ShooterReset;
@@ -197,10 +198,19 @@ public class Shooter extends PIDSubsystem implements PowerConsumer {
 		case Critical:
 			dontShoot = true;
 			break;
-			
 		default:
 			dontShoot = false;
 			break;
+		}
+	}
+	
+	public void checkCurrent() {
+		double shooterCurrent = CommandBase.brownout.getCurrent(0);
+		if (shooterCurrent > 40) {
+			dontShoot = true;
+		}
+		else {
+			dontShoot = false;
 		}
 	}
 	
