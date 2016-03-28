@@ -52,7 +52,7 @@ public class AutoRotateToAngle extends CommandBase {
 	}
     	
     private void buildController() {
-    		
+ 
        m_pid = new PIDController(KP, KI, KD,
                 new PIDSource() {
                     PIDSourceType m_sourceType = PIDSourceType.kDisplacement;
