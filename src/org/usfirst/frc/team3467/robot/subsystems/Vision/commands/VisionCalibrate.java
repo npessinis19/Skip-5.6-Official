@@ -20,7 +20,7 @@ public class VisionCalibrate extends CommandBase {
 			return;
 		};
 		
-		grip.isOnTarget();
+		grip.calculateTargetData();
 		
 		grip.setTarget_angle(grip.getAngle_theta());
 		grip.setTarget_distnce(grip.getDistance_delta());
