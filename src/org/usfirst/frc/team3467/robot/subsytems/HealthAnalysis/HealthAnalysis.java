@@ -5,5 +5,5 @@ import org.usfirst.frc.team3467.robot.commands.CommandBase;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 
 public class HealthAnalysis {
-private PowerDistributionPanel health = CommandBase.brownout.getpdp();
+//private PowerDistributionPanel health = CommandBase.brownout.getpdp();
 }
