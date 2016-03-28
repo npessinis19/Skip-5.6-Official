@@ -13,7 +13,6 @@ import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.ArcadeDrive;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.PreciseRotateToAngle;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.ResetDriveEncoders;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.SetBrakeMode;
-import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.SuperAutoRotate;
 import org.usfirst.frc.team3467.robot.subsystems.Intake.Intake;
 import org.usfirst.frc.team3467.robot.subsystems.Intake.commands.IntakeDrive;
 import org.usfirst.frc.team3467.robot.subsystems.Intake.commands.Roller_Actuate;
@@ -183,20 +182,22 @@ public class OI {
 		
 	//Utility Bar/Finger
 			//Extend Using the Right Joystick Trigger
-		new JoystickButton(PrimaryStick, 1)
+		new JoystickButton(SecondaryStick, 3)
 			.whenPressed(new Bar_actuate(UtilityBar.kOut));
 		
 			//Retract Using the Right Shoulder Button
-		new JoystickButton(PrimaryStick, 2)
+		new JoystickButton(SecondaryStick, 4)
 			.whenPressed(new Bar_actuate(UtilityBar.kIn));
 		
 			//Extend Finger using Top left button
-		new JoystickButton(PrimaryStick, 3)
+		/*
+		 * new JoystickButton(PrimaryStick, 1)
 			.whenPressed(new Finger_actuate(UtilityBar.kOut));
 		
 			//Retract Finger using Top Right Button
-		new JoystickButton(PrimaryStick, 4)
+		new JoystickButton(PrimaryStick, 2)
 			.whenActive(new Finger_actuate(UtilityBar.kIn));
+		*/
 		
 		// SmartDashboard Buttons
 		SmartDashboard.putData("Drivebase: Reset Encoders", new ResetDriveEncoders());
@@ -205,8 +206,6 @@ public class OI {
 		SmartDashboard.putData("Vision: Target Goal", new TargetGoal());
 		SmartDashboard.putData("Vision: Calibrate", new VisionCalibrate());
 		SmartDashboard.putData("Move on Target", new AutoTarget());
-		SmartDashboard.putData("Shooter Setup", new ShooterSetup());
-		SmartDashboard.putData("Super Rotate", new SuperAutoRotate(90, 1));
 	}
 }
 
