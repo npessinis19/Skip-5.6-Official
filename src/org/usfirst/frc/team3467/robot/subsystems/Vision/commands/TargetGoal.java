@@ -15,6 +15,7 @@ public class TargetGoal extends CommandBase {
 	private PIDController vision_PID;
 	private PIDF_CANTalon leftpidf_drive;
 	private PIDF_CANTalon rightpidf_drive;
+	private int count;
 	
 	private static final double P_P = 0.0;
 	private static final double P_I = 0.0;
@@ -94,6 +95,8 @@ public class TargetGoal extends CommandBase {
 	}
 	
 	protected void initialize() {
+		count = 0;
+		
 		ahrs.gyroReset();
 		driveBase.resetEncoders();
 		
@@ -105,19 +108,21 @@ public class TargetGoal extends CommandBase {
 
 	protected void execute() {
 		
-		if (!grip.createImage()) {
-			return;
+		while ((!grip.isOnTarget() && count <= 10) || (!grip.isGoodImage() && count <= 5)) {
+			grip.createImage();
+			count = count + 1;
 		}
 		
-		onTarget = grip.isOnTarget();
+		grip.calculateTargetData();
+		
 		Set_Angle();
 		
-	SmartDashboard.putNumber("Target Distance", grip.getChangeinAngle());
-	SmartDashboard.putNumber("Target Angle", grip.getChangeinDistance());
+	SmartDashboard.putNumber("Vision: Change in Angle", grip.getChangeinAngle());
+	SmartDashboard.putNumber("Vision: Change in Distance", grip.getChangeinDistance());
 	}
 
 	protected boolean isFinished() {
-		return isTimedOut() || onTarget;
+		return isTimedOut() || grip.isOnTarget();
 	}
 
 	protected void end() {
