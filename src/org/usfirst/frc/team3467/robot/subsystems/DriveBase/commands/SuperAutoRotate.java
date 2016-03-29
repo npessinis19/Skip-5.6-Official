@@ -135,6 +135,7 @@ public class SuperAutoRotate extends CommandBase {
 	}
 
 	protected void execute() {
+		driveBase.reportEncoders();
 	}
 
 	protected boolean isFinished() {
