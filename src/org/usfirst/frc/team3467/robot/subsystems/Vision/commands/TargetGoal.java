@@ -20,12 +20,12 @@ public class TargetGoal extends CommandBase {
 	private static final double P_P = 1.0;
 	private static final double P_I = 0.0;
 	private static final double P_D = 0.0;
-	private static final double TOLERANCE = 0.0;
+	private static final double TOLERANCE = 1.0;
 
 	private static final double P = 1.0;
 	private static final double I = 0.0;
 	private static final double D = 0.0;
-	private static final double tolerance = 0.0;
+	private static final double tolerance = 1.0;
 	double position;
 	
 	boolean onTarget;
