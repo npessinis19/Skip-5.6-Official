@@ -10,9 +10,11 @@ import org.usfirst.frc.team3467.robot.subsystems.Vision.commands.VisionCalibrate
 import org.usfirst.frc.team3467.robot.commands.CommandBase;
 import org.usfirst.frc.team3467.robot.commands.autonomous.AutoTarget;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.ArcadeDrive;
+import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.AutoRotateToAngle;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.PreciseRotateToAngle;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.ResetDriveEncoders;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.SetBrakeMode;
+import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.SuperAutoRotate;
 import org.usfirst.frc.team3467.robot.subsystems.Intake.Intake;
 import org.usfirst.frc.team3467.robot.subsystems.Intake.commands.IntakeDrive;
 import org.usfirst.frc.team3467.robot.subsystems.Intake.commands.Roller_Actuate;
@@ -206,6 +208,9 @@ public class OI {
 		SmartDashboard.putData("Vision: Target Goal", new TargetGoal());
 		SmartDashboard.putData("Vision: Calibrate", new VisionCalibrate());
 		SmartDashboard.putData("Move on Target", new AutoTarget());
+		SmartDashboard.putData("Rotate Test", new SuperAutoRotate(90, 0));
+		SmartDashboard.putData("Auto Rotate 90", new AutoRotateToAngle(90));
+		SmartDashboard.putData("Auto Target", new AutoTarget());
 	}
 }
 
