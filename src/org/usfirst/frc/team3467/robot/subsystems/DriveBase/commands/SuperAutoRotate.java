@@ -1,9 +1,11 @@
+
 package org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands;
 
 import org.usfirst.frc.team3467.robot.commands.CommandBase;
 import org.usfirst.frc.team3467.robot.pid.PIDF_CANTalon;
 
 import edu.wpi.first.wpilibj.CANTalon.TalonControlMode;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.PIDSource;
@@ -16,7 +18,7 @@ public class SuperAutoRotate extends CommandBase {
 	private PIDF_CANTalon  rightpidf_drive;
 	
 	//PID Constant for Position
-	private static double Posit_P = 1.0;
+	private static double Posit_P = 4.0;
 	private static double Posit_I = 0.0;
 	private static double Posit_D = 0.0;
 	private static double Posit_TOLERANCE = 5.0;
@@ -24,15 +26,16 @@ public class SuperAutoRotate extends CommandBase {
 	
 	//PID Constants for Angle
 	private static double Gyro_P = 1.0;
-	private static double Gyro_I = 0.0;
+	private static double Gyro_I = 0.001;
 	private static double Gyro_D = 0.0;
+	private static double TOLERANCE = 0.05;
 	double angle;
 	int mode = 0;
 	
 	public SuperAutoRotate(double angle, int mode) {
 		requires(driveBase);
 		buildControllers();
-		setTimeout(2);
+		setTimeout(20);
 		
 		this.angle = angle;
 		this.mode = mode;
@@ -94,14 +97,17 @@ public class SuperAutoRotate extends CommandBase {
 								leftpidf_drive.setSetpoint(position);
 							break;
 						case 2:
-								rightpidf_drive.setSetpoint(-position);
+								rightpidf_drive.setSetpoint(position);
 							break;
 						default:
-								leftpidf_drive.setSetpoint(position/2);
+								//Note, right encoder is backwards
+								leftpidf_drive.setSetpoint(-position/2);
 								rightpidf_drive.setSetpoint(-position/2);
 							break;
 					}
 				}});
+		
+		GyroPID.setAbsoluteTolerance(TOLERANCE);
 		
 		leftpidf_drive = new PIDF_CANTalon("Left Position", driveBase.getLeftTalon(), Posit_TOLERANCE, false, false);
 		leftpidf_drive.setPID(Posit_P, Posit_I, Posit_D);
@@ -129,6 +135,8 @@ public class SuperAutoRotate extends CommandBase {
 	}
 	
 	protected void initialize() {
+		ahrs.gyroReset();
+		driveBase.resetEncoders();
 		driveBase.setSlaveMode(false);
 		driveBase.setControlMode(TalonControlMode.Position);
 		startPID();
@@ -136,6 +144,8 @@ public class SuperAutoRotate extends CommandBase {
 
 	protected void execute() {
 		driveBase.reportEncoders();
+		SmartDashboard.putNumber("Gyro Error", GyroPID.getError());
+		SmartDashboard.putNumber("Position (Rotate)", position);
 	}
 
 	protected boolean isFinished() {
@@ -144,6 +154,7 @@ public class SuperAutoRotate extends CommandBase {
 
 	protected void end() {
 		stopPID();
+		driveBase.initDrive();
 	}
 
 	protected void interrupted() {

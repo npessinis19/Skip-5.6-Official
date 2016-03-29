@@ -16,15 +16,20 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class AutoRotateToAngle extends CommandBase {
 
-	private static final double TOLERANCE = 0.3;
+	private static final double TOLERANCE = 0.5;
 	
 	private PIDController m_pid;
 	private double m_maxSpeed = 0.3;
 	private double m_degrees = 0.0;
 	
 	private double KP = 2.0;
-	private double KI = 2.0;
+	private double KI = 0.5;
 	private double KD = 1.0;
+	
+	double e_min = 1000;
+	boolean stop = false;
+	int count = 0;
+	private static final int sufficientCount = 100;
     	
     public AutoRotateToAngle(double degrees, double maxSpeed, double kp, double ki, double kd) {
                 
@@ -33,7 +38,7 @@ public class AutoRotateToAngle extends CommandBase {
     	m_maxSpeed = maxSpeed;
     	m_degrees = degrees;
     	buildController();
-    	setTimeout(2);
+    //setTimeout(10);
     }
 
 	public AutoRotateToAngle(double degrees, double maxSpeed) {
@@ -72,8 +77,19 @@ public class AutoRotateToAngle extends CommandBase {
                 new PIDOutput() {
                 	
                 	public void pidWrite(double d) {
-                		// Spin with the magnitude returned by the PID calculation, 
+                		// Spin with the magnitude returned by the PID calculation,
+                		double er = Math.abs(m_pid.getError());
+
+                    	if (er >= 0 && er <= TOLERANCE) {
+                    		m_pid.setPID(KP - 0.068 * (count+1), KI, KD);
+                    		 if (count++ > sufficientCount) {
+                    			 stop = true;
+                    		 } 
+                    	}
+                    	else {
+                    	count = 0;
                 		driveBase.driveArcade(0, d, false);
+                    	}
                 }});
 		m_pid.setAbsoluteTolerance(TOLERANCE);
 		m_pid.setOutputRange((m_maxSpeed * -1.0), m_maxSpeed);
@@ -82,6 +98,14 @@ public class AutoRotateToAngle extends CommandBase {
 
     // Called just before this Command runs the first time
     protected void initialize() {
+    	
+    	SmartDashboard.putNumber("P", KP);
+    	SmartDashboard.putNumber("I", KI);
+    	SmartDashboard.putNumber("D", KD);
+    	
+    	stop = false;
+    	count = 0;
+    	
     	//Brake mode on
 		driveBase.setSlaveMode(false);
 		driveBase.setTalonBrakes(true);
@@ -95,14 +119,19 @@ public class AutoRotateToAngle extends CommandBase {
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
     	SmartDashboard.putNumber("Gyro Angle", ahrs.getGyroAngle());
+    	
+    	double p = SmartDashboard.getNumber("P");
+    	double i = SmartDashboard.getNumber("I");
+    	double d = SmartDashboard.getNumber("D");
+    	//m_pid.setPID(m_pid.getP(), i, d);
+    	//m_pid.setPID(p, i, d);
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-    	double e = m_pid.getError();
-
-    	return ((e >= 0 && e <= TOLERANCE) || m_pid.onTarget());
+    	return stop;
     }
+    
 
     // Called once after isFinished returns true
     protected void end() {

@@ -31,7 +31,7 @@ public class TargetGoal extends CommandBase {
 	boolean onTarget;
 	
 	public TargetGoal() {
-		Build_Controller();
+	//	Build_Controller();
 		setTimeout(4);
 	}
 	
@@ -100,10 +100,11 @@ public class TargetGoal extends CommandBase {
 		ahrs.gyroReset();
 		driveBase.resetEncoders();
 		
-		driveBase.setSlaveMode(false);
-		driveBase.setTalonBrakes(true);
+		//driveBase.setSlaveMode(false);
+	//	driveBase.setTalonBrakes(true);
 		
-		reset_PID();
+		//reset_PID();
+		//Start_PID();
 	}
 
 	protected void execute() {
@@ -112,22 +113,23 @@ public class TargetGoal extends CommandBase {
 			grip.createImage();
 			count = count + 1;
 		}
-		
 		grip.calculateTargetData();
+		grip.printData();
 		
-		Set_Angle();
+		//Set_Angle();
 		
 	SmartDashboard.putNumber("Vision: Change in Angle", grip.getChangeinAngle());
 	SmartDashboard.putNumber("Vision: Change in Distance", grip.getChangeinDistance());
 	}
 
 	protected boolean isFinished() {
-		return isTimedOut() || grip.isOnTarget();
+		//return isTimedOut() || grip.isOnTarget();
+		return isTimedOut();
 	}
 
 	protected void end() {
-		End_PID();
-		reset_PID();
+		//End_PID();
+		//reset_PID();
 	}
 
 	protected void interrupted() {
