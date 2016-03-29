@@ -12,6 +12,7 @@ public class AutoTarget extends CommandGroup {
 	public AutoTarget() {
 		addSequential(new TargetGoal());
 		addSequential(new AutoRotateToAngle(CommandBase.grip.getChangeinAngle()));
+		addSequential(new TargetGoal());
 		//addSequential(new DriveStraight(CommandBase.grip.changeinDistance));
 		//addSequential(new TargetGoal());
 		//addSequential(new AutoRotateToAngle(CommandBase.grip.changeinAngle));

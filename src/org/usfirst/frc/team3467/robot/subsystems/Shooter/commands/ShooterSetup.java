@@ -4,8 +4,9 @@ import org.usfirst.frc.team3467.robot.commands.CommandBase;
 
 public class ShooterSetup extends CommandBase {
 
-	boolean isClear;
-	boolean latching;
+	boolean isClearing = false;
+	boolean isLatching = false;
+	boolean isBrowned = false;
 	
 	public ShooterSetup() {
 		requires(pultaCat);
@@ -19,34 +20,37 @@ public class ShooterSetup extends CommandBase {
 		pneumatics.compressorStop();
 		pultaCat.initPIDMode();
 		pultaCat.latch();
+		isLatching = true;
 		
-		System.out.println("Shooter Setup: Latching");
-		
-		isClear = false;
-		latching = true;
+		System.out.println("Shooter Setup: Latching");		
 	}
 
 	protected void execute() {
 		
-		pultaCat.callbackAlert(CommandBase.brownout.getLevel());
-		pultaCat.checkCurrent();
-		
-		if (pultaCat.checkBrownOut()) {
-			System.out.println("Shooter Browned Out");
-			end();
-		}
-		
-		if (pultaCat.checkLatchLimit() || pultaCat.resetBarIsLatched()) {
-			pultaCat.clear();
-			isClear = true;
+		// Only worry about brownout while latching
+		if (isLatching == true) {
+			pultaCat.checkCurrent();
+			if (pultaCat.checkBrownOut()) {
+				isBrowned = true;
+
+				System.out.println("Shooter Setup: Browned Out!");
+			}
 			
-			System.out.println("Shooter Setup: Clearing");
+			if (pultaCat.resetBarIsLatched() || isBrowned) {
+				pultaCat.clear();
+				isLatching = false;
+				isClearing = true;
+				
+				System.out.println("Shooter Setup: Clearing");
+			}
 		}
+		
 	}
 
 	protected boolean isFinished() {
 		// Only timeout on the latching portion of setup
-		if ((!isClear && isTimedOut()) || (isClear && pultaCat.resetBarIsClear())) {
+		if ((isLatching && isTimedOut()) || (isClearing && pultaCat.resetBarIsClear())) {
+			System.out.println("Shooter Setup: Finished");
 			return(true);
 		}
 		else
@@ -63,5 +67,4 @@ public class ShooterSetup extends CommandBase {
 	protected void interrupted() {
 		end();
 	}
-	
 }

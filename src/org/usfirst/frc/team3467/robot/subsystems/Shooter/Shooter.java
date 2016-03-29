@@ -32,10 +32,6 @@ public class Shooter extends PIDSubsystem implements PowerConsumer {
 	// Talon PDP channel number
 	private static final int WINCH_PDP_CHANNEL = 0;
 	
-	// Brownout power level
-	private Brownout.PowerLevel powerlevel = Brownout.PowerLevel.Normal;
-	boolean dontShoot = false;
-	
 	//Catapult Objects
 	private CANTalon m_resetBar;
 	private DoubleSolenoid m_catLatch;
@@ -52,6 +48,14 @@ public class Shooter extends PIDSubsystem implements PowerConsumer {
 	private double m_resetBarSetpoint;
 	private boolean m_usePID;
 
+	// Maximum allowed current for resetting the catapult
+	private static final double MAX_RESET_CURRENT = 50.0;
+
+	// Power flags
+	private boolean m_voltageTooLow = false;
+	private boolean m_currentTooHigh = false;
+	private boolean m_powerAlert = false;
+	
 	// Reset bar setpoints
 	private double m_clearPoint = 0.69;  // bar is out of the way of catapult
 	private double m_latchPoint = 0.30; // bar is holding catapult so it can be latched
@@ -152,8 +156,11 @@ public class Shooter extends PIDSubsystem implements PowerConsumer {
 		// Save the position
 		m_resetBarSetpoint = m_latchPoint;
 		
-		if (debugging)
+		if (debugging) {
 			SmartDashboard.putNumber("Shooter Setpoint", m_resetBarSetpoint);
+			SmartDashboard.putBoolean("Shooter Current Too High", m_currentTooHigh);
+			SmartDashboard.putBoolean("Shooter Voltage Too Low", m_voltageTooLow);
+		}
 	}
 	
 	public void clear() {
@@ -173,7 +180,7 @@ public class Shooter extends PIDSubsystem implements PowerConsumer {
 	}
 	
 	public boolean resetBarIsLatched() {
-		return (m_resetAngle.get() <= m_latchPoint || m_resetBar.isReverseSoftLimitEnabled());
+		return (m_resetAngle.get() <= m_latchPoint || m_resetBar.isRevLimitSwitchClosed());
 	}
 	
 	// Control the solenoid that latches the catapult
@@ -189,33 +196,49 @@ public class Shooter extends PIDSubsystem implements PowerConsumer {
 		m_catLatch.set(DoubleSolenoid.Value.kOff);		
 	}
 
-	// PowerConsumer
+	// PowerConsumer callback
 	public void callbackAlert(Brownout.PowerLevel level) {
 		switch (level) {
-		case Chill:
-			dontShoot = false;
-			break;
 		case Critical:
-			dontShoot = true;
+			m_voltageTooLow = true;
 			break;
 		default:
-			dontShoot = false;
+			m_voltageTooLow = false;
 			break;
 		}
 	}
 	
+	// Current Check
 	public void checkCurrent() {
-		double shooterCurrent = CommandBase.brownout.getCurrent(0);
-		if (shooterCurrent > 40) {
-			dontShoot = true;
+
+		if (CommandBase.brownout.getCurrent(0) > MAX_RESET_CURRENT) {
+			m_currentTooHigh = true;
+		} else {
+			m_currentTooHigh = false;
 		}
-		else {
-			dontShoot = false;
-		}
+		
 	}
 	
 	public boolean checkBrownOut() {
-		return dontShoot;
+		
+		boolean retVal = false;
+		
+		if (m_voltageTooLow || m_currentTooHigh) {
+			m_powerAlert = true;
+			retVal = true;
+		} else {
+			retVal = false;			
+		}
+
+		// Use m_powerAlert as a flag to know when to update the SmartDashboard
+		// (We don't want to spend time updating it if nothing is changing)
+		if (debugging && m_powerAlert) {
+			SmartDashboard.putBoolean("Shooter Current Too High", m_currentTooHigh);
+			SmartDashboard.putBoolean("Shooter Voltage Too Low", m_voltageTooLow);
+		}
+		m_powerAlert = retVal;
+
+		return retVal;
 	}
 	
 	// This is called during RobotInit

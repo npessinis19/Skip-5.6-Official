@@ -7,7 +7,6 @@ public class GRIP {
 	
 	public NetworkTable table;
 
-	
 //Vision Processing Constants
 	//Is the goal on target
 	public boolean imageOnTarget = false;
@@ -50,35 +49,46 @@ public class GRIP {
 	private double Centery = 0.0;
 	private double Height = 0.0;
 	private double Width = 0.0;
+	private int contours = 0;
 	
 	public GRIP() {
 		table = NetworkTable.getTable("GRIP/myContoursReport");
 	}
 	
-	public boolean createImage () {
+	//Get values from Network Table and work with those values
+	public void createImage () {
 			double[] centerx = table.getNumberArray("centerX", defaultValue);
 			double[] centery = table.getNumberArray("centerY", defaultValue);
 			double[] width = table.getNumberArray("width", defaultValue);
 			double[] height = table.getNumberArray("height", defaultValue);
 			
-			SmartDashboard.putNumber("Vision: Contours", centerx.length);
+			contours = centerx.length;
+			System.out.println("Contours: " + contours);
 			
-			if (centerx.length == 1) {
+			if (contours > 0) {
+				System.out.println("centerx[0]: " + centerx[0]);
 				
-				Centerx = centerx[0];
-				Centery = centery[0];
-				Width = width[0];
-				Height = height[0];
-				
-				SmartDashboard.putNumber("Centerx", Centerx);
-				SmartDashboard.putNumber("Width", Width);
-				
-				return true;
+					Centerx = centerx[0];
+					Centery = centery[0];
+					Width = width[0];
+					Height = height[0];
+						
+					//Print values to SmartDashboard
+						SmartDashboard.putNumber("Vision: Centerx", Centerx);
+						SmartDashboard.putNumber("Vision: Centery", Centery);
+						SmartDashboard.putNumber("Vision: Width", Width);			
+						SmartDashboard.putNumber("Vision: Contours", centerx.length);				
 			}
-			else {
-				return false;
-			}
+	}
+	
+	public boolean isGoodImage() {
+		if(contours == 1) {
+			return true;
 		}
+		else {
+			return false;
+		}
+	}
 	
 	//Get the specific values from the network table
 	public double getCenterX() {
@@ -113,6 +123,8 @@ public class GRIP {
 		return changeinDistance;
 	}
 	
+	
+	//Calibrate where the target should be
 	public void setTarget_distnce(double distance) {
 		target_distance = distance;
 	}
@@ -121,6 +133,16 @@ public class GRIP {
 		target_angle = angle;
 	}
 	
+
+	public void printData() {
+		SmartDashboard.putNumber("Vision: Distance", distance_delta);
+		SmartDashboard.putNumber("Vision: Angle", angle_theta);
+		SmartDashboard.putNumber("Vision: Change in Angle", changeinAngle);
+		SmartDashboard.putNumber("Vision: Change in Distance", changeinDistance);
+	}
+	
+	
+	//Calculations of distance and of position
 	public boolean isOnPixel() {
 		boolean onPixel = false;
 		if ((Centerx - targetx) >=0 && (Centerx - targetx) <= 1/*Pixel Tolerance*/) {
@@ -131,8 +153,7 @@ public class GRIP {
 		return onPixel;
 	}
 	
-	public boolean isOnTarget() {
-		
+	public void calculateTargetData() {
 		imageOnTarget = false;
 		
 		//Calculates The Distance From the Target
@@ -145,18 +166,25 @@ public class GRIP {
 		changeinDistance = distance_delta - target_distance;
 		changeinAngle = (target_angle - angle_theta) - 10;
 		
-		//Prints Values to SmartDashBoard
+		//Prints the distances and angles needed to move to SmartDashBoard
 		SmartDashboard.putNumber("Vision: Distance", distance_delta);
 		SmartDashboard.putNumber("Vision: Angle", angle_theta);
-		System.out.println("Vision: Change in Angle" + changeinAngle);
 
+		SmartDashboard.putNumber("Vision: Change in Angle", changeinAngle);
+		SmartDashboard.putNumber("Vision: Change in Distance", changeinDistance);
+	}
+	
+	public boolean isOnTarget() {
 		if ((Math.abs(changeinDistance) >= 0 && Math.abs(changeinDistance) <= TOLERANCE_distance) &&
-				Math.abs(changeinAngle) >= 0 && Math.abs(changeinAngle) <= TOLERANCE_angle) {
+			 Math.abs(changeinAngle) >= 0 && Math.abs(changeinAngle) <= TOLERANCE_angle) {
 			imageOnTarget = true;
 		}
-		SmartDashboard.putNumber("Image: Change in Angle", changeinAngle);
-		SmartDashboard.putNumber("Image: Change in Distance", changeinDistance);
+		else {
+			imageOnTarget = false;
+		}
+		
 		SmartDashboard.putBoolean("Image On Target", imageOnTarget);
+		
 		return imageOnTarget;
 	}
 }	
