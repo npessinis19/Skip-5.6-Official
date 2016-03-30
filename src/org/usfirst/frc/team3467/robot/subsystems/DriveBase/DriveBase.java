@@ -123,14 +123,15 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 				leftTalon.changeControlMode(TalonControlMode.PercentVbus);
 				rightTalon.changeControlMode(TalonControlMode.PercentVbus);
 				
+
+
+				t_controlMode = TalonControlMode.PercentVbus;
+		}			
 				// Extra CIMs are slaves
 				setSlaveMode(true);
 				
 				// Brakes are off
 				setTalonBrakes(false);
-
-				t_controlMode = TalonControlMode.PercentVbus;
-		}
 		// Don't need to invert because the sticks give negative values
 		// in the forward direction
 		leftTalon.setInverted(false);

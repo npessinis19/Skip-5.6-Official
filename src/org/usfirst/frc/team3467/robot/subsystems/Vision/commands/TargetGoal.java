@@ -20,18 +20,18 @@ public class TargetGoal extends CommandBase {
 	private static final double P_P = 1.0;
 	private static final double P_I = 0.0;
 	private static final double P_D = 0.0;
-	private static final double TOLERANCE = 0.0;
+	private static final double TOLERANCE = 1.0;
 
 	private static final double P = 1.0;
 	private static final double I = 0.0;
 	private static final double D = 0.0;
-	private static final double tolerance = 0.0;
+	private static final double tolerance = 1.0;
 	double position;
 	
 	boolean onTarget;
 	
 	public TargetGoal() {
-		Build_Controller();
+	//	Build_Controller();
 		setTimeout(4);
 	}
 	
@@ -100,10 +100,11 @@ public class TargetGoal extends CommandBase {
 		ahrs.gyroReset();
 		driveBase.resetEncoders();
 		
-		driveBase.setSlaveMode(false);
-		driveBase.setTalonBrakes(true);
+		//driveBase.setSlaveMode(false);
+	//	driveBase.setTalonBrakes(true);
 		
-		reset_PID();
+		//reset_PID();
+		//Start_PID();
 	}
 
 	protected void execute() {
@@ -112,22 +113,23 @@ public class TargetGoal extends CommandBase {
 			grip.createImage();
 			count = count + 1;
 		}
-		
 		grip.calculateTargetData();
+		grip.printData();
 		
-		Set_Angle();
+		//Set_Angle();
 		
 	SmartDashboard.putNumber("Vision: Change in Angle", grip.getChangeinAngle());
 	SmartDashboard.putNumber("Vision: Change in Distance", grip.getChangeinDistance());
 	}
 
 	protected boolean isFinished() {
-		return isTimedOut() || grip.isOnTarget();
+		//return isTimedOut() || grip.isOnTarget();
+		return isTimedOut();
 	}
 
 	protected void end() {
-		End_PID();
-		reset_PID();
+		//End_PID();
+		//reset_PID();
 	}
 
 	protected void interrupted() {
