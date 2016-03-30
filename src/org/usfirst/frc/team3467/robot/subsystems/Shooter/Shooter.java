@@ -180,7 +180,7 @@ public class Shooter extends PIDSubsystem implements PowerConsumer {
 	}
 	
 	public boolean resetBarIsLatched() {
-		return (m_resetAngle.get() <= m_latchPoint || m_resetBar.isRevLimitSwitchClosed());
+		return (m_resetAngle.get() <= m_latchPoint  || m_resetBar.isRevLimitSwitchClosed());
 	}
 	
 	// Control the solenoid that latches the catapult
@@ -263,7 +263,7 @@ public class Shooter extends PIDSubsystem implements PowerConsumer {
 	// Check Latch catapult limit switch
 	public boolean checkLatchLimit() {
 		return m_resetBar.isRevLimitSwitchClosed();
-	}
+	} 
 	
 	// PIDController methods
 	protected double returnPIDInput() {

@@ -140,7 +140,7 @@ public class OI {
 	
 	//Catapult
 		// Halt Reset Bar PID and switch to manual mode
-		new JoystickButton(operator, Gamepad.leftTrigger_Axis)
+		new JoystickButton(operator, Gamepad.rightTrigger_Axis)
 			.whileHeld(new ShooterReset());
 		
 		//Reload Catapult
