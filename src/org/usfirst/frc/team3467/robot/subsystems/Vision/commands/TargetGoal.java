@@ -40,7 +40,7 @@ public class TargetGoal extends CommandBase {
 	
 	public TargetGoal() {
 	//Build_Controllers();
-	//setTimeout(4);
+	//setTimeout(5);
 	}
 	
 	public void Build_Controllers() {
@@ -166,6 +166,8 @@ public class TargetGoal extends CommandBase {
 		grip.printData();
 		ahrs.reportGyroValues();
 		driveBase.reportEncoders();
+		
+		SmartDashboard.putNumber("Test angle", grip.getChangeinAngle());
 		
 		deBug();
 		

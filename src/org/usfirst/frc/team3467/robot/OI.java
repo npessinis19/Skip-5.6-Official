@@ -4,12 +4,14 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+import org.usfirst.frc.team3467.robot.subsystems.Vision.commands.AutoAim;
 import org.usfirst.frc.team3467.robot.subsystems.Vision.commands.LightSwitch;
 import org.usfirst.frc.team3467.robot.subsystems.Vision.commands.TargetGoal;
 import org.usfirst.frc.team3467.robot.subsystems.Vision.commands.VisionCalibrate;
 import org.usfirst.frc.team3467.robot.commands.CommandBase;
 import org.usfirst.frc.team3467.robot.commands.autonomous.AutoTarget;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.ArcadeDrive;
+import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.AutoRotateToAngle;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.PreciseRotateToAngle;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.ResetDriveEncoders;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.SetBrakeMode;
@@ -139,7 +141,7 @@ public class OI {
 	
 	//Catapult
 		// Halt Reset Bar PID and switch to manual mode
-		new JoystickButton(operator, Gamepad.leftTrigger_Axis)
+		new JoystickButton(operator, Gamepad.rightTrigger_Axis)
 			.whileHeld(new ShooterReset());
 		
 		//Reload Catapult
@@ -203,11 +205,13 @@ public class OI {
 		// SmartDashboard Buttons
 		SmartDashboard.putData("Drivebase: Reset Encoders", new ResetDriveEncoders());
 		SmartDashboard.putData("Shooter: Calibrate", new ShooterOneWayCalibrate());
-		SmartDashboard.putData("AHRS: Reset Gryo", new ResetGyro());
+		SmartDashboard.putData("AHRS: Reset Gyro", new ResetGyro());
 		SmartDashboard.putData("Vision: Target Goal", new TargetGoal());
 		SmartDashboard.putData("Vision: Calibrate", new VisionCalibrate());
-		SmartDashboard.putData("Move on Target", new AutoTarget());
-		SmartDashboard.putData("Rotate Test", new SuperAutoRotate(90, 1));
+		SmartDashboard.putData("Test SuperAutoRotate", new SuperAutoRotate(90, 0));
+		SmartDashboard.putData("Test AutoRotateToAngle", new AutoRotateToAngle(90));
+		SmartDashboard.putData("Test AutoAim", new AutoAim());
+		SmartDashboard.putData("Test AutoTarget", new AutoTarget());
 	}
 }
 
