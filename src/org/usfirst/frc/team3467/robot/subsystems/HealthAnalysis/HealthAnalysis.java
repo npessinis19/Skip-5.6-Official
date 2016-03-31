@@ -1,4 +1,4 @@
-package org.usfirst.frc.team3467.robot.subsytems.HealthAnalysis;
+package org.usfirst.frc.team3467.robot.subsystems.HealthAnalysis;
 
 import org.usfirst.frc.team3467.robot.subsystems.Brownout.Brownout;
 import org.usfirst.frc.team3467.robot.commands.CommandBase;
