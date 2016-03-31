@@ -18,8 +18,6 @@ public class AutoPortCullis extends CommandGroup {
 		//addSequential(new ShooterPrepare());
 		addSequential(new Bar_actuate(UtilityBar.kIn));
 		addSequential(new Bar_actuate(UtilityBar.kOut));
-		addSequential(new DriveStraight(3500));
-		addSequential(new Bar_actuate(UtilityBar.kIn));
-		addSequential(new DriveStraight(2000, 0.8));
+		addSequential(new DriveStraight(5500));
 	}
 }
