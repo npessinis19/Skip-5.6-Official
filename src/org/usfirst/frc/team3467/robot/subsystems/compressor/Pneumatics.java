@@ -14,7 +14,7 @@ public class Pneumatics extends Subsystem implements PowerConsumer {
 
 	private Compressor scorpionCompressor;
 	private AnalogInput pressureSensor;
-	private boolean compressorActive = false;
+	private boolean compressorActive = true;
 	
 	// Pneumatics is a singleton
 	private static Pneumatics instance = new Pneumatics();
@@ -34,7 +34,7 @@ public class Pneumatics extends Subsystem implements PowerConsumer {
 		
 		scorpionCompressor = new Compressor();
 		pressureSensor = new AnalogInput(RobotMap.pneumatics_sensor_port);
-		scorpionCompressor.stop();;
+		scorpionCompressor.start();
 		compressorActive = true;
 		
 		Brownout.getInstance().registerCallback(this);
@@ -66,7 +66,7 @@ public class Pneumatics extends Subsystem implements PowerConsumer {
 		case Normal:
 		default:
 			if (!compressorActive) {
-				//scorpionCompressor.start();
+				scorpionCompressor.start();
 				compressorActive = true;
 			}
 			break;

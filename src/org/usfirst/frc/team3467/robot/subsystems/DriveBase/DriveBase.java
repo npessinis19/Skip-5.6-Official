@@ -16,9 +16,6 @@ import org.usfirst.frc.team3467.robot.subsystems.Brownout.PowerConsumer;
 
 public class DriveBase extends Subsystem implements PowerConsumer {
 	
-	//Debugging?
-	private static final boolean t_debugging = true;
-	
 	//Use to Toggle Arcade Drive, and t_useTank Drive
 	private boolean t_useTank = true;
 	
@@ -30,7 +27,8 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 	//Instance of the DriveBase Class
 	private static DriveBase 		instance;
 	
-	//DriveBase get instance method
+	
+	//DriveBase get instances
 	public DriveBase getInstance() {
 		return instance;
 	}
@@ -42,6 +40,7 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 	public CANTalon getRightTalon() {
 		return rightTalon;
 	}
+	
 	
 	//Initializing the Default Command
 	public void initDefaultCommand() {
@@ -55,12 +54,11 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 		}
 	}
 	
+	
 	//DriveBase class constructor
 	public DriveBase() {
-		//DriveBase instance = the current instance
 		instance = this;
 		
-		//Create instances of CANTalon motor controllers
 		leftTalon = new CANTalon(RobotMap.drivebase_LeftTalon);
 		rightTalon = new CANTalon(RobotMap.drivebase_RightTalon);
 		leftTalon2 = new CANTalon(RobotMap.drivebase_LeftTalon2);
@@ -68,17 +66,14 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 		leftTalon3 = new CANTalon(RobotMap.drivebase_LeftTalon3);
 		rightTalon3 = new CANTalon(RobotMap.drivebase_RightTalon3);
 		
-		//Set default control Modes for CANTalons
-		leftTalon.changeControlMode(TalonControlMode.PercentVbus);
-		rightTalon.changeControlMode(TalonControlMode.PercentVbus);
-		
-		//Slave extra talons on each side
+		//Slave extra Talons on each side
 		setSlaveMode(true);
 		
 		// Turn off Brake mode
 		setTalonBrakes(false);
 		
-		t_controlMode = CANTalon.TalonControlMode.PercentVbus;
+		//Set default control Modes for Master CANTalons
+		setControlMode(TalonControlMode.PercentVbus);
 		
 		//Set SIM encoders as feedback devices
 		leftTalon.setFeedbackDevice(CANTalon.FeedbackDevice.QuadEncoder);
@@ -93,6 +88,7 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 		t_drive.setSensitivity(0.5);
 		t_drive.setMaxOutput(1.0);
 	}
+	
 	
 	//Called for a PowerLevel update (See Brownout)
 	public void callbackAlert(Brownout.PowerLevel level) {
@@ -111,6 +107,7 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 			break;
 		}
 	}
+	
 	
 	// Set drive mode
 	public void setDriveMode(boolean usetank) {
@@ -138,7 +135,6 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 		rightTalon.setInverted(false);
 	}
 	
-	
 	//Use Standard Tank Drive method
 	public void driveTank (double LeftTalon, double RightTalon, boolean squared) {
 		t_drive.tankDrive(LeftTalon, RightTalon, squared);
@@ -152,15 +148,16 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 		t_drive.arcadeDrive(move, rotate, square);
 		if (true) {
 			reportEncoders();
+			CommandBase.ahrs.reportGyroValues();
 		}
 	}
 
 	// pass-thru to RobotDrive drive() method (used in autonomous)
 	public void drive(double outputMagnitude, double curve) {
-
 		t_drive.drive(outputMagnitude, curve);
 	}
 
+	
 	public void setSlaveMode(boolean enslave) {
 		if (enslave == false) {
 			leftTalon2.changeControlMode(TalonControlMode.PercentVbus);
@@ -189,6 +186,7 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 	public void setControlMode(TalonControlMode controlMode) {
 		leftTalon.changeControlMode(controlMode);
 		rightTalon.changeControlMode(controlMode);
+		
 		// Save control mode so we will know if we have to set it back later
 		t_controlMode = controlMode;
 	}

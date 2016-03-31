@@ -1,6 +1,7 @@
 package org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands;
 
 import org.usfirst.frc.team3467.robot.commands.CommandBase;
+import org.usfirst.frc.team3467.robot.pid.PIDF_CANTalon;
 
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDOutput;
@@ -19,20 +20,23 @@ public class AutoRotateToAngle extends CommandBase {
 	private static final double TOLERANCE = 0.5;
 	
 	private PIDController m_pid;
-	private double m_maxSpeed = 0.3;
+	
+	private double m_maxSpeed = 0.35;
 	private double m_degrees = 0.0;
 	
+	//Initial PID constants
 	private double KP = 2.0;
-	private double KI = 0.5;
-	private double KD = 1.0;
+	private double KI = 0.05;
+	private double KD = 0.3;
 	
-	double e_min = 1000;
-	boolean stop = false;
-	int count = 0;
-	private static final int sufficientCount = 100;
+	//Management Variables
+	private boolean stop = false; //Used to turn off command if robot in tolerance zone
+	private int count = 0; //Counter starts when robot is in tolerance zone
+	private static final int sufficientCount = 28; //When count is this number, the command will end
+	private double oldKP = KP;
     	
-    public AutoRotateToAngle(double degrees, double maxSpeed, double kp, double ki, double kd) {
-                
+
+    public AutoRotateToAngle(double degrees, double maxSpeed, double kp, double ki, double kd) {    
     	requires(driveBase);
     	KP = kp; KI = ki; KD = kd;
     	m_maxSpeed = maxSpeed;
@@ -42,7 +46,6 @@ public class AutoRotateToAngle extends CommandBase {
     }
 
 	public AutoRotateToAngle(double degrees, double maxSpeed) {
-                
 		requires(driveBase);
     	m_maxSpeed = maxSpeed;
     	m_degrees = degrees;
@@ -50,14 +53,12 @@ public class AutoRotateToAngle extends CommandBase {
 	}
     	
 	public AutoRotateToAngle(double degrees) {
-    	        
     	requires(driveBase);
     	m_degrees = degrees;
     	buildController();
 	}
     	
     private void buildController() {
- 
        m_pid = new PIDController(KP, KI, KD,
                 new PIDSource() {
                     PIDSourceType m_sourceType = PIDSourceType.kDisplacement;
@@ -78,10 +79,21 @@ public class AutoRotateToAngle extends CommandBase {
                 	
                 	public void pidWrite(double d) {
                 		// Spin with the magnitude returned by the PID calculation,
-                		double er = Math.abs(m_pid.getError());
+                		double er = m_pid.getError();
 
-                    	if (er >= 0 && er <= TOLERANCE) {
-                    		m_pid.setPID(KP - 0.068 * (count+1), KI, KD);
+                    	if (Math.abs(er) >= 0 && Math.abs(er) <= TOLERANCE) {
+                    		if (KP > 0.05) {
+                    			KP = oldKP - 0.3 * (count+1);
+                    			
+                    			if (KP < 0.01) KP = 0.01;
+                    			
+                    			m_pid.setPID(KP, KI, KD);
+                    			oldKP = KP;
+                    		}
+
+                    		System.out.println("KP " + KP);
+                    		System.out.println("Count " + count);
+                    		
                     		 if (count++ > sufficientCount) {
                     			 stop = true;
                     		 } 
@@ -91,9 +103,10 @@ public class AutoRotateToAngle extends CommandBase {
                 		driveBase.driveArcade(0, d, false);
                     	}
                 }});
-		m_pid.setAbsoluteTolerance(TOLERANCE);
+		
+       	m_pid.setAbsoluteTolerance(TOLERANCE);
 		m_pid.setOutputRange((m_maxSpeed * -1.0), m_maxSpeed);
-        m_pid.setSetpoint(m_degrees);
+        //m_pid.setSetpoint(m_degrees);
     }
 
     // Called just before this Command runs the first time
@@ -103,15 +116,19 @@ public class AutoRotateToAngle extends CommandBase {
     	SmartDashboard.putNumber("I", KI);
     	SmartDashboard.putNumber("D", KD);
     	
+    	//Initialize management
     	stop = false;
     	count = 0;
+    	oldKP = KP;
     	
     	//Brake mode on
 		driveBase.setSlaveMode(false);
 		driveBase.setTalonBrakes(true);
 		
     	// Get everything in a safe starting state.
-    	m_pid.reset();
+    	ahrs.gyroReset();
+		m_pid.reset();
+		m_pid.setSetpoint(m_degrees);
         m_pid.enable();
         SmartDashboard.putNumber("Rotate SetPoint", m_pid.getSetpoint());
     }
@@ -119,11 +136,16 @@ public class AutoRotateToAngle extends CommandBase {
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
     	SmartDashboard.putNumber("Gyro Angle", ahrs.getGyroAngle());
+    	SmartDashboard.putNumber("Error", m_pid.getError());
     	
     	double p = SmartDashboard.getNumber("P");
     	double i = SmartDashboard.getNumber("I");
     	double d = SmartDashboard.getNumber("D");
-    	//m_pid.setPID(m_pid.getP(), i, d);
+    	
+    	m_pid.setPID(m_pid.getP(), i, d);
+    	
+    	SmartDashboard.putNumber("P", KP);
+    	
     	//m_pid.setPID(p, i, d);
     }
 
@@ -132,11 +154,10 @@ public class AutoRotateToAngle extends CommandBase {
     	return stop;
     }
     
-
     // Called once after isFinished returns true
     protected void end() {
     	// Stop PID and the wheels
-    	m_pid.disable();
+    	m_pid.reset();
         driveBase.driveArcade(0, 0, false);
         System.out.println("AutoRotate has finished");
     }

@@ -21,6 +21,8 @@ public class ShooterSetup extends CommandBase {
 		pultaCat.initPIDMode();
 		pultaCat.latch();
 		isLatching = true;
+		isClearing = false;
+		isBrowned = false;
 		
 		System.out.println("Shooter Setup: Latching");		
 	}
@@ -44,7 +46,6 @@ public class ShooterSetup extends CommandBase {
 				System.out.println("Shooter Setup: Clearing");
 			}
 		}
-		
 	}
 
 	protected boolean isFinished() {

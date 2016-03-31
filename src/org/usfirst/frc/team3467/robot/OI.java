@@ -140,7 +140,7 @@ public class OI {
 	
 	//Catapult
 		// Halt Reset Bar PID and switch to manual mode
-		new JoystickButton(operator, Gamepad.leftTrigger_Axis)
+		new JoystickButton(operator, Gamepad.rightTrigger_Axis)
 			.whileHeld(new ShooterReset());
 		
 		//Reload Catapult
@@ -204,13 +204,12 @@ public class OI {
 		// SmartDashboard Buttons
 		SmartDashboard.putData("Drivebase: Reset Encoders", new ResetDriveEncoders());
 		SmartDashboard.putData("Shooter: Calibrate", new ShooterOneWayCalibrate());
-		SmartDashboard.putData("AHRS: Reset Gryo", new ResetGyro());
+		SmartDashboard.putData("AHRS: Reset Gyro", new ResetGyro());
 		SmartDashboard.putData("Vision: Target Goal", new TargetGoal());
 		SmartDashboard.putData("Vision: Calibrate", new VisionCalibrate());
-		SmartDashboard.putData("Move on Target", new AutoTarget());
-		SmartDashboard.putData("Rotate Test", new SuperAutoRotate(90, 0));
-		SmartDashboard.putData("Auto Rotate 90", new AutoRotateToAngle(90));
-		SmartDashboard.putData("Auto Target", new AutoTarget());
+		SmartDashboard.putData("Test SuperAutoRotate", new SuperAutoRotate(90, 0));
+		SmartDashboard.putData("Test AutoRotateToAngle", new AutoRotateToAngle(90));
+		//SmartDashboard.putData("Test AutoTarget", new AutoTarget());
 	}
 }
 
