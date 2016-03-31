@@ -7,7 +7,6 @@ public class GRIP {
 	
 	public NetworkTable table;
 
-	
 //Vision Processing Constants
 	//Is the goal on target
 	public boolean imageOnTarget = false;
@@ -64,17 +63,21 @@ public class GRIP {
 			double[] height = table.getNumberArray("height", defaultValue);
 			
 			contours = centerx.length;
-		
-				Centerx = centerx[0];
-				Centery = centery[0];
-				Width = width[0];
-				Height = height[0];
+			
+			if (contours > 0) {
+				System.out.println("centerx[0]: " + centerx[0]);
 				
-			//Print values to SmartDashboard
-				SmartDashboard.putNumber("Vision: Centerx", Centerx);
-				SmartDashboard.putNumber("Vision: Centery", Centery);
-				SmartDashboard.putNumber("Vision: Width", Width);			
-				SmartDashboard.putNumber("Vision: Contours", centerx.length);
+					Centerx = centerx[0];
+					Centery = centery[0];
+					Width = width[0];
+					Height = height[0];
+						
+					//Print values to SmartDashboard
+						SmartDashboard.putNumber("Vision: Centerx", Centerx);
+						SmartDashboard.putNumber("Vision: Centery", Centery);
+						SmartDashboard.putNumber("Vision: Width", Width);			
+						SmartDashboard.putNumber("Vision: Contours", centerx.length);				
+			}
 	}
 	
 	public boolean isGoodImage() {
@@ -135,6 +138,7 @@ public class GRIP {
 		SmartDashboard.putNumber("Vision: Angle", angle_theta);
 		SmartDashboard.putNumber("Vision: Change in Angle", changeinAngle);
 		SmartDashboard.putNumber("Vision: Change in Distance", changeinDistance);
+		SmartDashboard.putNumber("Vision: Contours", contours);
 	}
 	
 	
@@ -160,7 +164,7 @@ public class GRIP {
 		
 		//Calculate the distances and angles needed to move
 		changeinDistance = distance_delta - target_distance;
-		changeinAngle = (target_angle - angle_theta) - 10;
+		changeinAngle = (target_angle - angle_theta);
 		
 		//Prints the distances and angles needed to move to SmartDashBoard
 		SmartDashboard.putNumber("Vision: Distance", distance_delta);
