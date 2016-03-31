@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+import org.usfirst.frc.team3467.robot.subsystems.Vision.commands.AutoAim;
 import org.usfirst.frc.team3467.robot.subsystems.Vision.commands.LightSwitch;
 import org.usfirst.frc.team3467.robot.subsystems.Vision.commands.TargetGoal;
 import org.usfirst.frc.team3467.robot.subsystems.Vision.commands.VisionCalibrate;
@@ -209,7 +210,8 @@ public class OI {
 		SmartDashboard.putData("Vision: Calibrate", new VisionCalibrate());
 		SmartDashboard.putData("Test SuperAutoRotate", new SuperAutoRotate(90, 0));
 		SmartDashboard.putData("Test AutoRotateToAngle", new AutoRotateToAngle(90));
-		//SmartDashboard.putData("Test AutoTarget", new AutoTarget());
+		SmartDashboard.putData("Test AutoAim", new AutoAim());
+		SmartDashboard.putData("Test AutoTarget", new AutoTarget());
 	}
 }
 
