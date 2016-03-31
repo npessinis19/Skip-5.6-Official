@@ -27,7 +27,6 @@ public class MXP_AHRS extends Subsystem {
 		} catch (RuntimeException ex) {
 				DriverStation.reportError("Error Instantiating NavX MXP: " + ex.getMessage(), true);
 		}
-		
 	}
 	
 	//Get AHRS instance method
@@ -51,4 +50,11 @@ public class MXP_AHRS extends Subsystem {
 		SmartDashboard.putBoolean("Calibrating?", ahrs.isCalibrating());
 		return ahrs.getYaw();
 	}
+	
+	public void reportGyroValues() {
+		SmartDashboard.putNumber("Gyro Yaw", ahrs.getYaw());
+		SmartDashboard.putNumber("Gyro Angle", ahrs.getAngle());
+	}
+	
+	
 }

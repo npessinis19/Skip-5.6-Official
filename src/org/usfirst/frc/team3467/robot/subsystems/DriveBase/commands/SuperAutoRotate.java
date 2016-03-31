@@ -28,9 +28,15 @@ public class SuperAutoRotate extends CommandBase {
 	private static double Gyro_P = 1.0;
 	private static double Gyro_I = 0.001;
 	private static double Gyro_D = 0.0;
-	private static double TOLERANCE = 0.05;
-	double angle;
-	int mode = 0;
+	private static double TOLERANCE = 0.5;
+	
+	//Management Variables
+	private double angle; //Desired angle as SetPoint
+	private int mode = 0; //Turning mode (0-both sides, 1-left side, 2-right side)
+	private boolean stop = false; //Turn off command when in tolerance zone
+	private int count = 0; //Counter starts when robot is in tolerance zone
+	private static final int sufficientCount = 28; //Once count reaches 28, stop command
+	private double oldGyro_P = Gyro_P;
 	
 	public SuperAutoRotate(double angle, int mode) {
 		requires(driveBase);
@@ -69,6 +75,7 @@ public class SuperAutoRotate extends CommandBase {
 		Posit_D = Pd;
 	}
 	
+	
 	public void buildControllers() {
 		
 		GyroPID = new PIDController(Gyro_P, Gyro_I, Gyro_D, 
@@ -91,20 +98,38 @@ public class SuperAutoRotate extends CommandBase {
 				
 				public void pidWrite(double angle) {
 					position = angle * 14.75; //Encoder ticks required to rotate 1 degree
-				
-					switch(mode) {
-						case 1:
-								leftpidf_drive.setSetpoint(position);
-							break;
-						case 2:
-								rightpidf_drive.setSetpoint(position);
-							break;
-						default:
-								//Note, right encoder is backwards
-								leftpidf_drive.setSetpoint(-position/2);
-								rightpidf_drive.setSetpoint(-position/2);
-							break;
+					double error = GyroPID.getError();
+					
+					if (Math.abs(error) >= 0 || Math.abs(error) <= TOLERANCE) {
+						if (Gyro_P > 0.1) {
+							Gyro_P = oldGyro_P - 0.3 * (count + 1);
+							if (Gyro_P < 0.01) Gyro_P = 0.01;
+						}
+						
+						System.out.println("Gyro_P " + Gyro_P);
+						System.out.println("count " + count);
+						
+						if (count++ < sufficientCount) {
+							stop = true;
+						}
 					}
+					else {
+						count = 0;
+							
+						switch(mode) {
+							case 1:
+										leftpidf_drive.setSetpoint(position);
+							break;
+							case 2:
+										rightpidf_drive.setSetpoint(position);
+							break;
+							default:
+										//Note, right encoder is backwards
+										leftpidf_drive.setSetpoint(-position/2);
+										rightpidf_drive.setSetpoint(-position/2);
+							break;
+								}
+							}
 				}});
 		
 		GyroPID.setAbsoluteTolerance(TOLERANCE);
