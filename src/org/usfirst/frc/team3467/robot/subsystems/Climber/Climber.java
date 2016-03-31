@@ -6,6 +6,10 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 public class Climber extends Subsystem {
 	
+	public static final double kStop = 0;
+	public static final double Grab = 
+	
+	public CANTalon grabberTalon;	
 	public DoubleSolenoid datPiston;
 	
 	public Climber() {
@@ -21,8 +25,6 @@ public class Climber extends Subsystem {
 		return piston() = false;
 		
 	}
-	
-	bae.set(.5);
 	
 	protected void initDefaultCommand() {
 		
