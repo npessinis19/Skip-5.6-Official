@@ -26,6 +26,8 @@ public class AutoAim extends CommandBase {
 	private int count = 0; //Counter starts when robot is in tolerance zone
 	private static final int sufficientCount = 28; //When count is this number, the command will end
 	private double oldKP = KP;
+	private int aimState = 1; //Is the robot "moving" (Setpoint has been set
+	private int imageCount = 0; 
 	
 	private static final boolean debugging = false;
 
@@ -122,6 +124,8 @@ public class AutoAim extends CommandBase {
     	stop = false;
     	count = 0;
     	oldKP = KP;
+    	imageCount = 0;
+    	aimState = 1;
     	
     	//Brake mode on
 		driveBase.setSlaveMode(false);
@@ -135,14 +139,38 @@ public class AutoAim extends CommandBase {
 	}
 
 	protected void execute() {
-		if (!grip.isGoodImage()) {
-			grip.createImage();
-		}
-		else {
-			grip.calculateTargetData();
-			m_pid.setSetpoint(grip.getChangeinAngle());
+		switch (aimState) {
+		//State one, search for a good image
+		case 1: if(!grip.isGoodImage()) {
+					grip.createImage();
+				}
+				else {
+					aimState = 2;
+				}
+			break;
+		//Calculate target Data
+		case 2:
+				grip.calculateTargetData();
+				aimState = 3;
+			break;
+		//Move to correct position
+		case 3:
+				m_pid.setSetpoint(grip.getChangeinAngle());
+				aimState = 4;
+			break;
+		//Check if we're on Target (if not, go to aimState 1)
+		case 4: 
+				if (!grip.imageOnTarget) {
+					aimState = 1;
+				}
+				else {
+					System.out.println("AutokAim on Target");
+					end();
+				}
+			break;
 		}
 		
+		SmartDashboard.putNumber("Vision: aimState", aimState);
     	SmartDashboard.putNumber("Gyro Angle", ahrs.getGyroAngle());
     	SmartDashboard.putNumber("Error", m_pid.getError());
     	deBug();
@@ -162,5 +190,4 @@ public class AutoAim extends CommandBase {
 	protected void interrupted() {
 		end();
 	}
-
 }
