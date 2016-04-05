@@ -15,28 +15,24 @@ public class ArcadeDrive extends CommandBase {
 		driveBase.initDrive();
 	}
 
-	@Override
 	protected void execute() {
 		driveBase.driveArcade(oi.getPrimeY(), oi.getPrimeX(), true);
+		
 		// Alternate Method?
 		//driveBase.driveArcade(oi.getPrimeY(), oi.getPrimeTwist(), true);
-		SmartDashboard.putNumber("Arcade Gyro Yaw", ahrs.getGyroYaw());
+		
+		ahrs.reportGyroValues();;
 	}
 
 	protected boolean isFinished() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	protected void end() {
-		// TODO Auto-generated method stub
-		
 	}
 
-	@Override
 	protected void interrupted() {
-		// TODO Auto-generated method stub
-		
+		end();
 	}
 
 }

@@ -1,7 +1,6 @@
-package org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands;
+package org.usfirst.frc.team3467.robot.subsystems.Vision.commands;
 
 import org.usfirst.frc.team3467.robot.commands.CommandBase;
-import org.usfirst.frc.team3467.robot.pid.PIDF_CANTalon;
 
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDOutput;
@@ -9,20 +8,13 @@ import edu.wpi.first.wpilibj.PIDSource;
 import edu.wpi.first.wpilibj.PIDSourceType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-/**
- * Turn the robot to a given heading (in degrees relative to last reset heading;
- * negative values go counterclockwise).
- * Uses a local PID controller to run a simple PID loop that is only
- * enabled while this command is running. The input is the yaw() value from AHRS.
- */
-public class AutoRotateToAngle extends CommandBase {
-
+public class AutoAim extends CommandBase {
+	
 	private static final double TOLERANCE = 0.5;
 	
 	private PIDController m_pid;
 	
 	private double m_maxSpeed = 0.35;
-	private double m_degrees = 0.0;
 	
 	//Initial PID constants
 	private double KP = 2.0;
@@ -34,30 +26,31 @@ public class AutoRotateToAngle extends CommandBase {
 	private int count = 0; //Counter starts when robot is in tolerance zone
 	private static final int sufficientCount = 28; //When count is this number, the command will end
 	private double oldKP = KP;
-    	
+	private int aimState = 1; //Is the robot "moving" (Setpoint has been set
+	private int imageCount = 0; 
+	
+	private static final boolean debugging = false;
 
-    public AutoRotateToAngle(double degrees, double maxSpeed, double kp, double ki, double kd) {    
+    public AutoAim(double maxSpeed, double kp, double ki, double kd) {    
     	requires(driveBase);
     	KP = kp; KI = ki; KD = kd;
     	m_maxSpeed = maxSpeed;
-    	m_degrees = degrees;
     	buildController();
     //setTimeout(10);
     }
 
-	public AutoRotateToAngle(double degrees, double maxSpeed) {
+	public AutoAim(double maxSpeed) {
 		requires(driveBase);
     	m_maxSpeed = maxSpeed;
-    	m_degrees = degrees;
     	buildController();
 	}
     	
-	public AutoRotateToAngle(double degrees) {
+	public AutoAim() {
     	requires(driveBase);
-    	m_degrees = degrees;
     	buildController();
 	}
-    	
+    
+	
     private void buildController() {
        m_pid = new PIDController(KP, KI, KD,
                 new PIDSource() {
@@ -109,9 +102,20 @@ public class AutoRotateToAngle extends CommandBase {
         //m_pid.setSetpoint(m_degrees);
     }
 
-    // Called just before this Command runs the first time
-    protected void initialize() {
+	public void deBug() {
+		if (debugging) {	
+			double p = SmartDashboard.getNumber("P");
+			double i = SmartDashboard.getNumber("I");
+			double d = SmartDashboard.getNumber("D");
     	
+			m_pid.setPID(m_pid.getP(), i, d);
+    	
+			SmartDashboard.putNumber("P", KP);
+		}
+	}
+    
+    
+	protected void initialize() {
     	SmartDashboard.putNumber("P", KP);
     	SmartDashboard.putNumber("I", KI);
     	SmartDashboard.putNumber("D", KD);
@@ -120,6 +124,8 @@ public class AutoRotateToAngle extends CommandBase {
     	stop = false;
     	count = 0;
     	oldKP = KP;
+    	imageCount = 0;
+    	aimState = 1;
     	
     	//Brake mode on
 		driveBase.setSlaveMode(false);
@@ -128,43 +134,60 @@ public class AutoRotateToAngle extends CommandBase {
     	// Get everything in a safe starting state.
     	ahrs.gyroReset();
 		m_pid.reset();
-		m_pid.setSetpoint(m_degrees);
         m_pid.enable();
         SmartDashboard.putNumber("Rotate SetPoint", m_pid.getSetpoint());
-    }
+	}
 
-    // Called repeatedly when this Command is scheduled to run
-    protected void execute() {
+	protected void execute() {
+		switch (aimState) {
+		//State one, search for a good image
+		case 1: if(!grip.isGoodImage()) {
+					grip.createImage();
+				}
+				else {
+					aimState = 2;
+				}
+			break;
+		//Calculate target Data
+		case 2:
+				grip.calculateTargetData();
+				aimState = 3;
+			break;
+		//Move to correct position
+		case 3:
+				m_pid.setSetpoint(grip.getChangeinAngle());
+				aimState = 4;
+			break;
+		//Check if we're on Target (if not, go to aimState 1)
+		case 4: 
+				if (!grip.imageOnTarget) {
+					aimState = 1;
+				}
+				else {
+					System.out.println("AutokAim on Target");
+					end();
+				}
+			break;
+		}
+		
+		SmartDashboard.putNumber("Vision: aimState", aimState);
     	SmartDashboard.putNumber("Gyro Angle", ahrs.getGyroAngle());
     	SmartDashboard.putNumber("Error", m_pid.getError());
-    	
-    	double p = SmartDashboard.getNumber("P");
-    	double i = SmartDashboard.getNumber("I");
-    	double d = SmartDashboard.getNumber("D");
-    	
-    	m_pid.setPID(m_pid.getP(), i, d);
-    	
-    	SmartDashboard.putNumber("P", KP);
-    	
-    	//m_pid.setPID(p, i, d);
-    }
+    	deBug();
+	}
 
-    // Make this return true when this Command no longer needs to run execute()
-    protected boolean isFinished() {
-    	return stop;
-    }
-    
-    // Called once after isFinished returns true
-    protected void end() {
+	protected boolean isFinished() {
+		return stop;
+	}
+
+	protected void end() {
     	// Stop PID and the wheels
     	m_pid.reset();
         driveBase.driveArcade(0, 0, false);
-        System.out.println("AutoRotate has finished");
-    }
+        System.out.println("AutoAim has finished");
+	}
 
-    // Called when another command which requires one or more of the same
-    // subsystems is scheduled to run
-    protected void interrupted() {
-        end();
-    }
+	protected void interrupted() {
+		end();
+	}
 }

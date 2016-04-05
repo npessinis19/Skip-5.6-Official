@@ -28,10 +28,10 @@ public class GRIP {
 	private static final double Target_Height_ft = 1.0; //Feet
 	
 	//Calculated Values
-	private double angle_theta = 0.0;
-	private double distance_delta = 0.0;
-	private double changeinDistance = 0.0;
-	private double changeinAngle = 0.0;
+	private static double angle_theta = 0.0;
+	private static double distance_delta = 0.0;
+	private static double changeinDistance = 0.0;
+	private static double changeinAngle = 0.0;
 	
 	private static final double targetx = 150.1;
 	private static final double targety = 0.0;
@@ -63,7 +63,6 @@ public class GRIP {
 			double[] height = table.getNumberArray("height", defaultValue);
 			
 			contours = centerx.length;
-			System.out.println("Contours: " + contours);
 			
 			if (contours > 0) {
 				System.out.println("centerx[0]: " + centerx[0]);
@@ -116,6 +115,7 @@ public class GRIP {
 	}
 	
 	public double getChangeinAngle() {
+		System.out.println("Change in Angle " + changeinAngle);
 		return changeinAngle;
 	}
 	
@@ -139,6 +139,7 @@ public class GRIP {
 		SmartDashboard.putNumber("Vision: Angle", angle_theta);
 		SmartDashboard.putNumber("Vision: Change in Angle", changeinAngle);
 		SmartDashboard.putNumber("Vision: Change in Distance", changeinDistance);
+		SmartDashboard.putNumber("Vision: Contours", contours);
 	}
 	
 	
@@ -164,7 +165,7 @@ public class GRIP {
 		
 		//Calculate the distances and angles needed to move
 		changeinDistance = distance_delta - target_distance;
-		changeinAngle = (target_angle - angle_theta) - 10;
+		changeinAngle = target_angle + angle_theta;
 		
 		//Prints the distances and angles needed to move to SmartDashBoard
 		SmartDashboard.putNumber("Vision: Distance", distance_delta);

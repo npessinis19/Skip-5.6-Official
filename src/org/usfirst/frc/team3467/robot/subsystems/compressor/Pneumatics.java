@@ -14,7 +14,7 @@ public class Pneumatics extends Subsystem implements PowerConsumer {
 
 	private Compressor scorpionCompressor;
 	private AnalogInput pressureSensor;
-	private boolean compressorActive = false;
+	private boolean compressorActive = true;
 	
 	// Pneumatics is a singleton
 	private static Pneumatics instance = new Pneumatics();
