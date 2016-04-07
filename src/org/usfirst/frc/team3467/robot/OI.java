@@ -99,51 +99,59 @@ public class OI {
 		}
 		
 		
-	//Interupts the previous command
+	//Interrupts the previous command
 		//new JoystickButton(operator, Gamepad.leftBumper);
 		
 		
 	//DriveBase
 		//Toggle in and out of precision angle mode
 		new JoystickButton(PrimaryStick, 11)
-		.whenPressed(new PreciseRotateToAngle());
+			.whenPressed(new PreciseRotateToAngle());
 		
 		new JoystickButton(PrimaryStick, 12)
-		.whenPressed(new ArcadeDrive());
+			.whenPressed(new ArcadeDrive());
 		
 		new JoystickButton(PrimaryStick, 7)
-		.whenPressed(new AutoTarget());
+			.whenPressed(new AutoTarget());
+		
+	//Utility Bar
+		//Utility bar up
+		new JoystickButton(operator, Gamepad.xButton)
+			.whenPressed(new Bar_actuate(UtilityBar.kIn));
+		
+		//Utility bar down
+		new JoystickButton(operator, Gamepad.aButton)
+			.whenPressed(new Bar_actuate(UtilityBar.kOut));
+	
 		
 	//Intake
-		//Eject Slow
-		new JoystickButton(operator, Gamepad.xButton)
-			.whileHeld(new IntakeDrive(Intake.kEjectSlow));
-		
 		//Eject Fast
 		new JoystickButton(operator, Gamepad.yButton)
 			.whileHeld(new IntakeDrive(Intake.kEjectFast));
-		
-		//Intake Slow
-		new JoystickButton(operator, Gamepad.aButton)
-			.whileHeld(new IntakeDrive(Intake.kIntakeSlow));
 		
 		//Intake Fast
 		new JoystickButton(operator, Gamepad.bButton)
 			.whileHeld(new IntakeDrive(Intake.kIntakeFast));
 		
+		//Intake up
+		new JoystickButton(operator, Gamepad.rightTrigger_Axis)
+			.whenPressed(new Roller_Actuate(false));
+		
+		//Intake down
+		new JoystickButton(operator, Gamepad.leftTrigger_Axis)
+			.whenPressed(new Roller_Actuate(true));
+		
+		/*
 		//Intake Extend
 		new JoystickButton(SecondaryStick, 1)
 		.whenPressed(new Roller_Actuate(true));
 		
 		new JoystickButton(SecondaryStick, 2)
-		.whenPressed(new Roller_Actuate(false));
-		
+		.whenPressed(new Roller_Actuate(false));	
+		*/
 	
 	//Catapult
-		// Halt Reset Bar PID and switch to manual mode
-		new JoystickButton(operator, Gamepad.rightTrigger_Axis)
-			.whileHeld(new ShooterReset());
-		
+
 		//Reload Catapult
 		new JoystickButton(operator, Gamepad.leftBumper)
 			.whenPressed(new ShooterSetup());
@@ -182,7 +190,7 @@ public class OI {
 		new JoystickButton(operator, Gamepad.backButton)
 		.whenActive(new LightSwitch(false));
 		
-		
+	/*	
 	//Utility Bar/Finger
 			//Extend Using the Right Joystick Trigger
 		new JoystickButton(SecondaryStick, 3)
@@ -191,6 +199,7 @@ public class OI {
 			//Retract Using the Right Shoulder Button
 		new JoystickButton(SecondaryStick, 4)
 			.whenPressed(new Bar_actuate(UtilityBar.kIn));
+	*/
 		
 			//Extend Finger using Top left button
 		/*
