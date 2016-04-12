@@ -23,6 +23,5 @@ public class GamepadLeftTrigger extends Trigger {
     			leftTrigger = false;
     		}
     		return leftTrigger;
-
     }
 }

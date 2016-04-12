@@ -24,9 +24,10 @@ public class AutoLowBar extends CommandGroup {
 		addSequential(new Roller_Actuate(true));
 		//addSequential(new ShooterPrepare());
 		//addSequential(new JustDriveFor5(6));
-		addSequential(new DriveStraight(9950));
+		addSequential(new DriveStraight(7950));
 		addSequential(new Roller_Actuate(false));
-		addSequential(new AutoRotateToAngle(42.0, 0.3));
+		addSequential(new DriveStraight(2000, true, 0.01));
+		//addSequential(new AutoRotateToAngle(42.0, 0.3));
 		addSequential(new AutoIntake(true), 2.0);
 		addSequential(new LightSwitch(true));
 		//addSequential(new ShooterOneWayCalibrate());
