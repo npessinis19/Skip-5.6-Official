@@ -29,6 +29,8 @@ import org.usfirst.frc.team3467.robot.triggers.DPadLeft;
 import org.usfirst.frc.team3467.robot.triggers.DPadRight;
 import org.usfirst.frc.team3467.robot.triggers.DPadUp;
 import org.usfirst.frc.team3467.robot.triggers.DoubleButton;
+import org.usfirst.frc.team3467.robot.triggers.GamepadLeftTrigger;
+import org.usfirst.frc.team3467.robot.triggers.GamepadRightTrigger;
 
 public class OI {
 	
@@ -116,12 +118,12 @@ public class OI {
 		
 	//Utility Bar
 		//Utility bar up
-		new JoystickButton(operator, Gamepad.xButton)
-			.whenPressed(new Bar_actuate(UtilityBar.kIn));
+		new GamepadLeftTrigger(operator)
+		.whenActive(new Bar_actuate(UtilityBar.kOut));
 		
 		//Utility bar down
-		new JoystickButton(operator, Gamepad.aButton)
-			.whenPressed(new Bar_actuate(UtilityBar.kOut));
+		new GamepadRightTrigger(operator)
+			.whenActive(new Bar_actuate(UtilityBar.kIn));
 	
 		
 	//Intake
@@ -134,12 +136,12 @@ public class OI {
 			.whileHeld(new IntakeDrive(Intake.kIntakeFast));
 		
 		//Intake up
-		new JoystickButton(operator, Gamepad.rightTrigger_Axis)
-			.whenPressed(new Roller_Actuate(false));
+		new GamepadLeftTrigger(operator)
+			.whenActive(new Roller_Actuate(false));
 		
 		//Intake down
-		new JoystickButton(operator, Gamepad.leftTrigger_Axis)
-			.whenPressed(new Roller_Actuate(true));
+		new GamepadRightTrigger(operator)
+			.whenActive(new Roller_Actuate(true));
 		
 		/*
 		//Intake Extend
