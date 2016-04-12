@@ -191,6 +191,19 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 		t_controlMode = controlMode;
 	}
 	
+	public String getTalonControlMode() {
+		if (t_controlMode == TalonControlMode.PercentVbus) {
+			return "PercentVbus";
+		}
+		else if (t_controlMode == TalonControlMode.MotionProfile) {
+			return "MotionProfile";
+		}
+		else if(t_controlMode == TalonControlMode.Position) {
+			return "Position";
+		}
+		else; return "Problem";
+	}
+	
 	// return the distance driven (average of left and right encoders).
 	public double getDistance() {
 		return ((leftTalon.getPosition()) + (rightTalon.getPosition() * -1.0))/2;

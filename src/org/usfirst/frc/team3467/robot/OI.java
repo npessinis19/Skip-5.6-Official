@@ -12,6 +12,7 @@ import org.usfirst.frc.team3467.robot.commands.CommandBase;
 import org.usfirst.frc.team3467.robot.commands.autonomous.AutoTarget;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.ArcadeDrive;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.AutoRotateToAngle;
+import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.DriveMotionProfiling;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.PreciseRotateToAngle;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.ResetDriveEncoders;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.SetBrakeMode;
@@ -43,22 +44,24 @@ public class OI {
 	public static final int Arcade = 2;
 	public int userlogin = 2;
 	
+	
 /*
  * Joystick Mappings (done elsewhere in code)
  * 
  * Joystick PrimaryStick - used for Tank or Arcade Drive
- * Joystick SecondaryStick - used for Tank Drive (along with PrimaryStick)
  * 
  * Gamepad getRightStickX() - used for manual drive of Intake rollers
  * Gamepad getLeftStickY() - used for manual drive of Catapult reset bar
  * 
  */
 	
+	
 	public OI(){
 		PrimaryStick = new Joystick(0);
 		SecondaryStick = new Joystick(1);
 		operator = new Gamepad(2);
 	}
+	
 	
 	public Gamepad getGamepad() {
 		return operator;
@@ -86,6 +89,7 @@ public class OI {
 		return userlogin;
 	}
 	
+	
 	//Method that binds certain commands to certain buttons
 	public void BindCommands() {
 
@@ -99,12 +103,7 @@ public class OI {
 				CommandBase.driveBase.setDriveMode(false);
 				break;
 		}
-		
-		
-	//Interrupts the previous command
-		//new JoystickButton(operator, Gamepad.leftBumper);
-		
-		
+
 	//DriveBase
 		//Toggle in and out of precision angle mode
 		new JoystickButton(PrimaryStick, 11)
@@ -136,11 +135,11 @@ public class OI {
 			.whileHeld(new IntakeDrive(Intake.kIntakeFast));
 		
 		//Intake up
-		new GamepadLeftTrigger(operator)
+		new JoystickButton(operator, Gamepad.aButton)
 			.whenActive(new Roller_Actuate(false));
 		
 		//Intake down
-		new GamepadRightTrigger(operator)
+		new JoystickButton(operator, Gamepad.yButton)
 			.whenActive(new Roller_Actuate(true));
 		
 		/*
@@ -219,10 +218,13 @@ public class OI {
 		SmartDashboard.putData("AHRS: Reset Gyro", new ResetGyro());
 		SmartDashboard.putData("Vision: Target Goal", new TargetGoal());
 		SmartDashboard.putData("Vision: Calibrate", new VisionCalibrate());
+		
+		//Test Buttons
 		SmartDashboard.putData("Test SuperAutoRotate", new SuperAutoRotate(90, 0));
 		SmartDashboard.putData("Test AutoRotateToAngle", new AutoRotateToAngle(90));
 		SmartDashboard.putData("Test AutoAim", new AutoAim());
 		SmartDashboard.putData("Test AutoTarget", new AutoTarget());
+		SmartDashboard.putData("Test Motion Profiling", new DriveMotionProfiling(90, 3, 3, 10));
 	}
 }
 
