@@ -224,7 +224,7 @@ public class OI {
 		SmartDashboard.putData("Test AutoRotateToAngle", new AutoRotateToAngle(90));
 		SmartDashboard.putData("Test AutoAim", new AutoAim());
 		SmartDashboard.putData("Test AutoTarget", new AutoTarget());
-		SmartDashboard.putData("Test Motion Profiling", new DriveMotionProfiling(90, 3, 3, 10));
+		SmartDashboard.putData("Test Motion Profiling", new DriveMotionProfiling(90, 0.1, 0.1, 3));
 	}
 }
 

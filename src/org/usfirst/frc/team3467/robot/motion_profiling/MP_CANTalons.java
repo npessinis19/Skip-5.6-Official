@@ -61,6 +61,8 @@ public class MP_CANTalons {
 		
 	}
 	
+	
+	//Direct Calls to the CANTalons
 	public synchronized void clearMotionProfileTrajectories() {
 		m_talon.clearMotionProfileTrajectories();
 	}
@@ -90,35 +92,28 @@ public class MP_CANTalons {
 	
 	public synchronized void enableMotionProfiling() {
 		m_talon.set(1);
-		System.out.println("Motion Profiling Enabled");
+		//System.out.println("Motion Profiling Enabled");
 	}
 
 	public synchronized void disableMotionProfiling() {
 		m_talon.set(0);
-		System.out.println("Motion Profiling Disabled");
+		//System.out.println("Motion Profiling Disabled");
+	}
+	
+	public synchronized void holdMotionProfiling() {
+		m_talon.set(2);
 	}
 	
 	public synchronized void changeMotionControlFramePeriod( int dur){
 		m_talon.changeMotionControlFramePeriod(dur);
 	}
 
-	public synchronized void holdMotionProfiling() {
-		m_talon.set(2);
-	}
-	
-	
-	
-	
+
 	//Access the Motion Profiling Status object
 	public synchronized CANTalon.MotionProfileStatus getStatus() {
 		return m_status;
 	}
 	
-	//Update Data in Motion Profile Status Object
-	public synchronized void getMotionProfileStatus(MotionProfileStatus status) {
-		m_talon.getMotionProfileStatus(status);
-	}
-
 	//Update the current Motion Profile Status object
 	public synchronized void upDateMotionProfileStatus() {
 		m_talon.getMotionProfileStatus(m_status);
@@ -141,14 +136,17 @@ public class MP_CANTalons {
 		return m_status.topBufferCnt;
 	}
 	
-	public synchronized int TopbufferCount() {
-		return m_talon.getMotionProfileTopLevelBufferCount();
-	}
-	
-	public synchronized int ButtomBufferCount() {
+	public synchronized int BottomBufferCount() {
 		return m_status.btmBufferCnt;
 	}
 	
+	
+	//Retrieve Values from CANTalons
+	//Gets Top Buffer Count from CANTalons
+	public synchronized int TopbufferCount() {
+		return m_talon.getMotionProfileTopLevelBufferCount();
+	}
+		
 	public synchronized boolean isTopBufferFull() {
 		return m_talon.isMotionProfileTopLevelBufferFull();
 	}
@@ -171,11 +169,10 @@ public class MP_CANTalons {
 	}
 	
 	
-	public void startFilling(ArrayList <double[]> profile, int totalCount) {
+	public void startFilling(ArrayList <double[]> profile, int totalCount, boolean invert) {
 		
 		//Create an empty point
 		CANTalon.TrajectoryPoint flag = new TrajectoryPoint();
-		CANTalon.TrajectoryPoint initHold = new TrajectoryPoint();
 		
 		//Check if in Underrun Condition
 		if (m_status.isUnderrun) {
@@ -195,9 +192,8 @@ public class MP_CANTalons {
 		*/
 		
 		for (int i = 0; i < totalCount; i++) {
-			flag.position = profile.get(i)[1];
-			//flag.timeDurMs =(int) profile.get(i)[1];
-			flag.timeDurMs = (int) profile.get(i)[0];
+				flag.position = profile.get(i)[1];
+				flag.timeDurMs = (int) profile.get(i)[0];
 		
 			//if (m_debugging); testWriteOutput.set(true);
 		
@@ -231,6 +227,8 @@ public class MP_CANTalons {
 		}
 	}
 
+	
+	
 	public void testProfile() {
 		double[] test = {0, 0.625, 2.5, 5.625, 10, 15.625, 22.5, 30.625, 40, 50.625, 62.5, 75.625, 90, 105.625, 122.5, 140.625, 160, 180.625, 202.5, 225.625, 250, 275.625, 302.5, 330.625, 360, 390.625, 442.5, 455.625, 490, 525.625, 562.5, 600.625};
 		CANTalon.TrajectoryPoint testFlag = new CANTalon.TrajectoryPoint();
