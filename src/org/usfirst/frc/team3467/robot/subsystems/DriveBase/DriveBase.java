@@ -44,14 +44,8 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 	
 	//Initializing the Default Command
 	public void initDefaultCommand() {
-		if (t_useTank) {
-			this.setDefaultCommand(new TankDrive());
-			System.out.println("DriveBase: Set to TankDrive");
-		}
-		else {
-			this.setDefaultCommand(new ArcadeDrive());
-			System.out.println("DriveBase: Set to ArcadeDrive");
-		}
+		this.setDefaultCommand(new ArcadeDrive());
+		System.out.println("DriveBase: Set to ArcadeDrive");
 	}
 	
 	

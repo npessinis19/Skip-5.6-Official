@@ -2,48 +2,76 @@ package org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands;
 
 import org.usfirst.frc.team3467.robot.motion_profiling.BuildTrajectory;
 import org.usfirst.frc.team3467.robot.motion_profiling.MP_CANTalons;
-import org.usfirst.frc.team3467.robot.motion_profiling.TalonBuffer;
 import org.usfirst.frc.team3467.robot.commands.CommandBase;
 
+import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.CANTalon.TalonControlMode;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.DigitalOutput;
+
+import java.util.ArrayList;
 
 public class DriveMotionProfiling extends CommandBase {
 
 	private BuildTrajectory trajectory;
 	private MP_CANTalons leftmp_drive, rightmp_drive;
-	private Notifier notifier;
+	
+	private static boolean debugging = true;
+	private static double TOLERANCE = 0.5;
+	private double angle = 0.0;
+	
 	
 	public DriveMotionProfiling(int xnet, double accel, double decel, double cruise, double step) {
 		requires(driveBase);
-		buildManagers(xnet, step, step, step, xnet);
+		buildControllers();
 		
 		this.setInterruptible(false);
 		
 		SmartDashboard.putString("TestProfiling Mode", "position");
+		
+		trajectory = new BuildTrajectory(xnet, accel, decel, cruise, step);
 	}
  
 	public DriveMotionProfiling(double angle, double accel, double decel, double cruise) {
 		requires(driveBase);
-		buildManagers((int) angle * 25, accel, decel, cruise, 10);
+		buildControllers();
 		
+		this.angle = angle;
 		this.setInterruptible(false);
 		
-		setTimeout(20);
+		setTimeout(10);
 		
 		SmartDashboard.putString("TestProfiling Mode", "angle");
+		
+		trajectory = new BuildTrajectory((int) (angle - 1) * 14, accel, decel, cruise, 10);
 	}
 	
-	//Builds all controllers and managing objects
-	public void buildManagers(int xnet, double accel, double decel, double cruise, int step) {
+	
+	public void buildControllers() {
 		leftmp_drive = new MP_CANTalons("Left Drive", driveBase.getLeftTalon(), false);
 		rightmp_drive = new MP_CANTalons("Right Drive", driveBase.getRightTalon(), false);
-		
-		trajectory = new BuildTrajectory(xnet, accel, decel, cruise, step);
-		notifier = new Notifier( new TalonBuffer(leftmp_drive, leftmp_drive));
 	}
-
+	
+	
+	//Separate Thread that Processes points to Bottom Buffer
+	class PeriodicRunnable implements java.lang.Runnable {
+		public void run() { 
+			leftmp_drive.processMotionProfileBuffer();
+			rightmp_drive.processMotionProfileBuffer();
+		}
+	}
+	
+	
+	/*
+	public DriveMotionProfiling(){
+		leftmp_drive.changeMotionControlFramePeriod(1);
+		//rightmp_drive.changeMotionControlFramePeriod(1);
+		notifier.startPeriodic(.001);
+	}
+	*/
+	
+	Notifier notifier = new Notifier(new PeriodicRunnable());
 	
 	public void startMP() {
 		SmartDashboard.putString("TestProfiling Message", "startMP Called");
@@ -52,16 +80,14 @@ public class DriveMotionProfiling extends CommandBase {
 		
 		System.out.println("Starting Motion Profiling");
 		
-		leftmp_drive.startFilling(trajectory.getprofile(), trajectory.getTotalCount());
-		rightmp_drive.startFilling(trajectory.getprofile(), trajectory.getTotalCount());
+		leftmp_drive.startFilling(trajectory.getprofile(), trajectory.getTotalCount(), false);
+		rightmp_drive.startFilling(trajectory.getprofile(), trajectory.getTotalCount(), false);
 		
-		/* Test Profiling
-		 * leftmp_drive.testProfile();
-		 * rightmp_drive.testProfile();
-		 */
+		//leftmp_drive.testProfile();
+		//rightmp_drive.testProfile();
 		
 		leftmp_drive.changeMotionControlFramePeriod(20);
-		rightmp_drive.changeMotionControlFramePeriod(2);
+		rightmp_drive.changeMotionControlFramePeriod(20);
 		
 		notifier.startPeriodic(.005);
 				
@@ -72,9 +98,11 @@ public class DriveMotionProfiling extends CommandBase {
 		}
 		
 		leftmp_drive.upDateMotionProfileStatus();
+		rightmp_drive.upDateMotionProfileStatus();
 		
-		SmartDashboard.putNumber("Init Botttom Buffer", leftmp_drive.ButtomBufferCount());
-
+		SmartDashboard.putNumber("Init Left Botttom Buffer", leftmp_drive.BottomBufferCount());
+		SmartDashboard.putNumber("Init Right Bottom Buffer", rightmp_drive.BottomBufferCount());
+		
 		leftmp_drive.enableMotionProfiling();
 		rightmp_drive.enableMotionProfiling();
 	}
@@ -86,13 +114,40 @@ public class DriveMotionProfiling extends CommandBase {
 		leftmp_drive.disableMotionProfiling();
 		rightmp_drive.disableMotionProfiling();
 		
+		notifier.stop();
+		
 		System.out.println("MP Reset");
 	}
 
+	public void publishValues() {
+		if (debugging) {
+			leftmp_drive.upDateMotionProfileStatus();
+			rightmp_drive.upDateMotionProfileStatus();
+			
+			SmartDashboard.putNumber("Left Top Buffer", leftmp_drive.TopbufferCount());
+			SmartDashboard.putNumber("Right Top Buffer", rightmp_drive.TopbufferCount());
+			
+			SmartDashboard.putNumber("Left Bottom Buffer", leftmp_drive.BottomBufferCount());
+			SmartDashboard.putNumber("Right Bottom Buffer", rightmp_drive.BottomBufferCount());
+			
+			SmartDashboard.putBoolean("Left Is Underrun", leftmp_drive.isUnderrun());
+			SmartDashboard.putBoolean("Right Is Underrun", rightmp_drive.isUnderrun());
+			
+			SmartDashboard.putBoolean("Left Has Underrun", leftmp_drive.hasUnderrun());
+			SmartDashboard.putBoolean("Right Has Underrrun", rightmp_drive.hasUnderrun());
+			
+			System.out.println("Active Point " + leftmp_drive.getActivePoint().position + " Time " + leftmp_drive.getActivePoint().timeDurMs);
+		}
+	}
+	
 	
 	protected void initialize() {
 		driveBase.setControlMode(TalonControlMode.MotionProfile);
 		driveBase.resetEncoders();
+		
+		driveBase.getLeftTalon().reverseOutput(true);
+		driveBase.getRightTalon().reverseOutput(true);
+		
 		ahrs.gyroReset();
 		
 		startMP();
@@ -103,26 +158,23 @@ public class DriveMotionProfiling extends CommandBase {
 		driveBase.reportEncoders();
 		
 		driveBase.setControlMode(TalonControlMode.MotionProfile);
+		
 		leftmp_drive.upDateMotionProfileStatus();
-		leftmp_drive.testExecuteOutput();
+		
+		publishValues();
 		
 		leftmp_drive.enableMotionProfiling();
 		rightmp_drive.enableMotionProfiling();
 		
-	//leftmp_drive.stallOnLastPoint();
-	//	rightmp_drive.stallOnLastPoint();
+		//leftmp_drive.stallOnLastPoint();
+		//rightmp_drive.stallOnLastPoint();
 		
-		SmartDashboard.putNumber("Top Buffer", leftmp_drive.TopbufferCount());
-		SmartDashboard.putNumber("Buttom Buffer", leftmp_drive.ButtomBufferCount());
-		SmartDashboard.putBoolean("Is Underrun", leftmp_drive.getStatus().isUnderrun);
-		SmartDashboard.putBoolean("Has Underrun", leftmp_drive.hasUnderrun());
-		SmartDashboard.putBoolean("Is buffer full", leftmp_drive.isTopBufferFull());
 		SmartDashboard.putString("Talon Mode", driveBase.getTalonControlMode());
-		System.out.println("Active Point " + leftmp_drive.getActivePoint().position + " Time " + leftmp_drive.getActivePoint().timeDurMs);
 	}
 
 	protected boolean isFinished() {
-		return false;
+		double error = Math.abs(angle - ahrs.getGyroYaw());
+		return isTimedOut() || error <= TOLERANCE;
 	}
 
 	protected void end() {
@@ -130,6 +182,8 @@ public class DriveMotionProfiling extends CommandBase {
 		rightmp_drive.clearMotionProfileTrajectories();
 		
 		resetMP();
+		
+		driveBase.initDrive();
 	}
 
 	protected void interrupted() {
