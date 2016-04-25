@@ -44,14 +44,8 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 	
 	//Initializing the Default Command
 	public void initDefaultCommand() {
-		if (t_useTank) {
-			this.setDefaultCommand(new TankDrive());
-			System.out.println("DriveBase: Set to TankDrive");
-		}
-		else {
-			this.setDefaultCommand(new ArcadeDrive());
-			System.out.println("DriveBase: Set to ArcadeDrive");
-		}
+		this.setDefaultCommand(new ArcadeDrive());
+		System.out.println("DriveBase: Set to ArcadeDrive");
 	}
 	
 	
@@ -189,6 +183,19 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 		
 		// Save control mode so we will know if we have to set it back later
 		t_controlMode = controlMode;
+	}
+	
+	public String getTalonControlMode() {
+		if (t_controlMode == TalonControlMode.PercentVbus) {
+			return "PercentVbus";
+		}
+		else if (t_controlMode == TalonControlMode.MotionProfile) {
+			return "MotionProfile";
+		}
+		else if(t_controlMode == TalonControlMode.Position) {
+			return "Position";
+		}
+		else; return "Problem";
 	}
 	
 	// return the distance driven (average of left and right encoders).

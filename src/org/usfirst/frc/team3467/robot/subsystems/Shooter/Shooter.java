@@ -64,7 +64,7 @@ public class Shooter extends PIDSubsystem implements PowerConsumer {
 	Preferences m_prefs = Preferences.getInstance();
 	
 	// Has the robot been calibrated
-	private boolean m_hasBeenCalibrated = false;
+	private static boolean m_hasBeenCalibrated = false;
 	
 	//Shooter Constructor
 	public Shooter() {

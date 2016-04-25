@@ -21,6 +21,8 @@ public class DriveStraight extends CommandBase {
 	private PIDController m_pid;
 	private double m_maxSpeed = 0.6;
 	private double m_distance = 0.0;
+	private boolean m_manualCurve = false;
+	private double m_curveValue = 0.0;
 	
 	private double KP = 2.0;
 	private double KI = 0.0;
@@ -50,6 +52,17 @@ public class DriveStraight extends CommandBase {
     	buildController();
 	}
 	
+	public DriveStraight(double distance, boolean curve, double curveValue) {
+		requires(driveBase);
+		
+		m_distance = distance;
+		m_manualCurve = curve;
+		m_curveValue = curveValue;
+		
+		buildController();
+	}
+	
+	
 	private void buildController() {
 		
 		m_pid = new PIDController(KP, KI, KD,
@@ -74,7 +87,8 @@ public class DriveStraight extends CommandBase {
                 		// Drive with the magnitude returned by the PID calculation, 
                 		// and curve the opposite way from the current yaw reading
                 		// (Divide yaw by 180 so as to normalize to -1.0 / + 1.0)
-                		driveBase.drive(-d, -(ahrs.getGyroYaw()/240.));
+                		//driveBase.drive(-d, -(ahrs.getGyroYaw()/240.));
+                		setCurve(-d);
                 }});
 		
         m_pid.setAbsoluteTolerance(TOLERANCE);
@@ -92,6 +106,15 @@ public class DriveStraight extends CommandBase {
 			return false;
 		}
 	}
+	
+	public void setCurve(double d) {
+		if (m_manualCurve) {
+			driveBase.drive(d, m_curveValue);
+		}
+			else  {
+				driveBase.drive(d, -(ahrs.getGyroYaw()/240.));
+				}
+		}
 	
 	
     // Called just before this Command runs the first time
