@@ -9,15 +9,15 @@ import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.AutoRotateTo
 import org.usfirst.frc.team3467.robot.subsystems.Intake.commands.AutoIntake;
 import org.usfirst.frc.team3467.robot.subsystems.Intake.commands.Roller_Actuate;
 import org.usfirst.frc.team3467.robot.subsystems.Shooter.commands.Shoot;
-import org.usfirst.frc.team3467.robot.subsystems.Shooter.commands.ShooterOneWayCalibrate;
 import org.usfirst.frc.team3467.robot.subsystems.Shooter.commands.ShooterPrepare;
+import org.usfirst.frc.team3467.robot.subsystems.Vision.commands.AimBot;
 import org.usfirst.frc.team3467.robot.subsystems.Vision.commands.LightSwitch;
 import org.usfirst.frc.team3467.robot.subsystems.utilitybar.UtilityBar;
 import org.usfirst.frc.team3467.robot.subsystems.utilitybar.commands.Bar_actuate;
 
-public class AutoLowBar extends CommandGroup {
-	
-	public AutoLowBar() {
+public class LowBarAndShoot extends CommandGroup {
+
+	public LowBarAndShoot() {
 		addSequential(new Bar_actuate(UtilityBar.kIn));
 		addSequential(new Bar_actuate(UtilityBar.kOut));
 		//addSequential(new JustDriveFor5(0.5));
@@ -30,8 +30,7 @@ public class AutoLowBar extends CommandGroup {
 		addSequential(new DriveStraight(2000, true, 0.01));
 		addSequential(new DriveMotionProfiling(42, 0.1, 0.1, 3));
 		addSequential(new AutoIntake(true), 2.0);
-		addSequential(new LightSwitch(true));
-		//addSequential(new ShooterOneWayCalibrate());
-		//addSequential(new Shoot());
+		addSequential(new AimBot());
+		addSequential(new Shoot());
 	}
 }

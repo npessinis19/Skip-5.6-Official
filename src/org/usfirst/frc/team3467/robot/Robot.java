@@ -19,6 +19,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
 
+
+
 //Import subsystem classes from subsystem packages
 import org.usfirst.frc.team3467.robot.commands.CommandBase;
 	
@@ -29,7 +31,9 @@ import org.usfirst.frc.team3467.robot.commands.autonomous.AutoGetReady;
 import org.usfirst.frc.team3467.robot.commands.autonomous.AutoLowBar;
 import org.usfirst.frc.team3467.robot.commands.autonomous.AutoNon;
 import org.usfirst.frc.team3467.robot.commands.autonomous.AutoPortCullis;
+import org.usfirst.frc.team3467.robot.commands.autonomous.ChevalAndShoot;
 import org.usfirst.frc.team3467.robot.commands.autonomous.JustDriveFor5;
+import org.usfirst.frc.team3467.robot.commands.autonomous.LowBarAndShoot;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.AutoRotateToAngle;
 import org.usfirst.frc.team3467.robot.subsystems.Shooter.commands.Shoot;
 import org.usfirst.frc.team3467.robot.subsystems.Shooter.commands.ShooterOneWayCalibrate;
@@ -75,6 +79,8 @@ public class Robot extends IterativeRobot {
 		autoChooser.addObject("Auto Low Bar", new AutoLowBar());
 		autoChooser.addObject("Auto Port Culles", new AutoPortCullis());
 		autoChooser.addObject("Auto Get Ready", new AutoGetReady());
+		autoChooser.addObject("Low Bar and Shoot", new LowBarAndShoot());
+		autoChooser.addObject("Cheval and Shoot", new ChevalAndShoot());
 		
 		SmartDashboard.putData("Auto", autoChooser);
     }

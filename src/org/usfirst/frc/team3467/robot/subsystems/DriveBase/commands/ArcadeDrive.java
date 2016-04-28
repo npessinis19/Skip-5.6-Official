@@ -21,7 +21,8 @@ public class ArcadeDrive extends CommandBase {
 		// Alternate Method?
 		//driveBase.driveArcade(oi.getPrimeY(), oi.getPrimeTwist(), true);
 		
-		ahrs.reportGyroValues();;
+		ahrs.reportGyroValues();
+		SmartDashboard.putString("Talon Mode", driveBase.getTalonControlMode());
 	}
 
 	protected boolean isFinished() {
