@@ -1,6 +1,7 @@
 package org.usfirst.frc.team3467.robot.subsystems.Intake.commands;
 
 import org.usfirst.frc.team3467.robot.commands.CommandBase;
+import org.usfirst.frc.team3467.robot.subsystems.Intake.Intake;
 
 public class IntakeDrive extends CommandBase {
 
@@ -36,13 +37,16 @@ public class IntakeDrive extends CommandBase {
 	            speed = (speed * speed);
 	        else
 	            speed = -(speed * speed);
-	        
-
 		}
 		else
 		{
-			speed = m_speed;		
-		}
+			if (m_speed == Intake.kIntakeFast && !pultaCat.resetBarIsLatched()) {
+				speed = 0;
+			}
+			else {
+			speed = m_speed;
+			}
+	}
 		
 		intake.driveManual(speed);
 	}

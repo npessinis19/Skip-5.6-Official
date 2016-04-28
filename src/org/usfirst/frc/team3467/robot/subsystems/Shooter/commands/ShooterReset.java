@@ -2,6 +2,8 @@ package org.usfirst.frc.team3467.robot.subsystems.Shooter.commands;
 
 import org.usfirst.frc.team3467.robot.commands.CommandBase;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 
 /**
  *
@@ -19,6 +21,11 @@ public class ShooterReset extends CommandBase {
 	public ShooterReset(double speed) {
 		requires(pultaCat);
 		m_speed = speed;
+	}
+	
+	public void publish() {
+		SmartDashboard.putBoolean("Shooter is clear", pultaCat.resetBarIsClear());
+		SmartDashboard.putBoolean("Shooter is latched", pultaCat.resetBarIsLatched());
 	}
 	
 	protected void initialize() {
@@ -49,7 +56,8 @@ public class ShooterReset extends CommandBase {
 		
 		pultaCat.driveManual(speed);
 		
-		
+		SmartDashboard.putNumber("Shooter Reset Angle", pultaCat.getResetAngle());
+		publish();
 	}
 	
 	protected boolean isFinished() {

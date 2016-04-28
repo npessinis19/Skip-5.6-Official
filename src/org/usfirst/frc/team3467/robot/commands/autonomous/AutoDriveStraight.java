@@ -25,13 +25,15 @@ import edu.wpi.first.wpilibj.command.CommandGroup;
 public class AutoDriveStraight extends CommandGroup {
     
     public  AutoDriveStraight() {
-    	addSequential(new DriveStraight(50));
-		addSequential(new Roller_Actuate(true));
+    	addSequential(new Bar_actuate(UtilityBar.kOut));
+    	//addSequential(new Bar_actuate(UtilityBar.kIn));
+    	//addSequential(new DriveStraight(50));
+		//addSequential(new Roller_Actuate(true));
 		addSequential(new Bar_actuate(UtilityBar.kIn));
 		addSequential(new ResetDriveEncoders());
-    	addSequential(new DriveStraight(9950));
+    	addSequential(new DriveStraight(10950));
     	//addSequential(new Bar_actuate(UtilityBar.kIn));
-    	addSequential(new Bar_actuate(UtilityBar.kOut));
+    	//addSequential(new Bar_actuate(UtilityBar.kOut));
     	addSequential(new LightSwitch(true));
     }
 }

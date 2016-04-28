@@ -23,6 +23,8 @@ public class DriveStraight extends CommandBase {
 	private double m_distance = 0.0;
 	private boolean m_manualCurve = false;
 	private double m_curveValue = 0.0;
+	private double m_pastDistance = 0.0;
+	private int m_count = 0;
 	
 	private double KP = 2.0;
 	private double KI = 0.0;
@@ -43,10 +45,10 @@ public class DriveStraight extends CommandBase {
     	m_maxSpeed = maxSpeed;
     	m_distance = distance;
     	buildController();
+    	;
     }
 	
 	public DriveStraight(double distance) {
-    
     	requires(driveBase);
     	m_distance = distance;
     	buildController();
@@ -62,6 +64,13 @@ public class DriveStraight extends CommandBase {
 		buildController();
 	}
 	
+	public DriveStraight(double distance, double maxSpeed, double timeOut) {
+		requires(driveBase);
+		m_distance = distance;
+		m_maxSpeed = maxSpeed;
+		
+		setTimeout(timeOut);
+	}
 	
 	private void buildController() {
 		
@@ -98,8 +107,7 @@ public class DriveStraight extends CommandBase {
 
 	//If the robot has hit a wall, SAY SOMETHING!
 	public boolean hasStalled() {
-		double pastDistance = driveBase.getDistance();
-		if (driveBase.getDistance() - pastDistance <= 1) {
+		if (driveBase.getDistance() - m_pastDistance <= 1) {
 			return true;
 		}
 		else {
@@ -130,13 +138,23 @@ public class DriveStraight extends CommandBase {
     protected void execute() {
     	driveBase.reportEncoders();
     	
+    	if (hasStalled()) {
+    		m_count++;
+    	}
     	
+    	m_pastDistance = driveBase.getDistance();
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
     	double error = m_pid.getError();
-        return (error >= 0 && error <= TOLERANCE);
+    	
+    	if (m_count >= 50) {
+    		return true;
+    	}
+    	else {
+    		return (error >= 0 && error <= TOLERANCE);
+    	}
     }
 
     // Called once after isFinished returns true

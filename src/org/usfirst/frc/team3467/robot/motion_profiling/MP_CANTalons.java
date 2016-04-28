@@ -22,8 +22,8 @@ public class MP_CANTalons {
 	
 	private boolean m_debugging = false;
 	public boolean testFlashOn = false;
+	private boolean bufferOutOnce = false;
 
-	
 	private MotionProfileStatus m_status;
 	
 	//Motion Profiling Variables
@@ -57,8 +57,6 @@ public class MP_CANTalons {
 		
 		SmartDashboard.putNumber(m_name + "TopBufferCount", m_status.topBufferCnt);
 		SmartDashboard.putNumber(m_name + "BottomBuffercount", m_status.btmBufferCnt);
-		
-		
 	}
 	
 	
@@ -73,6 +71,7 @@ public class MP_CANTalons {
 
 	public synchronized void processMotionProfileBuffer() {
 		m_talon.processMotionProfileBuffer();
+		
 		if (m_debugging) {
 			testProcessOutput.set(true);
 			
@@ -104,7 +103,7 @@ public class MP_CANTalons {
 		m_talon.set(2);
 	}
 	
-	public synchronized void changeMotionControlFramePeriod( int dur){
+	public synchronized void changeMotionControlFramePeriod(int dur){
 		m_talon.changeMotionControlFramePeriod(dur);
 	}
 
@@ -118,7 +117,7 @@ public class MP_CANTalons {
 	public synchronized void upDateMotionProfileStatus() {
 		m_talon.getMotionProfileStatus(m_status);
 	}
-	
+
 	//Retrieve Values from the Motion Profile Status Object Instnace
 	public synchronized boolean isUnderrun() {
 		return m_status.isUnderrun;
@@ -140,6 +139,29 @@ public class MP_CANTalons {
 		return m_status.btmBufferCnt;
 	}
 	
+	public synchronized boolean isComplete() {
+		boolean finished = false;
+		
+		if(m_status.btmBufferCnt <= 1) {
+			bufferOutOnce = true;
+			
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
+			if (bufferOutOnce && m_status.btmBufferCnt <= 0) {
+				finished = true;
+			}
+			else {
+				finished = false;
+			}
+		}
+		
+		return finished;
+	}
+
 	
 	//Retrieve Values from CANTalons
 	//Gets Top Buffer Count from CANTalons
@@ -205,6 +227,7 @@ public class MP_CANTalons {
 			}
 			*/
 			
+			//Use PID Slot 1 for Motion Profiling
 			flag.profileSlotSelect = 0;
 		
 			System.out.println("Profile Points " + flag.position + " Time " + flag.timeDurMs + " Index " + i);
@@ -242,7 +265,7 @@ public class MP_CANTalons {
 			testFlag.position = test[j];
 			testFlag.timeDurMs = 5;
 			
-			testWriteOutput.set(true);
+			if(m_debugging); testWriteOutput.set(true);
 			
 			testFlag.profileSlotSelect = 0;
 			
@@ -262,8 +285,7 @@ public class MP_CANTalons {
 			}
 			
 			m_talon.pushMotionProfileTrajectory(testFlag);
-			
-			testWriteOutput.set(false);
+			if (m_debugging); testWriteOutput.set(false);
 		}
 	}
 }

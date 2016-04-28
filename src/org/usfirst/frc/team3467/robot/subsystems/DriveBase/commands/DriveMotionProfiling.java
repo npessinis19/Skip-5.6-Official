@@ -19,7 +19,7 @@ public class DriveMotionProfiling extends CommandBase {
 	
 	private static boolean debugging = true;
 	private static double TOLERANCE = 0.5;
-	private double angle = 0.0;
+	private double m_angle = 0.0;
 	
 	
 	public DriveMotionProfiling(int xnet, double accel, double decel, double cruise, double step) {
@@ -33,11 +33,16 @@ public class DriveMotionProfiling extends CommandBase {
 		trajectory = new BuildTrajectory(xnet, accel, decel, cruise, step);
 	}
  
+	/**
+	 * Drive a created motion profile based on input data
+	 * 
+	 * Parameters: angle of rotation, acceleration, deceleration, cruise velocity, 
+	 */
 	public DriveMotionProfiling(double angle, double accel, double decel, double cruise) {
 		requires(driveBase);
 		buildControllers();
 		
-		this.angle = angle;
+		m_angle = angle;
 		this.setInterruptible(false);
 		
 		setTimeout(10);
@@ -61,7 +66,6 @@ public class DriveMotionProfiling extends CommandBase {
 			rightmp_drive.processMotionProfileBuffer();
 		}
 	}
-	
 	
 	/*
 	public DriveMotionProfiling(){
@@ -136,7 +140,8 @@ public class DriveMotionProfiling extends CommandBase {
 			SmartDashboard.putBoolean("Left Has Underrun", leftmp_drive.hasUnderrun());
 			SmartDashboard.putBoolean("Right Has Underrrun", rightmp_drive.hasUnderrun());
 			
-			System.out.println("Active Point " + leftmp_drive.getActivePoint().position + " Time " + leftmp_drive.getActivePoint().timeDurMs);
+			System.out.println("Active Point Left " + leftmp_drive.getActivePoint().position + " Time " + leftmp_drive.getActivePoint().timeDurMs);
+			System.out.println("Active Point Right " + rightmp_drive.getActivePoint().position + " Time " + rightmp_drive.getActivePoint().timeDurMs);
 		}
 	}
 	
@@ -147,6 +152,9 @@ public class DriveMotionProfiling extends CommandBase {
 		
 		driveBase.getLeftTalon().reverseOutput(true);
 		driveBase.getRightTalon().reverseOutput(true);
+		
+		leftmp_drive.clearMotionProfileTrajectories();
+		rightmp_drive.clearMotionProfileTrajectories();
 		
 		ahrs.gyroReset();
 		
@@ -173,7 +181,7 @@ public class DriveMotionProfiling extends CommandBase {
 	}
 
 	protected boolean isFinished() {
-		double error = Math.abs(angle - ahrs.getGyroYaw());
+		double error = Math.abs(m_angle - ahrs.getGyroYaw());
 		return isTimedOut() || error <= TOLERANCE;
 	}
 
@@ -184,6 +192,8 @@ public class DriveMotionProfiling extends CommandBase {
 		resetMP();
 		
 		driveBase.initDrive();
+		
+		System.out.println("Drive Motion Profiling Finished");
 	}
 
 	protected void interrupted() {

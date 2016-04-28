@@ -8,6 +8,7 @@ public class Shoot extends CommandBase {
 	
 	public Shoot() {
 		requires(pultaCat);
+		setTimeout(1);
 		setInterruptible(false);
 	}
 	
@@ -26,7 +27,7 @@ public class Shoot extends CommandBase {
 
 	public boolean isFinished() {
         System.out.println("Is Shoot finished?");
- 		return shotFired;
+ 		return shotFired && isTimedOut();
 	}
 	
 	public void end() {
