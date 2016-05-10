@@ -6,9 +6,7 @@ import edu.wpi.first.wpilibj.command.CommandGroup;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.DriveStraight;
 import org.usfirst.frc.team3467.robot.subsystems.utilitybar.UtilityBar;
 import org.usfirst.frc.team3467.robot.subsystems.utilitybar.commands.Bar_actuate;
-import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.AutoRotateToAngle;
 import org.usfirst.frc.team3467.robot.subsystems.Intake.commands.Roller_Actuate;
-import org.usfirst.frc.team3467.robot.subsystems.Shooter.commands.ShooterPrepare;
 
 public class AutoPortCullis extends CommandGroup {
 	
