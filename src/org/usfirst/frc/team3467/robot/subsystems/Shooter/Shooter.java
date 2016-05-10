@@ -1,6 +1,5 @@
 package org.usfirst.frc.team3467.robot.subsystems.Shooter;
 
-import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -35,7 +34,7 @@ public class Shooter extends PIDSubsystem implements PowerConsumer {
 	//Catapult Objects
 	private CANTalon m_resetBar;
 	private DoubleSolenoid m_catLatch;
-	private AnalogPotentiometer m_resetAngle;
+	//private AnalogPotentiometer m_resetAngle;
 	
 	//PID Constants
 	private static final double SHOOT_P = 20.0;
@@ -45,7 +44,7 @@ public class Shooter extends PIDSubsystem implements PowerConsumer {
 	private static final double TOLERANCE = 0.01;
 	
 	// PID variables
-	private double m_resetBarSetpoint;
+	private int m_resetBarSetpoint;
 	private boolean m_usePID;
 
 	// Maximum allowed current for resetting the catapult
@@ -57,36 +56,39 @@ public class Shooter extends PIDSubsystem implements PowerConsumer {
 	private boolean m_powerAlert = false;
 	
 	// Reset bar setpoints
-	private double m_clearPoint = 0.69;  // bar is out of the way of catapult
-	private double m_latchPoint = 0.30; // bar is holding catapult so it can be latched
-	private double m_deltaPot = 0.40; //Change in pot signal between clear and latch points
+	private int m_clearPoint = 490;  // bar is out of the way of catapult
+	private int m_latchPoint = 61; // bar is holding catapult so it can be latched
+	private int m_deltaPot = 429; //Change in pot signal between clear and latch points
 	// The roboRio Preferences
 	Preferences m_prefs = Preferences.getInstance();
 	
 	// Has the robot been calibrated
-	private boolean m_hasBeenCalibrated = false;
+	private static boolean m_hasBeenCalibrated = false;
+	
 	
 	//Shooter Constructor
 	public Shooter() {
 	
 		super("Shooter", SHOOT_P, SHOOT_I, SHOOT_D);
 
-		m_resetAngle = new AnalogPotentiometer(new AnalogInput(RobotMap.catapult_potentiometer_port));
+		//m_resetAngle = new AnalogPotentiometer(new AnalogInput(RobotMap.catapult_potentiometer_port));
 		m_resetBar = new CANTalon(RobotMap.catapult_Talon);
 		
 		m_resetBar.enableBrakeMode(true);
+		m_resetBar.setFeedbackDevice(CANTalon.FeedbackDevice.AnalogPot);
 		
 		m_catLatch = new DoubleSolenoid(RobotMap.catapult_solenoid_latch, RobotMap.catapult_solenoid_release);
 		
 		// Start with setpoint at the current potentiometer reading 
-		m_resetBarSetpoint = m_resetAngle.get();
+		m_resetBarSetpoint = m_resetBar.getAnalogInRaw();
 		m_usePID = false;
+		
 		this.setAbsoluteTolerance(TOLERANCE);
 		
 		// Update reset bar setpoints from Preferences
-		double cp = m_clearPoint; double lp = m_latchPoint;
-		m_clearPoint = m_prefs.getDouble("Shooter Clear Point", cp);
-		m_latchPoint = m_prefs.getDouble("Shooter Latch Point", lp);
+		int cp = m_clearPoint; int lp = m_latchPoint;
+		m_clearPoint = m_prefs.getInt("Shooter Clear Point", cp);
+		m_latchPoint = m_prefs.getInt("Shooter Latch Point", lp);
 		
 		// Update PID gains from Preferences
 		double p, i, d;
@@ -98,11 +100,14 @@ public class Shooter extends PIDSubsystem implements PowerConsumer {
 		// Register with Brownout subsystem
 		Brownout.getInstance().registerCallback(this);		
 	}
-		
+	
+	
 	protected void initDefaultCommand() {
 		this.setDefaultCommand(new ShooterReset());	// Drive Manually by default
 	}
 	
+	
+	//Set Shooter Modes
 	public void initManualMode() {
 		
 		if (m_usePID) {
@@ -125,7 +130,7 @@ public class Shooter extends PIDSubsystem implements PowerConsumer {
 
 		// Update the reset bar setpoint even while in manual mode
 		// to avoid surprises when returning to PID control
-		double angle = m_resetAngle.get();
+		int angle = m_resetBar.getAnalogInRaw();
 		if (debugging) {
 	    	SmartDashboard.putNumber("Shooter Reset Angle", angle);
 		}
@@ -145,6 +150,7 @@ public class Shooter extends PIDSubsystem implements PowerConsumer {
 		}
 		return true;
 	}
+	
 	
 	/*
 	 * Methods to move Reset Bar to useful positions
@@ -174,14 +180,22 @@ public class Shooter extends PIDSubsystem implements PowerConsumer {
 			SmartDashboard.putNumber("Shooter Setpoint", m_resetBarSetpoint);
 	}
 	
+	
+	//Check if if the reset bar is in a position
 	public boolean resetBarIsClear() {
 		// If reset angle is >= m_clearPoint, or if clear limit switch is closed, return true
-		return ((m_resetAngle.get() >= m_clearPoint) || m_resetBar.isFwdLimitSwitchClosed());
+		return ((m_resetBar.getAnalogInRaw() >= m_clearPoint) || m_resetBar.isFwdLimitSwitchClosed());
 	}
 	
 	public boolean resetBarIsLatched() {
-		return (m_resetAngle.get() <= m_latchPoint  || m_resetBar.isRevLimitSwitchClosed());
+		return (m_resetBar.getAnalogInRaw() <= m_latchPoint  || m_resetBar.isRevLimitSwitchClosed());
 	}
+	
+	public int getResetAngle() {
+		return m_resetBar.getAnalogInRaw();
+	}
+	
+	
 	
 	// Control the solenoid that latches the catapult
 	public void cataLatch() {
@@ -244,8 +258,12 @@ public class Shooter extends PIDSubsystem implements PowerConsumer {
 	// This is called during RobotInit
 	public void cataCalibrate() {
 		
-		m_clearPoint = m_resetAngle.get();
+		m_clearPoint = m_resetBar.getAnalogInRaw();
 		m_latchPoint = m_clearPoint - m_deltaPot;
+		
+		m_prefs.putDouble("Shooter Clear Point", m_clearPoint);
+		m_prefs.putDouble("Shooter Latch Point", m_latchPoint);
+		
 		m_hasBeenCalibrated = true;
 	}
 	
@@ -267,7 +285,7 @@ public class Shooter extends PIDSubsystem implements PowerConsumer {
 	
 	// PIDController methods
 	protected double returnPIDInput() {
-		double angle = m_resetAngle.get();
+		int angle = m_resetBar.getAnalogInRaw();
 		if (debugging) {
 	    	SmartDashboard.putBoolean("Shooter PID Enabled", true);
 	    	SmartDashboard.putNumber("Shooter Reset Angle", angle);
@@ -289,12 +307,12 @@ public class Shooter extends PIDSubsystem implements PowerConsumer {
 		// If trying to drive and a limit switch is hit, then stop...
 		if(checkClearLimit() && speed > 0.0) {
 			speed = 0.0;
-			if (Math.abs(m_resetAngle.get() - m_clearPoint) > .2)
+			if (Math.abs(m_resetBar.getAnalogInRaw() - m_clearPoint) > 200)
 				SmartDashboard.putBoolean("Shooter Out of Calibration", true);
 		}
 		else if(checkLatchLimit() && speed < 0.0) {
 			speed = 0.0;
-			if (Math.abs(m_resetAngle.get() - m_latchPoint) > .2)
+			if (Math.abs(m_resetBar.getAnalogInRaw() - m_latchPoint) > 200)
 				SmartDashboard.putBoolean("Shooter Out of Calibration", true);
 		}
 		return(speed);

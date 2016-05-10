@@ -4,14 +4,17 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+import org.usfirst.frc.team3467.robot.subsystems.Vision.commands.AimBot;
 import org.usfirst.frc.team3467.robot.subsystems.Vision.commands.AutoAim;
 import org.usfirst.frc.team3467.robot.subsystems.Vision.commands.LightSwitch;
 import org.usfirst.frc.team3467.robot.subsystems.Vision.commands.TargetGoal;
 import org.usfirst.frc.team3467.robot.subsystems.Vision.commands.VisionCalibrate;
 import org.usfirst.frc.team3467.robot.commands.CommandBase;
 import org.usfirst.frc.team3467.robot.commands.autonomous.AutoTarget;
+import org.usfirst.frc.team3467.robot.commands.autonomous.LowBarAndShoot;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.ArcadeDrive;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.AutoRotateToAngle;
+import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.DriveMotionProfiling;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.PreciseRotateToAngle;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.ResetDriveEncoders;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.SetBrakeMode;
@@ -29,6 +32,8 @@ import org.usfirst.frc.team3467.robot.triggers.DPadLeft;
 import org.usfirst.frc.team3467.robot.triggers.DPadRight;
 import org.usfirst.frc.team3467.robot.triggers.DPadUp;
 import org.usfirst.frc.team3467.robot.triggers.DoubleButton;
+import org.usfirst.frc.team3467.robot.triggers.GamepadLeftTrigger;
+import org.usfirst.frc.team3467.robot.triggers.GamepadRightTrigger;
 
 public class OI {
 	
@@ -41,22 +46,24 @@ public class OI {
 	public static final int Arcade = 2;
 	public int userlogin = 2;
 	
+	
 /*
  * Joystick Mappings (done elsewhere in code)
  * 
  * Joystick PrimaryStick - used for Tank or Arcade Drive
- * Joystick SecondaryStick - used for Tank Drive (along with PrimaryStick)
  * 
  * Gamepad getRightStickX() - used for manual drive of Intake rollers
  * Gamepad getLeftStickY() - used for manual drive of Catapult reset bar
  * 
  */
 	
+	
 	public OI(){
 		PrimaryStick = new Joystick(0);
-		SecondaryStick = new Joystick(1);
+		//SecondaryStick = new Joystick(1);
 		operator = new Gamepad(2);
 	}
+	
 	
 	public Gamepad getGamepad() {
 		return operator;
@@ -84,6 +91,7 @@ public class OI {
 		return userlogin;
 	}
 	
+	
 	//Method that binds certain commands to certain buttons
 	public void BindCommands() {
 
@@ -97,53 +105,59 @@ public class OI {
 				CommandBase.driveBase.setDriveMode(false);
 				break;
 		}
-		
-		
-	//Interupts the previous command
-		//new JoystickButton(operator, Gamepad.leftBumper);
-		
-		
+
 	//DriveBase
 		//Toggle in and out of precision angle mode
-		new JoystickButton(PrimaryStick, 11)
-		.whenPressed(new PreciseRotateToAngle());
+		new JoystickButton(PrimaryStick, 3)
+			.whenPressed(new PreciseRotateToAngle());
 		
-		new JoystickButton(PrimaryStick, 12)
-		.whenPressed(new ArcadeDrive());
+		new JoystickButton(PrimaryStick, 4)
+			.whenPressed(new ArcadeDrive());
 		
-		new JoystickButton(PrimaryStick, 7)
-		.whenPressed(new AutoTarget());
+		//Toggle in and out of AimBot
+		new JoystickButton(PrimaryStick, 1)
+			.whenPressed(new AimBot());
+		
+		new JoystickButton(PrimaryStick, 2)
+			.whenPressed(new ArcadeDrive());
+		
+	//Utility Bar
+		//Utility bar up
+		new GamepadLeftTrigger(operator)
+		.whenActive(new Bar_actuate(UtilityBar.kOut));
+		
+		//Utility bar down
+		new GamepadRightTrigger(operator)
+			.whenActive(new Bar_actuate(UtilityBar.kIn));
+	
 		
 	//Intake
-		//Eject Slow
-		new JoystickButton(operator, Gamepad.xButton)
-			.whileHeld(new IntakeDrive(Intake.kEjectSlow));
-		
 		//Eject Fast
-		new JoystickButton(operator, Gamepad.yButton)
+		new JoystickButton(operator, Gamepad.xButton)
 			.whileHeld(new IntakeDrive(Intake.kEjectFast));
-		
-		//Intake Slow
-		new JoystickButton(operator, Gamepad.aButton)
-			.whileHeld(new IntakeDrive(Intake.kIntakeSlow));
 		
 		//Intake Fast
 		new JoystickButton(operator, Gamepad.bButton)
 			.whileHeld(new IntakeDrive(Intake.kIntakeFast));
 		
+		//Intake up
+		new JoystickButton(operator, Gamepad.aButton)
+			.whenActive(new Roller_Actuate(true));
+		
+		//Intake down
+		new JoystickButton(operator, Gamepad.yButton)
+			.whenActive(new Roller_Actuate(false));
+		
+		/*
 		//Intake Extend
 		new JoystickButton(SecondaryStick, 1)
 		.whenPressed(new Roller_Actuate(true));
 		
 		new JoystickButton(SecondaryStick, 2)
-		.whenPressed(new Roller_Actuate(false));
-		
+		.whenPressed(new Roller_Actuate(false));	
+		*/
 	
 	//Catapult
-		// Halt Reset Bar PID and switch to manual mode
-		new JoystickButton(operator, Gamepad.rightTrigger_Axis)
-			.whileHeld(new ShooterReset());
-		
 		//Reload Catapult
 		new JoystickButton(operator, Gamepad.leftBumper)
 			.whenPressed(new ShooterSetup());
@@ -152,6 +166,7 @@ public class OI {
 		new JoystickButton(operator, Gamepad.rightBumper)
 			.whenPressed(new Shoot());
 	
+		
 		// DPad Up
 		new DPadUp(operator)
 			.whenActive(new SetBrakeMode(false));
@@ -161,17 +176,17 @@ public class OI {
 			.whenActive(new SetBrakeMode(true));
  		
 		/*
-		// DPad Right
+		 DPad Right
 		new DPadRight(operator)
 			.whenActive(new ShooterLatch());
 
-		// DPad Left
+		DPad Left
 		new DPadLeft(operator)
 			.whenActive(new ShooterClear());
 		 */
 		
 		// Quick latch reset (emergency use only)
-		new DoubleButton(SecondaryStick, 7, 12)
+		new JoystickButton(operator, Gamepad.leftStickPress)
 		.whenActive(new ShooterRetryUnlatch());
 		
 		
@@ -182,7 +197,7 @@ public class OI {
 		new JoystickButton(operator, Gamepad.backButton)
 		.whenActive(new LightSwitch(false));
 		
-		
+	/*	
 	//Utility Bar/Finger
 			//Extend Using the Right Joystick Trigger
 		new JoystickButton(SecondaryStick, 3)
@@ -191,6 +206,7 @@ public class OI {
 			//Retract Using the Right Shoulder Button
 		new JoystickButton(SecondaryStick, 4)
 			.whenPressed(new Bar_actuate(UtilityBar.kIn));
+	*/
 		
 			//Extend Finger using Top left button
 		/*
@@ -208,10 +224,14 @@ public class OI {
 		SmartDashboard.putData("AHRS: Reset Gyro", new ResetGyro());
 		SmartDashboard.putData("Vision: Target Goal", new TargetGoal());
 		SmartDashboard.putData("Vision: Calibrate", new VisionCalibrate());
+		SmartDashboard.putData("Vision: AimBot", new AimBot());
+		
+		//Test Buttons
 		SmartDashboard.putData("Test SuperAutoRotate", new SuperAutoRotate(90, 0));
 		SmartDashboard.putData("Test AutoRotateToAngle", new AutoRotateToAngle(90));
 		SmartDashboard.putData("Test AutoAim", new AutoAim());
 		SmartDashboard.putData("Test AutoTarget", new AutoTarget());
+		SmartDashboard.putData("Test Motion Profiling", new DriveMotionProfiling(20, 0.1, 0.1, 3));
 	}
 }
 

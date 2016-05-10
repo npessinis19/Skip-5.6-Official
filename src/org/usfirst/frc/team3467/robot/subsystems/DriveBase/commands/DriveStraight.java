@@ -21,6 +21,10 @@ public class DriveStraight extends CommandBase {
 	private PIDController m_pid;
 	private double m_maxSpeed = 0.6;
 	private double m_distance = 0.0;
+	private boolean m_manualCurve = false;
+	private double m_curveValue = 0.0;
+	private double m_pastDistance = 0.0;
+	private int m_count = 0;
 	
 	private double KP = 2.0;
 	private double KI = 0.0;
@@ -41,13 +45,31 @@ public class DriveStraight extends CommandBase {
     	m_maxSpeed = maxSpeed;
     	m_distance = distance;
     	buildController();
+    	;
     }
 	
 	public DriveStraight(double distance) {
-    
     	requires(driveBase);
     	m_distance = distance;
     	buildController();
+	}
+	
+	public DriveStraight(double distance, boolean curve, double curveValue) {
+		requires(driveBase);
+		
+		m_distance = distance;
+		m_manualCurve = curve;
+		m_curveValue = curveValue;
+		
+		buildController();
+	}
+	
+	public DriveStraight(double distance, double maxSpeed, double timeOut) {
+		requires(driveBase);
+		m_distance = distance;
+		m_maxSpeed = maxSpeed;
+		
+		setTimeout(timeOut);
 	}
 	
 	private void buildController() {
@@ -74,7 +96,8 @@ public class DriveStraight extends CommandBase {
                 		// Drive with the magnitude returned by the PID calculation, 
                 		// and curve the opposite way from the current yaw reading
                 		// (Divide yaw by 180 so as to normalize to -1.0 / + 1.0)
-                		driveBase.drive(-d, -(ahrs.getGyroYaw()/240.));
+                		//driveBase.drive(-d, -(ahrs.getGyroYaw()/240.));
+                		setCurve(-d);
                 }});
 		
         m_pid.setAbsoluteTolerance(TOLERANCE);
@@ -84,14 +107,22 @@ public class DriveStraight extends CommandBase {
 
 	//If the robot has hit a wall, SAY SOMETHING!
 	public boolean hasStalled() {
-		double pastDistance = driveBase.getDistance();
-		if (driveBase.getDistance() - pastDistance <= 1) {
+		if (driveBase.getDistance() - m_pastDistance <= 1) {
 			return true;
 		}
 		else {
 			return false;
 		}
 	}
+	
+	public void setCurve(double d) {
+		if (m_manualCurve) {
+			driveBase.drive(d, m_curveValue);
+		}
+			else  {
+				driveBase.drive(d, -(ahrs.getGyroYaw()/240.));
+				}
+		}
 	
 	
     // Called just before this Command runs the first time
@@ -107,13 +138,23 @@ public class DriveStraight extends CommandBase {
     protected void execute() {
     	driveBase.reportEncoders();
     	
+    	if (hasStalled()) {
+    		m_count++;
+    	}
     	
+    	m_pastDistance = driveBase.getDistance();
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
     	double error = m_pid.getError();
-        return (error >= 0 && error <= TOLERANCE);
+    	
+    	if (m_count >= 50) {
+    		return true;
+    	}
+    	else {
+    		return (error >= 0 && error <= TOLERANCE);
+    	}
     }
 
     // Called once after isFinished returns true

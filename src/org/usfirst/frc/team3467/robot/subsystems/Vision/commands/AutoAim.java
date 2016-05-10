@@ -160,7 +160,7 @@ public class AutoAim extends CommandBase {
 			break;
 		//Check if we're on Target (if not, go to aimState 1)
 		case 4: 
-				if (!grip.imageOnTarget) {
+				if (!grip.isOnTarget()) {
 					aimState = 1;
 				}
 				else {
