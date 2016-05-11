@@ -26,7 +26,7 @@ public class LowBarAndShoot extends CommandGroup {
 		addSequential(new DriveStraight(7950));
 		addSequential(new Roller_Actuate(false));
 		addSequential(new DriveStraight(2000, true, 0.01));
-		addSequential(new DriveMotionProfiling(42, 0.1, 0.1, 3));
+		addSequential(new DriveMotionProfiling(42, 0.1, 0.1, 3, true));
 		addSequential(new AutoIntake(true), 2.0);
 		addSequential(new AimBot());
 		addSequential(new Shoot());
