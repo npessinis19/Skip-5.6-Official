@@ -40,9 +40,9 @@ public class RobotMap {
 		public static final int utilitybar_solenoid_deploy = 5;
 		public static final int utilitybar_solenoid_retract = 2;
 
+	//Important Ball Eject Variables
 		
-	//Important Utility Finger Variables
-		public static final int utilityfinger_solenoid_in = 7;
-		public static final int utilityfinger_solenoid_out = 0;
+		public static final int BallEject_solenoid_deploy = 7;
+		public static final int BallEject_solenoid_retract = 0;
 		
 }
