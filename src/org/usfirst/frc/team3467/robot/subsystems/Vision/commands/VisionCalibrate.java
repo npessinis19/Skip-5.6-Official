@@ -7,38 +7,33 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class VisionCalibrate extends CommandBase {
 
 	public VisionCalibrate() {
-		setTimeout(1);
+		setTimeout(5);
 	}
 	
 	protected void initialize() {
+		grip.createImage();
+		grip.calculateTargetData();
 		
-
+		grip.setTarget_angle(grip.getAngle_theta());
+		grip.setTarget_distnce(grip.getDistance_delta());
 	}
 	
 	protected void execute() {
 	//	if (!grip.createImage()) {
 		//	return;
 	//	};
-		
-		grip.calculateTargetData();
-		
-		grip.setTarget_angle(grip.getAngle_theta());
-		grip.setTarget_distnce(grip.getDistance_delta());
-		
 		SmartDashboard.putNumber("Target Distance", grip.getChangeinDistance());
 		SmartDashboard.putNumber("Target Angle", grip.getChangeinAngle());
 	}
 
 	@Override
 	protected boolean isFinished() {
-		return isTimedOut()
-				;
+		return isTimedOut();
 	}
 
 	@Override
 	protected void end() {
-		// TODO Auto-generated method stub
-		
+		light.lightOn();
 	}
 
 	@Override

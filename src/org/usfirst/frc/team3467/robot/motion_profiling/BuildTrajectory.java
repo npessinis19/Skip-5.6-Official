@@ -7,13 +7,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class BuildTrajectory {
 
-	private static ArrayList<double[]> flags;
+	private ArrayList<double[]> flags;
 	
 	
-	public BuildTrajectory(int xnet, double accel, double decel, double cruise, double step) {
+	public BuildTrajectory(int xnet, double accel, double decel, double cruise, double step) {		
+		//flags.clear();
 		flags = TrapProfGen(xnet, accel, decel, cruise, step);
 	}
-	
 	
 	//Get Profile Values
 	public ArrayList <double[]> getprofile() {
@@ -33,7 +33,7 @@ public class BuildTrajectory {
 	}
 	
 
-	/* 
+	/**
 	 * Creates the Profile based on input values
 	 * (xnet) is the total distance in encoder ticks
 	 * (accel) is the total acceleration in ticks/ms^2
@@ -43,9 +43,18 @@ public class BuildTrajectory {
 	 */
 	public ArrayList<double[]> TrapProfGen(int xnet, double accel, double decel, double cruise, double step) {
 		
+		System.out.println("New profile generating with xnet "+xnet);
+		
 		SmartDashboard.putString("BuildTrajectory Message", "Profile Generation Started");
 		
 		ArrayList <double[]> out = new ArrayList <double[]>();
+		
+		boolean isNeg = false;
+		
+		if (xnet < 0){
+			isNeg = true;
+			xnet = xnet * -1;
+		}
 		
 		boolean toCruise = true;
 		double time =  0;
@@ -87,15 +96,19 @@ public class BuildTrajectory {
 				x = vaccel*(time-taccel) - .5 * decel * Math.pow(time-taccel, 2) + xaccel;
 			}
 		
-		double[] outArray = {step , x};
+			if(isNeg) x = x * -1;
+			
+			double[] outArray = {step , x};
 		
-		//System.out.println(time+"    "+
-		out.add(outArray);
-		time = time + step;
+			System.out.println("Building Trajectory Point: "+time+"    "+ x);
+			out.add(outArray);
+			time = time + step;
 		}
 		
+		if(isNeg) xnet = xnet*-1;
+		
 		double[] outArrayFinal = {step , xnet};
-		System.out.println(time+"    "+ xnet);
+		System.out.println("Building Trajectory Point: "+time+"    "+ xnet);
 		out.add(outArrayFinal);
 		return out;
 		}

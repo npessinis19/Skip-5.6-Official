@@ -4,19 +4,18 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import org.usfirst.frc.team3467.robot.subsystems.Vision.commands.AutoAim;
+import org.usfirst.frc.team3467.robot.subsystems.Vision.commands.AimBot;
 import org.usfirst.frc.team3467.robot.subsystems.Vision.commands.LightSwitch;
 import org.usfirst.frc.team3467.robot.subsystems.Vision.commands.TargetGoal;
 import org.usfirst.frc.team3467.robot.subsystems.Vision.commands.VisionCalibrate;
 import org.usfirst.frc.team3467.robot.commands.CommandBase;
 import org.usfirst.frc.team3467.robot.commands.autonomous.AutoTarget;
+import org.usfirst.frc.team3467.robot.commands.autonomous.LowBarAndShoot;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.ArcadeDrive;
-import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.AutoRotateToAngle;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.DriveMotionProfiling;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.PreciseRotateToAngle;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.ResetDriveEncoders;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.SetBrakeMode;
-import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.SuperAutoRotate;
 import org.usfirst.frc.team3467.robot.subsystems.Intake.Intake;
 import org.usfirst.frc.team3467.robot.subsystems.Intake.commands.IntakeDrive;
 import org.usfirst.frc.team3467.robot.subsystems.Intake.commands.Roller_Actuate;
@@ -58,7 +57,7 @@ public class OI {
 	
 	public OI(){
 		PrimaryStick = new Joystick(0);
-		SecondaryStick = new Joystick(1);
+		//SecondaryStick = new Joystick(1);
 		operator = new Gamepad(2);
 	}
 	
@@ -106,14 +105,18 @@ public class OI {
 
 	//DriveBase
 		//Toggle in and out of precision angle mode
-		new JoystickButton(PrimaryStick, 11)
+		new JoystickButton(PrimaryStick, 3)
 			.whenPressed(new PreciseRotateToAngle());
 		
-		new JoystickButton(PrimaryStick, 12)
+		new JoystickButton(PrimaryStick, 4)
 			.whenPressed(new ArcadeDrive());
 		
-		new JoystickButton(PrimaryStick, 7)
-			.whenPressed(new AutoTarget());
+		//Toggle in and out of AimBot
+		new JoystickButton(PrimaryStick, 1)
+			.whenPressed(new AimBot());
+		
+		new JoystickButton(PrimaryStick, 2)
+			.whenPressed(new ArcadeDrive());
 		
 	//Utility Bar
 		//Utility bar up
@@ -127,7 +130,7 @@ public class OI {
 		
 	//Intake
 		//Eject Fast
-		new JoystickButton(operator, Gamepad.yButton)
+		new JoystickButton(operator, Gamepad.xButton)
 			.whileHeld(new IntakeDrive(Intake.kEjectFast));
 		
 		//Intake Fast
@@ -136,11 +139,11 @@ public class OI {
 		
 		//Intake up
 		new JoystickButton(operator, Gamepad.aButton)
-			.whenActive(new Roller_Actuate(false));
+			.whenActive(new Roller_Actuate(true));
 		
 		//Intake down
 		new JoystickButton(operator, Gamepad.yButton)
-			.whenActive(new Roller_Actuate(true));
+			.whenActive(new Roller_Actuate(false));
 		
 		/*
 		//Intake Extend
@@ -152,7 +155,6 @@ public class OI {
 		*/
 	
 	//Catapult
-
 		//Reload Catapult
 		new JoystickButton(operator, Gamepad.leftBumper)
 			.whenPressed(new ShooterSetup());
@@ -161,6 +163,7 @@ public class OI {
 		new JoystickButton(operator, Gamepad.rightBumper)
 			.whenPressed(new Shoot());
 	
+		
 		// DPad Up
 		new DPadUp(operator)
 			.whenActive(new SetBrakeMode(false));
@@ -170,17 +173,17 @@ public class OI {
 			.whenActive(new SetBrakeMode(true));
  		
 		/*
-		// DPad Right
+		 DPad Right
 		new DPadRight(operator)
 			.whenActive(new ShooterLatch());
 
-		// DPad Left
+		DPad Left
 		new DPadLeft(operator)
 			.whenActive(new ShooterClear());
 		 */
 		
 		// Quick latch reset (emergency use only)
-		new DoubleButton(SecondaryStick, 7, 12)
+		new JoystickButton(operator, Gamepad.leftStickPress)
 		.whenActive(new ShooterRetryUnlatch());
 		
 		
@@ -218,13 +221,11 @@ public class OI {
 		SmartDashboard.putData("AHRS: Reset Gyro", new ResetGyro());
 		SmartDashboard.putData("Vision: Target Goal", new TargetGoal());
 		SmartDashboard.putData("Vision: Calibrate", new VisionCalibrate());
+		SmartDashboard.putData("Vision: AimBot", new AimBot());
 		
 		//Test Buttons
-		SmartDashboard.putData("Test SuperAutoRotate", new SuperAutoRotate(90, 0));
-		SmartDashboard.putData("Test AutoRotateToAngle", new AutoRotateToAngle(90));
-		SmartDashboard.putData("Test AutoAim", new AutoAim());
 		SmartDashboard.putData("Test AutoTarget", new AutoTarget());
-		SmartDashboard.putData("Test Motion Profiling", new DriveMotionProfiling(90, 0.1, 0.1, 3));
+		SmartDashboard.putData("Test Motion Profiling", new DriveMotionProfiling(20, 0.1, 0.1, 3, true));
 	}
 }
 

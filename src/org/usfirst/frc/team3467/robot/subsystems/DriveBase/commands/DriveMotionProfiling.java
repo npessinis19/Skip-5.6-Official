@@ -19,25 +19,45 @@ public class DriveMotionProfiling extends CommandBase {
 	
 	private static boolean debugging = true;
 	private static double TOLERANCE = 0.5;
-	private double angle = 0.0;
+	private double m_angle = 0.0;
+	private boolean m_reset;
 	
 	
-	public DriveMotionProfiling(int xnet, double accel, double decel, double cruise, double step) {
+	/**
+	 * @param Distance
+	 * @param Acceleration
+	 * @param Deceleration
+	 * @param Cruise Velocity
+	 * @param Period
+	 * @param Reset Encoders
+	 */
+	public DriveMotionProfiling(int xnet, double accel, double decel, double cruise, double step, boolean reset) {
 		requires(driveBase);
 		buildControllers();
 		
-		this.setInterruptible(false);
+		m_reset = reset;
+		this.setInterruptible(true);
 		
 		SmartDashboard.putString("TestProfiling Mode", "position");
 		
 		trajectory = new BuildTrajectory(xnet, accel, decel, cruise, step);
 	}
  
-	public DriveMotionProfiling(double angle, double accel, double decel, double cruise) {
+	/**
+	 * Drive a created motion profile based on input data
+	 * 
+	 * @param Angle of rotation
+	 * @param Acceleration
+	 * @param Deceleration
+	 * @param Cruise velocity
+	 * @param Reset Encoders 
+	 */
+	public DriveMotionProfiling(double angle, double accel, double decel, double cruise, boolean reset) {
 		requires(driveBase);
 		buildControllers();
 		
-		this.angle = angle;
+		m_angle = angle;
+		m_reset = reset;
 		this.setInterruptible(false);
 		
 		setTimeout(10);
@@ -61,7 +81,6 @@ public class DriveMotionProfiling extends CommandBase {
 			rightmp_drive.processMotionProfileBuffer();
 		}
 	}
-	
 	
 	/*
 	public DriveMotionProfiling(){
@@ -136,17 +155,22 @@ public class DriveMotionProfiling extends CommandBase {
 			SmartDashboard.putBoolean("Left Has Underrun", leftmp_drive.hasUnderrun());
 			SmartDashboard.putBoolean("Right Has Underrrun", rightmp_drive.hasUnderrun());
 			
-			System.out.println("Active Point " + leftmp_drive.getActivePoint().position + " Time " + leftmp_drive.getActivePoint().timeDurMs);
+			System.out.println("Active Point Left " + leftmp_drive.getActivePoint().position + " Time " + leftmp_drive.getActivePoint().timeDurMs);
+			System.out.println("Active Point Right " + rightmp_drive.getActivePoint().position + " Time " + rightmp_drive.getActivePoint().timeDurMs);
 		}
 	}
 	
 	
 	protected void initialize() {
 		driveBase.setControlMode(TalonControlMode.MotionProfile);
-		driveBase.resetEncoders();
+		
+		if(m_reset) driveBase.resetEncoders();
 		
 		driveBase.getLeftTalon().reverseOutput(true);
 		driveBase.getRightTalon().reverseOutput(true);
+		
+		leftmp_drive.clearMotionProfileTrajectories();
+		rightmp_drive.clearMotionProfileTrajectories();
 		
 		ahrs.gyroReset();
 		
@@ -173,7 +197,7 @@ public class DriveMotionProfiling extends CommandBase {
 	}
 
 	protected boolean isFinished() {
-		double error = Math.abs(angle - ahrs.getGyroYaw());
+		double error = Math.abs(m_angle - ahrs.getGyroYaw());
 		return isTimedOut() || error <= TOLERANCE;
 	}
 
@@ -184,6 +208,8 @@ public class DriveMotionProfiling extends CommandBase {
 		resetMP();
 		
 		driveBase.initDrive();
+		
+		System.out.println("Drive Motion Profiling Finished");
 	}
 
 	protected void interrupted() {

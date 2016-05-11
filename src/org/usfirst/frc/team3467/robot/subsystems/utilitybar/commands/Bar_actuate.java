@@ -12,7 +12,7 @@ public class Bar_actuate extends CommandBase {
 	public Bar_actuate(Value inORout) {
 	 requires(utilitybar);
 	 INorOUT = inORout;
-	 setTimeout(2.0);
+	 setTimeout(1.0);
 	}
 	
 	public Bar_actuate() {

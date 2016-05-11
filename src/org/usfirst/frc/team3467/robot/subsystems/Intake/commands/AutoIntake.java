@@ -19,7 +19,7 @@ public class AutoIntake extends CommandBase {
 	protected void execute() {
 		if (autoIntakeIn) {
 			intake.driveManual(Intake.kIntakeFast);
-		}
+			}
 		else {
 			intake.driveManual((Intake.kEjectFast));
 		}
