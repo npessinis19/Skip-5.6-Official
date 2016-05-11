@@ -20,13 +20,23 @@ public class DriveMotionProfiling extends CommandBase {
 	private static boolean debugging = true;
 	private static double TOLERANCE = 0.5;
 	private double m_angle = 0.0;
+	private boolean m_reset;
 	
 	
-	public DriveMotionProfiling(int xnet, double accel, double decel, double cruise, double step) {
+	/**
+	 * @param Distance
+	 * @param Acceleration
+	 * @param Deceleration
+	 * @param Cruise Velocity
+	 * @param Period
+	 * @param Reset Encoders
+	 */
+	public DriveMotionProfiling(int xnet, double accel, double decel, double cruise, double step, boolean reset) {
 		requires(driveBase);
 		buildControllers();
 		
-		this.setInterruptible(false);
+		m_reset = reset;
+		this.setInterruptible(true);
 		
 		SmartDashboard.putString("TestProfiling Mode", "position");
 		
@@ -36,13 +46,18 @@ public class DriveMotionProfiling extends CommandBase {
 	/**
 	 * Drive a created motion profile based on input data
 	 * 
-	 * Parameters: angle of rotation, acceleration, deceleration, cruise velocity, 
+	 * @param Angle of rotation
+	 * @param Acceleration
+	 * @param Deceleration
+	 * @param Cruise velocity
+	 * @param Reset Encoders 
 	 */
-	public DriveMotionProfiling(double angle, double accel, double decel, double cruise) {
+	public DriveMotionProfiling(double angle, double accel, double decel, double cruise, boolean reset) {
 		requires(driveBase);
 		buildControllers();
 		
 		m_angle = angle;
+		m_reset = reset;
 		this.setInterruptible(false);
 		
 		setTimeout(10);
@@ -148,7 +163,8 @@ public class DriveMotionProfiling extends CommandBase {
 	
 	protected void initialize() {
 		driveBase.setControlMode(TalonControlMode.MotionProfile);
-		driveBase.resetEncoders();
+		
+		if(m_reset) driveBase.resetEncoders();
 		
 		driveBase.getLeftTalon().reverseOutput(true);
 		driveBase.getRightTalon().reverseOutput(true);
