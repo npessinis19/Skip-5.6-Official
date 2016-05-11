@@ -5,7 +5,6 @@ import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.usfirst.frc.team3467.robot.subsystems.Vision.commands.AimBot;
-import org.usfirst.frc.team3467.robot.subsystems.Vision.commands.AutoAim;
 import org.usfirst.frc.team3467.robot.subsystems.Vision.commands.LightSwitch;
 import org.usfirst.frc.team3467.robot.subsystems.Vision.commands.TargetGoal;
 import org.usfirst.frc.team3467.robot.subsystems.Vision.commands.VisionCalibrate;
@@ -13,12 +12,10 @@ import org.usfirst.frc.team3467.robot.commands.CommandBase;
 import org.usfirst.frc.team3467.robot.commands.autonomous.AutoTarget;
 import org.usfirst.frc.team3467.robot.commands.autonomous.LowBarAndShoot;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.ArcadeDrive;
-import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.AutoRotateToAngle;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.DriveMotionProfiling;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.PreciseRotateToAngle;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.ResetDriveEncoders;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.SetBrakeMode;
-import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.SuperAutoRotate;
 import org.usfirst.frc.team3467.robot.subsystems.Intake.Intake;
 import org.usfirst.frc.team3467.robot.subsystems.Intake.commands.IntakeDrive;
 import org.usfirst.frc.team3467.robot.subsystems.Intake.commands.Roller_Actuate;
@@ -227,9 +224,6 @@ public class OI {
 		SmartDashboard.putData("Vision: AimBot", new AimBot());
 		
 		//Test Buttons
-		SmartDashboard.putData("Test SuperAutoRotate", new SuperAutoRotate(90, 0));
-		SmartDashboard.putData("Test AutoRotateToAngle", new AutoRotateToAngle(90));
-		SmartDashboard.putData("Test AutoAim", new AutoAim());
 		SmartDashboard.putData("Test AutoTarget", new AutoTarget());
 		SmartDashboard.putData("Test Motion Profiling", new DriveMotionProfiling(20, 0.1, 0.1, 3));
 	}

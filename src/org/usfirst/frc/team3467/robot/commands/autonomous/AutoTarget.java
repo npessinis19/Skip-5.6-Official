@@ -1,6 +1,5 @@
 package org.usfirst.frc.team3467.robot.commands.autonomous;
 
-import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.AutoRotateToAngle;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.DriveStraight;
 import org.usfirst.frc.team3467.robot.subsystems.Vision.commands.TargetGoal;
 import org.usfirst.frc.team3467.robot.commands.CommandBase;
@@ -11,7 +10,6 @@ public class AutoTarget extends CommandGroup {
 	
 	public AutoTarget() {
 		addSequential(new TargetGoal());
-		addSequential(new AutoRotateToAngle(-42));
 		//addSequential(new TargetGoal());
 		//addSequential(new DriveStraight(CommandBase.grip.changeinDistance));
 		//addSequential(new TargetGoal());
