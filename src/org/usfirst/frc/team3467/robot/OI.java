@@ -225,7 +225,7 @@ public class OI {
 		
 		//Test Buttons
 		SmartDashboard.putData("Test AutoTarget", new AutoTarget());
-		SmartDashboard.putData("Test Motion Profiling", new DriveMotionProfiling(20, 0.1, 0.1, 3));
+		SmartDashboard.putData("Test Motion Profiling", new DriveMotionProfiling(20, 0.1, 0.1, 3, true));
 	}
 }
 

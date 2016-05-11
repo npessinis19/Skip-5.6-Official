@@ -13,6 +13,7 @@ public class AimBot extends CommandBase {
 	
 		private BuildTrajectory trajectory;
 		private MP_CANTalons leftmp_drive, rightmp_drive;
+		
 		private int aimState = 1;
 		private boolean finished = false;
 		private static boolean debugging = true;
@@ -135,7 +136,7 @@ public class AimBot extends CommandBase {
 						grip.calculateTargetData();
 						grip.printData();
 						
-						System.out.println("Change in Angle" + grip.getChangeinAngle());
+						System.out.println("Aimbot found Change in Angle" + grip.getChangeinAngle());
 						
 						trajectory = new BuildTrajectory((int) (grip.getChangeinAngle() - 1) * 14, 0.05, 0.05, 2, 10);
 					
@@ -148,6 +149,7 @@ public class AimBot extends CommandBase {
 					}
 					else {
 						System.out.println("Failed to make trajectory");
+						
 						aimState = 1;
 					}
 				break;
@@ -176,9 +178,7 @@ public class AimBot extends CommandBase {
 			//State 5, check if we're on Target (if not, go to aimState 1)
 			case 5: 
 					grip.createImage();
-					if (grip.isGoodImage()) {
-						grip.calculateTargetData();
-					}
+					grip.calculateTargetData();
 					
 					if (!grip.isOnTarget()) {
 						aimState = 1;
@@ -241,6 +241,6 @@ public class AimBot extends CommandBase {
 		}
 
 		protected void interrupted() {
-			end();
+			resetMP();
 		}
 	}

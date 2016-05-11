@@ -2,15 +2,15 @@ package org.usfirst.frc.team3467.robot.subsystems.Vision;
 
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.AnalogInput;
 
 public class GRIP {
 	
-	
-	public NetworkTable table;
+	private DigitalInput axis;
+	private AnalogInput value;
 	private Preferences m_prefs;
-	
-	
+
 //Vision Processing Constants
 	//Is the goal on target
 	private boolean imageOnTarget = false;
@@ -53,51 +53,28 @@ public class GRIP {
 	private static final double TOLERANCE_angle = 0.5;
 	
 	//Image Matricies and Values
-	private double[] defaultValue = new double[0];
 	
 	private double Centerx = 0.0;;
 	private double Centery = 0.0;
-	private double Height = 0.0;
-	private double Width = 0.0;
-	private int contours = 0;
 	
 	public GRIP() {
-		table = NetworkTable.getTable("GRIP/myContoursReport");
+		axis = new DigitalInput(0);
+		
+		value = new AnalogInput(0);
+		
 		System.out.println("Network Tabes initiated");
 	}
 	
 	//Get values from Network Table and work with those values
 	public void createImage () {
-			double[] centerx = table.getNumberArray("centerX", defaultValue);
-			double[] centery = table.getNumberArray("centerY", defaultValue);
-			double[] width = table.getNumberArray("width", defaultValue);
-			double[] height = table.getNumberArray("height", defaultValue);
-			
-			contours = centerx.length;
-			
-			if (contours > 0) {
-				System.out.println("centerx[0]: " + centerx[0]);
-				
-					Centerx = centerx[0];
-					Centery = centery[0];
-					Width = width[0];
-					Height = height[0];
+		
+		
 						
 					//Print values to SmartDashboard
 						SmartDashboard.putNumber("Vision: Centerx", Centerx);
 						SmartDashboard.putNumber("Vision: Centery", Centery);
 						SmartDashboard.putNumber("Vision: Width", Width);			
 						SmartDashboard.putNumber("Vision: Contours", centerx.length);				
-			}
-	}
-	
-	public boolean isGoodImage() {
-		if(contours >= 0) {
-			return true;
-		}
-		else {
-			return false;
-		}
 	}
 	
 	
@@ -109,14 +86,7 @@ public class GRIP {
 	public double getCenterY() {
 		return this.Centery;
 	}
-	
-	public double getHeight() {
-		return this.Height;
-	}
-	
-	public double getWidth() {
-		return this.Width;
-	}
+
 	
 	public double getAngle_theta() {
 		return angle_theta;
@@ -154,7 +124,6 @@ public class GRIP {
 		
 		SmartDashboard.putNumber("Vision: Change in Angle", changeinAngle);
 		SmartDashboard.putNumber("Vision: Change in Distance", changeinDistance);
-		SmartDashboard.putNumber("Vision: Contours", contours);
 	}
 	
 	
