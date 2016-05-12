@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.usfirst.frc.team3467.robot.RobotMap;
 import org.usfirst.frc.team3467.robot.commands.CommandBase;
+import org.usfirst.frc.team3467.robot.motion_profiling.MP_CANTalons;
 import org.usfirst.frc.team3467.robot.subsystems.Brownout.Brownout;
 import org.usfirst.frc.team3467.robot.subsystems.Brownout.PowerConsumer;
 import org.usfirst.frc.team3467.robot.subsystems.Shooter.commands.ShooterReset;
@@ -102,6 +103,12 @@ public class Shooter extends PIDSubsystem implements PowerConsumer {
 	}
 	
 	
+	private void buildControllers() {
+		shooterTalon = new MP_CANTalons("Shooter", Shooter.getpultaCat(), false);
+		
+	}
+
+
 	protected void initDefaultCommand() {
 		this.setDefaultCommand(new ShooterReset());	// Drive Manually by default
 	}
