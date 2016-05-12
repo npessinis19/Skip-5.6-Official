@@ -71,8 +71,7 @@ public abstract class CommandBase extends Command {
 		oi = new OI();
 
 		//Initial Commands
-		oi.BindCommands();
-		
+		oi.BindCommands();	
 	}
 	
 	public CommandBase() {

@@ -3,7 +3,6 @@ package org.usfirst.frc.team3467.robot.commands.autonomous;
 import edu.wpi.first.wpilibj.command.CommandGroup;
 
 import org.usfirst.frc.team3467.robot.commands.CommandBase;
-import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.AutoRotateToAngle;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.DriveStraight;
 import org.usfirst.frc.team3467.robot.subsystems.Vision.commands.TargetGoal;
 import org.usfirst.frc.team3467.robot.subsystems.utilitybar.UtilityBar;
