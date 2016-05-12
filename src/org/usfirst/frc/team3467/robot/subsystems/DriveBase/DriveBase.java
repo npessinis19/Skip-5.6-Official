@@ -11,10 +11,12 @@ import org.usfirst.frc.team3467.robot.commands.CommandBase;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.TankDrive;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.ArcadeDrive;
 import org.usfirst.frc.team3467.robot.subsystems.Brownout.Brownout;
+import org.usfirst.frc.team3467.robot.motion_profiling.BuildTrajectory;
+import org.usfirst.frc.team3467.robot.motion_profiling.MotionProfile;
 import org.usfirst.frc.team3467.robot.subsystems.Brownout.Brownout.PowerLevel;
 import org.usfirst.frc.team3467.robot.subsystems.Brownout.PowerConsumer;
 
-public class DriveBase extends Subsystem implements PowerConsumer {
+public class DriveBase extends Subsystem implements PowerConsumer, MotionProfile {
 	
 	//Use to Toggle Arcade Drive, and t_useTank Drive
 	private boolean t_useTank = true;
@@ -223,5 +225,20 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 		rightTalon2.enableBrakeMode(setBrake);
 		leftTalon3.enableBrakeMode(setBrake);
 		rightTalon3.enableBrakeMode(setBrake);
+	}
+
+	public void resetMP() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void startMP(BuildTrajectory trajectory) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void publishValues() {
+		// TODO Auto-generated method stub
+		
 	}
 }
