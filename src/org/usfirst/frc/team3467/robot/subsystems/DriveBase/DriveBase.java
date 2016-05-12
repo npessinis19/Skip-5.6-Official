@@ -183,6 +183,9 @@ public class DriveBase extends Subsystem implements PowerConsumer, MotionProfile
 		leftTalon.changeControlMode(controlMode);
 		rightTalon.changeControlMode(controlMode);
 		
+		leftTalon.changeControlMode(TalonControlMode.Current);
+		leftTalon.set(0);
+		
 		// Save control mode so we will know if we have to set it back later
 		t_controlMode = controlMode;
 	}
