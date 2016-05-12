@@ -4,8 +4,11 @@ import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.CANTalon.MotionProfileStatus;
 import edu.wpi.first.wpilibj.CANTalon.TrajectoryPoint;
 import edu.wpi.first.wpilibj.CANTalon.TalonControlMode;
+import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import org.usfirst.frc.team3467.robot.motion_profiling.BuildTrajectory;
 
 import java.util.ArrayList;
 
@@ -113,11 +116,13 @@ public class MP_CANTalons {
 		return m_status;
 	}
 	
+	
 	//Update the current Motion Profile Status object
 	public synchronized void upDateMotionProfileStatus() {
 		m_talon.getMotionProfileStatus(m_status);
 	}
 
+	
 	//Retrieve Values from the Motion Profile Status Object Instnace
 	public synchronized boolean isUnderrun() {
 		return m_status.isUnderrun;
@@ -164,7 +169,6 @@ public class MP_CANTalons {
 
 	
 	//Retrieve Values from CANTalons
-	//Gets Top Buffer Count from CANTalons
 	public synchronized int TopbufferCount() {
 		return m_talon.getMotionProfileTopLevelBufferCount();
 	}
@@ -173,11 +177,7 @@ public class MP_CANTalons {
 		return m_talon.isMotionProfileTopLevelBufferFull();
 	}
 	
-
 	
-	//public synchronized void stallOnLastPoint() {
-	//	if (m_status.activePoint.isLastPoint); m_talon.set(2);
-//	}
 	
 	public synchronized void testExecuteOutput() {
 		if (m_debugging) {
@@ -191,8 +191,46 @@ public class MP_CANTalons {
 	}
 	
 	
-	public void startFilling(ArrayList <double[]> profile, int totalCount, boolean invert) {
+	
+	//Interface Methods
+	public void resetMP() { 
+		clearMotionProfileTrajectories();
+		disableMotionProfiling();
 		
+		//notifier.stop();
+		
+		System.out.println("MP Reset");
+	}
+	
+	
+	public void startMP(BuildTrajectory trajectory) {
+		SmartDashboard.putString("TestProfiling Message", "startMP Called");
+		
+		resetMP();
+		
+		System.out.println("Starting Motion Profiling");
+		
+		startFilling(trajectory.getprofile(), trajectory.getTotalCount(), false);
+		
+		changeMotionControlFramePeriod(20);
+				
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		upDateMotionProfileStatus();
+		
+		SmartDashboard.putNumber("Init Left Botttom Buffer", BottomBufferCount());
+		
+		enableMotionProfiling();
+	}
+	
+	
+	//Create Motion Profile trajectory points
+	public void startFilling(ArrayList <double[]> profile, int totalCount, boolean invert) {
+
 		//Create an empty point
 		CANTalon.TrajectoryPoint flag = new TrajectoryPoint();
 		
@@ -251,6 +289,52 @@ public class MP_CANTalons {
 	}
 
 	
+	//Splice Motion Profile Trajectory
+	public void spliceTrajectory(ArrayList <double[]> profile, int totalCount, boolean invert) {
+		
+		//Update Status
+		m_talon.getMotionProfileStatus(m_status);
+		
+		//Create an empty point
+		CANTalon.TrajectoryPoint spliceFlag = new TrajectoryPoint();
+		CANTalon.TrajectoryPoint currentFlag = m_status.activePoint;
+		
+		//Check if is Underrun
+		if (m_status.isUnderrun) {
+			System.out.println("Motion Profiling is Underrun");
+		}
+		
+		m_talon.clearMotionProfileHasUnderrun();
+		
+		for (int i = 0; i < totalCount; i++) {
+			spliceFlag.position = profile.get(i)[1] + currentFlag.position;
+			spliceFlag.timeDurMs = (int) profile.get(i)[0];
+			
+			spliceFlag.profileSlotSelect = 0;
+			
+			System.out.println("Splice Points " + spliceFlag.position + " Time " + spliceFlag.timeDurMs);
+			
+			spliceFlag.velocityOnly = false;
+			spliceFlag.zeroPos = false;
+			
+			if (i == 0) {
+				spliceFlag.zeroPos = false;
+				spliceFlag.isLastPoint = false;
+			}
+			if ((i + 1) == totalCount) {
+				spliceFlag.isLastPoint = true;
+			}
+			
+			m_talon.pushMotionProfileTrajectory(spliceFlag);
+				System.out.println("Successful Splice of Profile points");
+			
+			if ((i + 1) <= 128) {
+				m_talon.processMotionProfileBuffer();
+				System.out.println("Successful");
+			}
+			
+		}
+	}
 	
 	public void testProfile() {
 		double[] test = {0, 0.625, 2.5, 5.625, 10, 15.625, 22.5, 30.625, 40, 50.625, 62.5, 75.625, 90, 105.625, 122.5, 140.625, 160, 180.625, 202.5, 225.625, 250, 275.625, 302.5, 330.625, 360, 390.625, 442.5, 455.625, 490, 525.625, 562.5, 600.625};
