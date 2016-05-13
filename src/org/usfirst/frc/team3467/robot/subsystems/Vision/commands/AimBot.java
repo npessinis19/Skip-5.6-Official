@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.Notifier;
 public class AimBot extends CommandBase {
 	
 		private BuildTrajectory trajectory;
-		private MP_CANTalons leftmp_drive, rightmp_drive;
 		
 		private int aimState = 1;
 		private boolean finished = false;
@@ -21,17 +20,10 @@ public class AimBot extends CommandBase {
 		
 		public AimBot() {
 			requires(driveBase);
-			buildControllers();
 			
 			this.setInterruptible(true);
 			
 			//setTimeout(3);
-		}
-		
-		
-		public void buildControllers() {
-			leftmp_drive = new MP_CANTalons("Left Drive", driveBase.getLeftTalon(), false);
-			rightmp_drive = new MP_CANTalons("Right Drive", driveBase.getRightTalon(), false);
 		}
 		
 		

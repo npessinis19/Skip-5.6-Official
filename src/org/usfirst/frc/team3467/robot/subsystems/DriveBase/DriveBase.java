@@ -267,9 +267,23 @@ public class DriveBase extends Subsystem implements PowerConsumer, MotionProfile
 		SmartDashboard.putBoolean("Right Has Underrun", rightmp_drive.hasUnderrun());
 	}
 
-
 	public void processMotionProfileBuffer() {
 		leftmp_drive.processMotionProfileBuffer();
 		rightmp_drive.processMotionProfileBuffer();
+	}
+
+	public void updateMotionProfileStatus() {
+		leftmp_drive.upDateMotionProfileStatus();
+		rightmp_drive.upDateMotionProfileStatus();
+	}
+
+
+	public boolean isComplete() {
+		if (leftmp_drive.isComplete() && rightmp_drive.isComplete()) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 }
