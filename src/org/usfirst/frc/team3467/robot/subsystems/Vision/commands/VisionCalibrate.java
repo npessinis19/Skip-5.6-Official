@@ -8,6 +8,7 @@ public class VisionCalibrate extends CommandBase {
 
 	public VisionCalibrate() {
 		setTimeout(5);
+		this.setInterruptible(true);
 	}
 	
 	protected void initialize() {
@@ -26,20 +27,16 @@ public class VisionCalibrate extends CommandBase {
 		SmartDashboard.putNumber("Target Angle", grip.getChangeinAngle());
 	}
 
-	@Override
 	protected boolean isFinished() {
 		return isTimedOut();
 	}
 
-	@Override
 	protected void end() {
 		light.lightOn();
 	}
 
-	@Override
 	protected void interrupted() {
-		// TODO Auto-generated method stub
-		
+		end();
 	}
 
 }
