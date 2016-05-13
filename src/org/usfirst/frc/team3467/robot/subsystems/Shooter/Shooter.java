@@ -76,12 +76,9 @@ public class Shooter extends PIDSubsystem implements PowerConsumer, MotionProfil
 	
 	
 	//Shooter Constructor
-	public Shooter(int xnet, double accel, double decel, double cruise, double step, boolean reset) {
+	public Shooter() {
 		
 		super("Shooter", SHOOT_P, SHOOT_I, SHOOT_D);
-		
-		upTrajectory = new BuildTrajectory(0, 0.0, 0.0, 0.0, 0.0);
-		downTrajectory = new BuildTrajectory(0, 0.0, 0.0, 0.0, 0.0);
 
 		//m_resetAngle = new AnalogPotentiometer(new AnalogInput(RobotMap.catapult_potentiometer_port));
 		m_resetBar = new CANTalon(RobotMap.catapult_Talon);
@@ -332,24 +329,25 @@ public class Shooter extends PIDSubsystem implements PowerConsumer, MotionProfil
 	}
 
 
-	@Override
 	public void resetMP() {
 		shooterTalon.clearMotionProfileTrajectories();
 		shooterTalon.disableMotionProfiling();
 		
 	}
 
-
-	@Override
 	public void startMP(BuildTrajectory trajectory) {
+		shooterTalon.startFilling(trajectory.getprofile(), trajectory.getTotalCount(), false);
 		
+		shooterTalon.changeMotionControlFramePeriod(20);
 		
+		shooterTalon.enableMotionProfiling();
 	}
 
-
-	@Override
 	public void publishValues() {
-		// TODO Auto-generated method stub
+		SmartDashboard.putNumber("Shooter top buffer", shooterTalon.topBuffercount());
+		SmartDashboard.putNumber("Shooter bottom buffer", shooterTalon.BottomBufferCount());
 		
+		SmartDashboard.putBoolean("Shooter is underrun", shooterTalon.isUnderrun());
+		SmartDashboard.putBoolean("Shooter has underrun", shooterTalon.hasUnderrun());
 	}
 }
