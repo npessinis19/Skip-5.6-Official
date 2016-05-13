@@ -21,10 +21,9 @@ public class ShootMP extends CommandBase {
 	 * @param Period
 	 * @param Reset Encoders
 	 */
-	public ShootMP(int xnet, double accel, double decel, double cruise, double step, boolean reset) {
-		requires (shooter);
+	public ShootMP() {
+		requires(Shooter);
 
-		
 		m_reset = reset;
 		this.setInterruptible(true);
 		
