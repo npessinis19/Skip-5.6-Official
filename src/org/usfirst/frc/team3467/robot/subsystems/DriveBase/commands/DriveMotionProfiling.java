@@ -4,18 +4,13 @@ import org.usfirst.frc.team3467.robot.motion_profiling.BuildTrajectory;
 import org.usfirst.frc.team3467.robot.motion_profiling.MP_CANTalons;
 import org.usfirst.frc.team3467.robot.commands.CommandBase;
 
-import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.CANTalon.TalonControlMode;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.DigitalOutput;
-
-import java.util.ArrayList;
 
 public class DriveMotionProfiling extends CommandBase {
 
 	private BuildTrajectory trajectory;
-	private MP_CANTalons leftmp_drive, rightmp_drive;
 	
 	private static boolean debugging = true;
 	private static double TOLERANCE = 0.5;
@@ -69,8 +64,7 @@ public class DriveMotionProfiling extends CommandBase {
 	//Separate Thread that Processes points to Bottom Buffer
 	class PeriodicRunnable implements java.lang.Runnable {
 		public void run() { 
-			leftmp_drive.processMotionProfileBuffer();
-			rightmp_drive.processMotionProfileBuffer();
+			driveBase.processMotionProfileBuffer();
 		}
 	}
 	
@@ -92,10 +86,8 @@ public class DriveMotionProfiling extends CommandBase {
 		driveBase.getLeftTalon().reverseOutput(true);
 		driveBase.getRightTalon().reverseOutput(true);
 		
-		leftmp_drive.clearMotionProfileTrajectories();
-		rightmp_drive.clearMotionProfileTrajectories();
-		
 		ahrs.gyroReset();
+		
 		notifier.startPeriodic(0.005);
 		driveBase.startMP(trajectory);
 	}
@@ -106,12 +98,9 @@ public class DriveMotionProfiling extends CommandBase {
 		
 		driveBase.setControlMode(TalonControlMode.MotionProfile);
 		
-		leftmp_drive.upDateMotionProfileStatus();
+		driveBase.updateMotionProfileStatus();
 		
 		driveBase.publishValues();
-		
-		leftmp_drive.enableMotionProfiling();
-		rightmp_drive.enableMotionProfiling();
 		
 		//leftmp_drive.stallOnLastPoint();
 		//rightmp_drive.stallOnLastPoint();
@@ -126,6 +115,8 @@ public class DriveMotionProfiling extends CommandBase {
 
 	protected void end() {
 		driveBase.resetMP();
+		
+		notifier.stop();
 		
 		driveBase.initDrive();
 		

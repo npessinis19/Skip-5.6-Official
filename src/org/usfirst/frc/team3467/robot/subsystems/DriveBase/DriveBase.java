@@ -232,6 +232,8 @@ public class DriveBase extends Subsystem implements PowerConsumer, MotionProfile
 		rightTalon3.enableBrakeMode(setBrake);
 	}
 
+	
+	//Motion Profile Interface Buffer
 	public void resetMP() {
 		leftmp_drive.clearMotionProfileTrajectories();
 		rightmp_drive.clearMotionProfileTrajectories();
@@ -246,6 +248,9 @@ public class DriveBase extends Subsystem implements PowerConsumer, MotionProfile
 		
 		leftmp_drive.changeMotionControlFramePeriod(20);
 		rightmp_drive.changeMotionControlFramePeriod(20);
+		
+		leftmp_drive.enableMotionProfiling();
+		rightmp_drive.enableMotionProfiling();
 	}
 
 	public void publishValues() {
@@ -260,5 +265,25 @@ public class DriveBase extends Subsystem implements PowerConsumer, MotionProfile
 		
 		SmartDashboard.putBoolean("Left Has Underrun", leftmp_drive.hasUnderrun());
 		SmartDashboard.putBoolean("Right Has Underrun", rightmp_drive.hasUnderrun());
+	}
+
+	public void processMotionProfileBuffer() {
+		leftmp_drive.processMotionProfileBuffer();
+		rightmp_drive.processMotionProfileBuffer();
+	}
+
+	public void updateMotionProfileStatus() {
+		leftmp_drive.upDateMotionProfileStatus();
+		rightmp_drive.upDateMotionProfileStatus();
+	}
+
+
+	public boolean isComplete() {
+		if (leftmp_drive.isComplete() && rightmp_drive.isComplete()) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 }
