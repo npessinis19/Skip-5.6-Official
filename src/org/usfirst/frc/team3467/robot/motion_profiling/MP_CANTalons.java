@@ -202,7 +202,6 @@ public class MP_CANTalons {
 		System.out.println("MP Reset");
 	}
 	
-	
 	public void startMP(BuildTrajectory trajectory) {
 		SmartDashboard.putString("TestProfiling Message", "startMP Called");
 		
@@ -213,6 +212,8 @@ public class MP_CANTalons {
 		startFilling(trajectory.getprofile(), trajectory.getTotalCount(), false);
 		
 		changeMotionControlFramePeriod(20);
+		
+		//notifier.startPeriodic(.005);
 				
 		try {
 			Thread.sleep(2000);
@@ -226,6 +227,20 @@ public class MP_CANTalons {
 		
 		enableMotionProfiling();
 	}
+	
+	public void publishValues() {
+			upDateMotionProfileStatus();
+			
+			SmartDashboard.putNumber(m_name + " Top Buffer", TopbufferCount());
+			SmartDashboard.putNumber(m_name + " Bottom Buffer", BottomBufferCount());
+			SmartDashboard.putBoolean(m_name + " Is Underrun", isUnderrun());
+
+			
+			SmartDashboard.putBoolean(m_name + " Has Underrun", hasUnderrun());
+			
+			System.out.println("Active Point " + m_name + getActivePoint().position + " Time " + getActivePoint().timeDurMs);
+		}
+	
 	
 	
 	//Create Motion Profile trajectory points
