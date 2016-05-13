@@ -10,4 +10,6 @@ public interface MotionProfile {
 	public void startMP(BuildTrajectory trajectory);
 	
 	public void publishValues();
+	
+	public void processMotionProfileBuffer();
 }
