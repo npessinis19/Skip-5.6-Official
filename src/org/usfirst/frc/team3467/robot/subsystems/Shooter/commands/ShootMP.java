@@ -8,10 +8,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class ShootMP extends CommandBase {
 	
-	private BuildTrajectory upTrajectory;
-	private BuildTrajectory downTrajectory;
-	private MP_CANTalons shooterTalon;
-	
 	private static boolean debugging = true;
 	private static double TOLERANCE = 0.5;
 	private double m_angle = 0.0;
@@ -25,18 +21,13 @@ public class ShootMP extends CommandBase {
 	 * @param Period
 	 * @param Reset Encoders
 	 */
-	public ShootMP(int xnet, double accel, double decel, double cruise, double step, boolean reset) {
-		
-		requires (shooter);
-		buildControllers();
-		
+	public ShootMP() {
+		requires(Shooter);
+
 		m_reset = reset;
 		this.setInterruptible(true);
 		
 		SmartDashboard.putString("TestProfiling Mode", "position");
-		
-		upTrajectory = new BuildTrajectory(xnet, accel, decel, cruise, step);
-		downTrajectory = new BuildTrajectory(xnet, accel, decel, cruise, step);
 	}
 
 	@Override

@@ -9,10 +9,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.usfirst.frc.team3467.robot.RobotMap;
 import org.usfirst.frc.team3467.robot.commands.CommandBase;
+import org.usfirst.frc.team3467.robot.motion_profiling.BuildTrajectory;
 import org.usfirst.frc.team3467.robot.motion_profiling.MP_CANTalons;
 import org.usfirst.frc.team3467.robot.subsystems.Brownout.Brownout;
 import org.usfirst.frc.team3467.robot.subsystems.Brownout.PowerConsumer;
 import org.usfirst.frc.team3467.robot.subsystems.Shooter.commands.ShooterReset;
+import org.usfirst.frc.team3467.robot.motion_profiling.MotionProfile;
 
 /*
 	How the Shooter works:
@@ -24,8 +26,10 @@ import org.usfirst.frc.team3467.robot.subsystems.Shooter.commands.ShooterReset;
  
  */
 
-public class Shooter extends PIDSubsystem implements PowerConsumer {
-
+public class Shooter extends PIDSubsystem implements PowerConsumer, MotionProfile {
+	
+	private MP_CANTalons shooterTalon;
+	
 	// Controls display to SmartDashboard
 	private static final boolean debugging = true;
 	
@@ -36,6 +40,10 @@ public class Shooter extends PIDSubsystem implements PowerConsumer {
 	private CANTalon m_resetBar;
 	private DoubleSolenoid m_catLatch;
 	//private AnalogPotentiometer m_resetAngle;
+	
+	//Motion Profile Trajectories
+	public BuildTrajectory upTrajectory;
+	public BuildTrajectory downTrajectory;
 	
 	//PID Constants
 	private static final double SHOOT_P = 20.0;
@@ -69,11 +77,13 @@ public class Shooter extends PIDSubsystem implements PowerConsumer {
 	
 	//Shooter Constructor
 	public Shooter() {
-	
+		
 		super("Shooter", SHOOT_P, SHOOT_I, SHOOT_D);
 
 		//m_resetAngle = new AnalogPotentiometer(new AnalogInput(RobotMap.catapult_potentiometer_port));
 		m_resetBar = new CANTalon(RobotMap.catapult_Talon);
+		
+		shooterTalon = new MP_CANTalons("Shooter", m_resetBar, false);
 		
 		m_resetBar.enableBrakeMode(true);
 		m_resetBar.setFeedbackDevice(CANTalon.FeedbackDevice.AnalogPot);
@@ -101,13 +111,6 @@ public class Shooter extends PIDSubsystem implements PowerConsumer {
 		// Register with Brownout subsystem
 		Brownout.getInstance().registerCallback(this);		
 	}
-	
-	
-	private void buildControllers() {
-		shooterTalon = new MP_CANTalons("Shooter", Shooter.getpultaCat(), false);
-		
-	}
-
 
 	protected void initDefaultCommand() {
 		this.setDefaultCommand(new ShooterReset());	// Drive Manually by default
@@ -323,5 +326,28 @@ public class Shooter extends PIDSubsystem implements PowerConsumer {
 				SmartDashboard.putBoolean("Shooter Out of Calibration", true);
 		}
 		return(speed);
+	}
+
+
+	public void resetMP() {
+		shooterTalon.clearMotionProfileTrajectories();
+		shooterTalon.disableMotionProfiling();
+		
+	}
+
+	public void startMP(BuildTrajectory trajectory) {
+		shooterTalon.startFilling(trajectory.getprofile(), trajectory.getTotalCount(), false);
+		
+		shooterTalon.changeMotionControlFramePeriod(20);
+		
+		shooterTalon.enableMotionProfiling();
+	}
+
+	public void publishValues() {
+		SmartDashboard.putNumber("Shooter top buffer", shooterTalon.topBuffercount());
+		SmartDashboard.putNumber("Shooter bottom buffer", shooterTalon.BottomBufferCount());
+		
+		SmartDashboard.putBoolean("Shooter is underrun", shooterTalon.isUnderrun());
+		SmartDashboard.putBoolean("Shooter has underrun", shooterTalon.hasUnderrun());
 	}
 }
