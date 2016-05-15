@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 
 import org.usfirst.frc.team3467.robot.OI;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.DriveBase;
+import org.usfirst.frc.team3467.robot.subsystems.BallEject.BallEject;
 import org.usfirst.frc.team3467.robot.subsystems.Brownout.Brownout;
 import org.usfirst.frc.team3467.robot.subsystems.NavX_MXP.MXP_AHRS;
 import org.usfirst.frc.team3467.robot.subsystems.utilitybar.UtilityBar;
@@ -29,6 +30,7 @@ public abstract class CommandBase extends Command {
 	public static UtilityBar utilitybar;
 	public static Shooter pultaCat;
 	public static Intake intake;
+	public static balleject BallEject;
 	
 	//Vision Classes
 	public static Flashlight light;
@@ -64,6 +66,8 @@ public abstract class CommandBase extends Command {
 		subsystemList.addElement(intake);
 		light = new Flashlight();
 		subsystemList.addElement(light);
+		Balleject = new ballEject();
+		subsystemList.addElement(BallEject);
 		
 		//Non-Subsystem Classes
 		video = new Video();
