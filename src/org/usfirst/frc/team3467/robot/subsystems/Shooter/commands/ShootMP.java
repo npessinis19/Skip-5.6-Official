@@ -13,6 +13,8 @@ public class ShootMP extends CommandBase {
 	private double m_angle = 0.0;
 	private boolean m_reset;
 	
+	private int state = 0;
+	
 	/**
 	 * @param Distance
 	 * @param Acceleration
@@ -22,35 +24,66 @@ public class ShootMP extends CommandBase {
 	 * @param Reset Encoders
 	 */
 	public ShootMP() {
-		requires(Shooter);
+		requires(pultaCat);
 
-		m_reset = reset;
 		this.setInterruptible(true);
 		
 		SmartDashboard.putString("TestProfiling Mode", "position");
 	}
 
+	private void armSetUp() {
+		switch (state) { 
+		//Down with the bourgeois (pultaCat)
+		case 1: 
+			pultaCat.startMP(pultaCat.downTrajectory);
+			state = 2;
+			break;
+		//Check if execution of bourgeois is finished and latches
+		case 2:
+			if (pultaCat.isComplete() && pultaCat.resetBarIsLatched()) {
+				pultaCat.cataLatch();
+				state = 3;
+			}
+			break;
+		//Rise of the bourgeois
+		case 3:
+			pultaCat.startMP(pultaCat.upTrajectory);
+			state = 4;
+			break;
+		//Check if execution of profile is finished
+		case 4:
+			if (pultaCat.isComplete() && pultaCat.resetBarIsClear()) {
+				end();
+			}
+		default:
+			System.out.println("You suck and need to pick 1");
+			break;
+		}
+	}
+	
 	@Override
-	protected void initialize() {
-		// TODO Auto-generated method stub
-		
+ 	protected void initialize() {
+		state = 1;
+		System.out.println("Starting pultaCat!");
 	}
 
 	@Override
 	protected void execute() {
-		// TODO Auto-generated method stub
-		
+		armSetUp();
+		pultaCat.publishValues();
+		SmartDashboard.putNumber("ShooterSetpoint", pultaCat.getResetAngle());
+		SmartDashboard.putNumber("Shooter state: ", state);
 	}
 
 	@Override
 	protected boolean isFinished() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	protected void end() {
-		// TODO Auto-generated method stub
+		state = 0;
+		System.out.println("Finished with pultaCat!");
 		
 	}
 
