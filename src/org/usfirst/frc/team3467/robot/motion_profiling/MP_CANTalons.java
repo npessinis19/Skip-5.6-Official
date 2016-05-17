@@ -126,7 +126,7 @@ public class MP_CANTalons {
 	}
 
 	
-	//Retrieve Values from the Motion Profile Status Object Instnace
+	//Retrieve Values from the Motion Profile Status Object Instance
 	public synchronized boolean isUnderrun() {
 		return m_status.isUnderrun;
 	}
@@ -234,7 +234,14 @@ public class MP_CANTalons {
 	
 	
 	
-	//Create Motion Profile trajectory points
+	/**
+	 * startFilling generates a motion profile trajectory that is sent
+	 * 		to the top API buffer.
+	 * 
+	 * @param Profile In the form of an Array List
+	 * @param totalCount Length of profile
+	 * @param invert CHange the sign of all profile points
+	 */
 	public void startFilling(ArrayList <double[]> Profile, int totalCount, boolean invert) {
 
 		profile = Profile;
@@ -297,17 +304,28 @@ public class MP_CANTalons {
 	}
 
 	
-	//Splice Motion Profile Trajectory
+	/**
+	 * Splice Trajectory
+	 * 		Holds the current Motion Profile point,
+	 * 		Clears the old trajectory from both buffers
+	 * 		Updates the Motion Profile Status,
+	 * 		and generates a new trajectory
+	 * 
+	 * @param profile In the form of an ArrayList
+	 * @param totalCount Length of the profile
+	 * @param invert change the signs of all profile points
+	 */
 	public void spliceTrajectory(ArrayList <double[]> profile, int totalCount, boolean invert) {
+		holdMotionProfiling();
 		
-		//Update Status
-		m_talon.getMotionProfileStatus(m_status);
+		clearMotionProfileTrajectories();
 		
-		//Create an empty point
+		upDateMotionProfileStatus();
+		
 		CANTalon.TrajectoryPoint spliceFlag = new TrajectoryPoint();
-		CANTalon.TrajectoryPoint currentFlag = m_status.activePoint;
+		//CANTalon.TrajectoryPoint currentFlag = m_status.activePoint;
 		
-		//Check if is Underrun
+		//Check if Underrun
 		if (m_status.isUnderrun) {
 			System.out.println("Motion Profiling is Underrun");
 		}
@@ -315,7 +333,7 @@ public class MP_CANTalons {
 		m_talon.clearMotionProfileHasUnderrun();
 		
 		for (int i = 0; i < totalCount; i++) {
-			spliceFlag.position = profile.get(i)[1] + currentFlag.position;
+			spliceFlag.position = profile.get(i)[1] /*+ currentFlag.position*/;
 			spliceFlag.timeDurMs = (int) profile.get(i)[0];
 			
 			spliceFlag.profileSlotSelect = 0;
@@ -340,7 +358,6 @@ public class MP_CANTalons {
 				m_talon.processMotionProfileBuffer();
 				System.out.println("Successful");
 			}
-			
 		}
 	}
 
