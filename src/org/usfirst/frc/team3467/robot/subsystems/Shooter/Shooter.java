@@ -350,4 +350,21 @@ public class Shooter extends PIDSubsystem implements PowerConsumer, MotionProfil
 		SmartDashboard.putBoolean("Shooter is underrun", shooterTalon.isUnderrun());
 		SmartDashboard.putBoolean("Shooter has underrun", shooterTalon.hasUnderrun());
 	}
+
+	public void processMotionProfileBuffer() {
+		shooterTalon.processMotionProfileBuffer();
+	}
+
+	public void updateMotionProfileStatus() {
+		shooterTalon.upDateMotionProfileStatus();
+	}
+
+	public boolean isComplete() {
+		if(shooterTalon.isComplete()) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
 }
