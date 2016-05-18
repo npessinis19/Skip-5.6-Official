@@ -277,7 +277,9 @@ public class DriveBase extends Subsystem implements PowerConsumer, MotionProfile
 		rightmp_drive.upDateMotionProfileStatus();
 	}
 
-
+	/**
+	 * Checks if the motion profile is complete
+	 */
 	public boolean isComplete() {
 		if (leftmp_drive.isComplete() && rightmp_drive.isComplete()) {
 			return true;

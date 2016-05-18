@@ -20,7 +20,6 @@ public class AimBot extends CommandBase {
 		
 		public AimBot() {
 			requires(driveBase);
-			
 			this.setInterruptible(true);
 			
 			//setTimeout(3);
@@ -30,8 +29,7 @@ public class AimBot extends CommandBase {
 		//Separate Thread that Processes points to Bottom Buffer
 		class PeriodicRunnable implements java.lang.Runnable {
 			public void run() { 
-				leftmp_drive.processMotionProfileBuffer();
-				rightmp_drive.processMotionProfileBuffer();
+				driveBase.processMotionProfileBuffer();
 			}
 		}
 		
@@ -45,73 +43,6 @@ public class AimBot extends CommandBase {
 		*/
 		
 		Notifier notifier = new Notifier(new PeriodicRunnable());
-		
-		public void startMP() {
-			System.out.println("Start Auto Aim Motion Profiling");
-			
-			resetMP();
-			
-			leftmp_drive.startFilling(trajectory.getprofile(), trajectory.getTotalCount(), false);
-			rightmp_drive.startFilling(trajectory.getprofile(), trajectory.getTotalCount(), false);
-			
-			//leftmp_drive.testProfile();
-			//rightmp_drive.testProfile();
-			
-			leftmp_drive.changeMotionControlFramePeriod(20);
-			rightmp_drive.changeMotionControlFramePeriod(20);
-			
-			notifier.startPeriodic(.005);
-					
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			
-			if (debugging) {
-				leftmp_drive.upDateMotionProfileStatus();
-				rightmp_drive.upDateMotionProfileStatus();
-			
-				SmartDashboard.putNumber("Init Left Botttom Buffer", leftmp_drive.BottomBufferCount());
-				SmartDashboard.putNumber("Init Right Bottom Buffer", rightmp_drive.BottomBufferCount());
-			}
-			
-			leftmp_drive.enableMotionProfiling();
-			rightmp_drive.enableMotionProfiling();
-		}
-		
-		public void resetMP() { 
-			leftmp_drive.clearMotionProfileTrajectories();
-			rightmp_drive.clearMotionProfileTrajectories();
-			
-			leftmp_drive.disableMotionProfiling();
-			rightmp_drive.disableMotionProfiling();
-			
-			System.out.println("MP Reset");
-		}
-
-		public void publishValues() {
-			if (debugging) {
-				leftmp_drive.upDateMotionProfileStatus();
-				rightmp_drive.upDateMotionProfileStatus();
-				
-				SmartDashboard.putNumber("Left Top Buffer", leftmp_drive.TopbufferCount());
-				SmartDashboard.putNumber("Right Top Buffer", rightmp_drive.TopbufferCount());
-				
-				SmartDashboard.putNumber("Left Bottom Buffer", leftmp_drive.BottomBufferCount());
-				SmartDashboard.putNumber("Right Bottom Buffer", rightmp_drive.BottomBufferCount());
-				
-				SmartDashboard.putBoolean("Left Is Underrun", leftmp_drive.isUnderrun());
-				SmartDashboard.putBoolean("Right Is Underrun", rightmp_drive.isUnderrun());
-				
-				SmartDashboard.putBoolean("Left Has Underrun", leftmp_drive.hasUnderrun());
-				SmartDashboard.putBoolean("Right Has Underrrun", rightmp_drive.hasUnderrun());
-				
-				System.out.println("Left Active Point " + leftmp_drive.getActivePoint().position + " Time " + leftmp_drive.getActivePoint().timeDurMs);
-				System.out.println("Right Active Point" + rightmp_drive.getActivePoint().position + " Time " + rightmp_drive.getActivePoint().timeDurMs);
-			}
-			SmartDashboard.putNumber("Vision: AimState", aimState);
-		}
 		
 		public void autoAim() {
 			switch (aimState) {
@@ -131,27 +62,21 @@ public class AimBot extends CommandBase {
 						System.out.println("Aimbot found Change in Angle" + grip.getChangeinAngle());
 						
 						trajectory = new BuildTrajectory((int) (grip.getChangeinAngle() - 1) * 14, 0.05, 0.05, 2, 10);
-					
-						aimState = 1;
 
 					if (trajectory != null) {
 						System.out.println("AimBot Calculated");
-						
 						aimState = 3;
 					}
 					else {
-						System.out.println("Failed to make trajectory");
-						
+						System.out.println("Failed to make trajectory: falling back to target search");
 						aimState = 1;
 					}
 				break;
 			//State 3: Move to correct position
 			case 3:
 					light.lightOff();
-					startMP();
 					
-					leftmp_drive.enableMotionProfiling();
-					rightmp_drive.enableMotionProfiling();
+					driveBase.startMP(trajectory);
 					
 					System.out.println("AimBot moving");
 					
@@ -159,10 +84,8 @@ public class AimBot extends CommandBase {
 				break;
 			//State 4, wait for move to finish	
 			case 4:
-					leftmp_drive.enableMotionProfiling();
-					rightmp_drive.enableMotionProfiling();
 				
-					if (leftmp_drive.isComplete()) {
+					if (driveBase.isComplete()) {
 						System.out.println("AimBot moved");
 						aimState = 5;
 					}
@@ -194,8 +117,7 @@ public class AimBot extends CommandBase {
 			driveBase.getLeftTalon().reverseOutput(true);
 			driveBase.getRightTalon().reverseOutput(true);
 			
-			leftmp_drive.clearMotionProfileTrajectories();
-			rightmp_drive.clearMotionProfileTrajectories();
+			driveBase.resetMP();
 			
 			aimState = 1;
 			

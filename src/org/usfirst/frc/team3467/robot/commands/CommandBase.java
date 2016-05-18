@@ -30,7 +30,7 @@ public abstract class CommandBase extends Command {
 	public static UtilityBar utilitybar;
 	public static Shooter pultaCat;
 	public static Intake intake;
-	public static balleject BallEject;
+	public static BallEject ballEject;
 	
 	//Vision Classes
 	public static Flashlight light;
@@ -66,8 +66,8 @@ public abstract class CommandBase extends Command {
 		subsystemList.addElement(intake);
 		light = new Flashlight();
 		subsystemList.addElement(light);
-		Balleject = new ballEject();
-		subsystemList.addElement(BallEject);
+		ballEject = new BallEject();
+		subsystemList.addElement(ballEject);
 		
 		//Non-Subsystem Classes
 		video = new Video();
