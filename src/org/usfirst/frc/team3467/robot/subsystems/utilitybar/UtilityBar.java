@@ -28,8 +28,6 @@ public class UtilityBar extends Subsystem {
 		
 		barSolenoid = new DoubleSolenoid(RobotMap.utilitybar_solenoid_deploy,
 											RobotMap.utilitybar_solenoid_retract);
-		fingerSolenoid = new DoubleSolenoid(RobotMap.utilityfinger_solenoid_out, 
-											RobotMap.utilityfinger_solenoid_in);
 	}
 	
 	//Use Class Constants
