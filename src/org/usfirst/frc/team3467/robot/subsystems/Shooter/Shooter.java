@@ -119,7 +119,7 @@ public class Shooter extends PIDSubsystem implements PowerConsumer, MotionProfil
 	}
 	
 	public CANTalon returnCANTalon(){
-		return CANTalon;
+		return m_resetBar;
 	}
 	
 	//Set Shooter Modes
