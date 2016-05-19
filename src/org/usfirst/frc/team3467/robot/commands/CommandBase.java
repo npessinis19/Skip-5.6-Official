@@ -30,14 +30,14 @@ public abstract class CommandBase extends Command {
 	public static UtilityBar utilitybar;
 	public static Shooter pultaCat;
 	public static Intake intake;
-	public static balleject BallEject;
+	public static BallEject ballEject;
 	
 	//Vision Classes
 	public static Flashlight light;
 	public static GRIP grip;
 	public static Video video;
 	
-		//Create vector with subsystemss as elements for global subsystem commands
+		//Create vector with subsystems as elements for global subsystem commands
 	public static Vector <Subsystem> subsystemList;
 	
 	
@@ -66,12 +66,12 @@ public abstract class CommandBase extends Command {
 		subsystemList.addElement(intake);
 		light = new Flashlight();
 		subsystemList.addElement(light);
-		Balleject = new ballEject();
-		subsystemList.addElement(BallEject);
+		ballEject = new BallEject();
+		subsystemList.addElement(ballEject);
 		
 		//Non-Subsystem Classes
-		video = new Video();
-		grip = new GRIP();
+		//video = new Video();
+		//grip = new GRIP();
 		oi = new OI();
 
 		//Initial Commands

@@ -4,70 +4,71 @@ import org.usfirst.frc.team3467.robot.commands.CommandBase;
 import org.usfirst.frc.team3467.robot.motion_profiling.BuildTrajectory;
 import org.usfirst.frc.team3467.robot.motion_profiling.MP_CANTalons;
 
+import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class ShootMP extends CommandBase {
 	
-	private static boolean debugging = true;
-	private static double TOLERANCE = 0.5;
-	private double m_angle = 0.0;
-	private boolean m_reset;
-	
 	private int state = 0;
 	
-	/**
-	 * @param Distance
-	 * @param Acceleration
-	 * @param Deceleration
-	 * @param Cruise Velocity
-	 * @param Period
-	 * @param Reset Encoders
-	 */
 	public ShootMP() {
 		requires(pultaCat);
+		
+		setTimeout(2);
 
 		this.setInterruptible(true);
 		
 		SmartDashboard.putString("TestProfiling Mode", "position");
 	}
 
+	class PeriodicRunnable implements java.lang.Runnable {
+		public void run() {
+			pultaCat.processMotionProfileBuffer();
+		}
+		
+	}
+	
+	Notifier notify = new Notifier(new PeriodicRunnable());
+	
 	private void armSetUp() {
 		switch (state) { 
 		//Down with the bourgeois (pultaCat)
 		case 1: 
-			pultaCat.startMP(pultaCat.downTrajectory);
+			pultaCat.startMPwithAddition(pultaCat.shooterTrajectory, true, 491);
+			notify.startPeriodic(0.005);
 			state = 2;
 			break;
 		//Check if execution of bourgeois is finished and latches
-		case 2:
-			if (pultaCat.isComplete() && pultaCat.resetBarIsLatched()) {
+		/*case 2:
+			if (pultaCat.isComplete() || pultaCat.resetBarIsLatched()) {
+				pultaCat.resetMP();
 				pultaCat.cataLatch();
 				state = 3;
 			}
 			break;
 		//Rise of the bourgeois
 		case 3:
-			pultaCat.startMP(pultaCat.upTrajectory);
+			pultaCat.startMPwithAddition(pultaCat.shooterTrajectory, false, 62);
 			state = 4;
 			break;
 		//Check if execution of profile is finished
 		case 4:
-			if (pultaCat.isComplete() && pultaCat.resetBarIsClear()) {
+			if (pultaCat.isComplete() || pultaCat.resetBarIsClear()) {
 				end();
 			}
+			*/
 		default:
 			System.out.println("You suck and need to pick 1");
 			break;
 		}
 	}
 	
-	@Override
+	
  	protected void initialize() {
 		state = 1;
 		System.out.println("Starting pultaCat!");
 	}
 
-	@Override
 	protected void execute() {
 		armSetUp();
 		pultaCat.publishValues();
@@ -75,22 +76,17 @@ public class ShootMP extends CommandBase {
 		SmartDashboard.putNumber("Shooter state: ", state);
 	}
 
-	@Override
 	protected boolean isFinished() {
-		return false;
+		return isTimedOut();
 	}
 
-	@Override
 	protected void end() {
+		pultaCat.resetMP();
+		notify.stop();
 		state = 0;
 		System.out.println("Finished with pultaCat!");
-		
 	}
 
-	@Override
 	protected void interrupted() {
-		// TODO Auto-generated method stub
-		
 	}
-
 }

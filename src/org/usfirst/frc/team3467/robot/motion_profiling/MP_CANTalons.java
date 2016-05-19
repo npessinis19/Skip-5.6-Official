@@ -28,12 +28,14 @@ public class MP_CANTalons {
 	private boolean m_debugging = false;
 	public boolean testFlashOn = false;
 	private boolean bufferOutOnce = false;
-
+	public boolean stopProduction = false;
+	
+	//Motion Profile Status Object
 	private MotionProfileStatus m_status;
 	
 	//Motion Profiling Objects 
-	private ArrayList <double[]> profile;;
-	private TrajectoryPoint flag;
+	private ArrayList <double[]> m_profile;;
+	private TrajectoryPoint m_flag;
 	
 	
 	public MP_CANTalons(String name, CANTalon talon, boolean debugging) {
@@ -41,7 +43,7 @@ public class MP_CANTalons {
 		this.m_talon = talon;
 		this.m_debugging = debugging;
 		
-		flag = new TrajectoryPoint();
+		m_flag = new TrajectoryPoint();
 		m_status = new MotionProfileStatus();
 		
 		if (m_debugging) {
@@ -53,7 +55,7 @@ public class MP_CANTalons {
 		m_talon.changeControlMode(TalonControlMode.MotionProfile);
 		m_talon.getMotionProfileStatus(m_status);
 		
-		m_talon.processMotionProfileBuffer();
+		m_talon.clearMotionProfileTrajectories();
 	}
 
 	
@@ -126,7 +128,7 @@ public class MP_CANTalons {
 	}
 
 	
-	//Retrieve Values from the Motion Profile Status Object Instnace
+	//Retrieve Values from the Motion Profile Status Object Instance
 	public synchronized boolean isUnderrun() {
 		return m_status.isUnderrun;
 	}
@@ -149,7 +151,7 @@ public class MP_CANTalons {
 	
 	public synchronized boolean isComplete() {
 		boolean finished = false;
-		
+
 		upDateMotionProfileStatus();
 		
 		if(m_status.activePoint.isLastPoint) {
@@ -232,119 +234,185 @@ public class MP_CANTalons {
 			System.out.println("Active Point " + m_name + getActivePoint().position + " Time " + getActivePoint().timeDurMs);
 		}
 	
+	/**
+	 * Add constant number to trajectory points
+	 * @param profile array list of trajectory data
+	 * @param totalCount total number of trajectory points
+	 * @param invert multiply points by -1
+	 * @param addition add a number to trajectory points
+	 */
 	
-	
-	//Create Motion Profile trajectory points
-	public void startFilling(ArrayList <double[]> Profile, int totalCount, boolean invert) {
+	public void startFillingPlusSome(ArrayList <double[]> profile, int totalCount, boolean invert, int addition) {
+		m_profile = profile;
 
-		profile = Profile;
-		
 		//Create an empty point
 		//CANTalon.TrajectoryPoint flag = new TrajectoryPoint();
 		
 		//Check if in Underrun Condition
-		if (m_status.isUnderrun) {
-			System.out.println("Motion Profiling Is Underrun");
-		}
+		if (m_status.isUnderrun); System.out.println("Motion Profiling Is Underrun");
 		
 		//Clear isUnderrun Flag
 		m_talon.clearMotionProfileHasUnderrun();
 		
-		/*
-		//Hold on initial Point
-		initHold.position = 2250;
-		initHold.isLastPoint = false;
-		m_talon.pushMotionProfileTrajectory(initHold);
-		m_talon.processMotionProfileBuffer();
-		m_talon.set(2);
-		*/
-		
 		for (int i = 0; i < totalCount; i++) {
-				flag.position = profile.get(i)[1];
-				flag.timeDurMs = (int) profile.get(i)[0];
-		
-			//if (m_debugging); testWriteOutput.set(true);
-		
-		/*
+				upDateMotionProfileStatus();
+			
+				if (invert){
+					m_flag.position = m_profile.get(i)[1] * -1 + addition;
+					m_flag.timeDurMs = (int) m_profile.get(i)[0];
+				}		
+				else {
+					m_flag.position = m_profile.get(i)[1] + addition;
+					m_flag.timeDurMs = (int) m_profile.get(i)[0];
+				}
+				
+		/*if (m_debugging); testWriteOutput.set(true);
 			try {
 				Thread.sleep(50);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+		}
 			*/
 			
-			//Use PID Slot 1 for Motion Profiling
-			flag.profileSlotSelect = 0;
+			//Use PID Slot 0 for Motion Profiling
+			m_flag.profileSlotSelect = 0;
 		
-			System.out.println("Profile Points " + flag.position + " Time " + flag.timeDurMs + " Index " + i);
+			System.out.println("Profile Points " + m_flag.position + " Time " + m_flag.timeDurMs + " Index " + i);
 			
 			//Only use velocities?
-			flag.velocityOnly = false;
-			flag.zeroPos = false;
+			m_flag.velocityOnly = false;
+			m_flag.zeroPos = false;
 		
+			//Checks
 			if (i == 0) {
-				flag.zeroPos = false;
-				flag.isLastPoint = false;
+				m_flag.zeroPos = false;
+				m_flag.isLastPoint = false;
 			}
+			if ((i + 1) == totalCount); m_flag.isLastPoint = true;
+
+			m_talon.pushMotionProfileTrajectory(m_flag);
 			
-			if ((i + 1) == totalCount) {
-				flag.isLastPoint = true;
-			}
-			m_talon.pushMotionProfileTrajectory(flag);
-			System.out.println("Successful Push of Profile Point " + m_talon.pushMotionProfileTrajectory(flag));
+			//System.out.println("Successful Push of Profile Point " + i /*m_talon.pushMotionProfileTrajectory(m_flag)*/);
 			//testWriteOutput.set(false);
 		}
 	}
-
 	
-	//Splice Motion Profile Trajectory
-	public void spliceTrajectory(ArrayList <double[]> profile, int totalCount, boolean invert) {
-		
-		//Update Status
-		m_talon.getMotionProfileStatus(m_status);
-		
+	
+	
+	/**
+	 * startFilling generates a motion profile trajectory based on a profile.
+	 * 
+	 * @param Profile In the form of an Array List
+	 * @param totalCount Length of profile
+	 * @param invert Change the sign of all profile points
+	 */
+	public void startFilling(ArrayList <double[]> Profile, int totalCount, boolean invert) {
+		m_profile = Profile;
+
 		//Create an empty point
-		CANTalon.TrajectoryPoint spliceFlag = new TrajectoryPoint();
-		CANTalon.TrajectoryPoint currentFlag = m_status.activePoint;
+		//CANTalon.TrajectoryPoint flag = new TrajectoryPoint();
 		
-		//Check if is Underrun
-		if (m_status.isUnderrun) {
-			System.out.println("Motion Profiling is Underrun");
-		}
+		//Check if in Underrun Condition
+		if (m_status.isUnderrun); System.out.println("Motion Profiling Is Underrun");
 		
+		//Clear isUnderrun Flag
 		m_talon.clearMotionProfileHasUnderrun();
 		
 		for (int i = 0; i < totalCount; i++) {
-			spliceFlag.position = profile.get(i)[1] + currentFlag.position;
-			spliceFlag.timeDurMs = (int) profile.get(i)[0];
+				upDateMotionProfileStatus();
 			
-			spliceFlag.profileSlotSelect = 0;
+				m_flag.position = m_profile.get(i)[1];
+				m_flag.timeDurMs = (int) m_profile.get(i)[0];
+		
+		/*if (m_debugging); testWriteOutput.set(true);
+			try {
+				Thread.sleep(50);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+			*/
 			
-			System.out.println("Splice Points " + spliceFlag.position + " Time " + spliceFlag.timeDurMs);
+			//Use PID Slot 0 for Motion Profiling
+			m_flag.profileSlotSelect = 0;
+		
+			System.out.println("Profile Points " + m_flag.position + " Time " + m_flag.timeDurMs + " Index " + i);
 			
-			spliceFlag.velocityOnly = false;
-			spliceFlag.zeroPos = false;
-			
+			//Only use velocities?
+			m_flag.velocityOnly = false;
+			m_flag.zeroPos = false;
+		
+			//Checks
 			if (i == 0) {
-				spliceFlag.zeroPos = false;
-				spliceFlag.isLastPoint = false;
+				m_flag.zeroPos = false;
+				m_flag.isLastPoint = false;
 			}
-			if ((i + 1) == totalCount) {
-				spliceFlag.isLastPoint = true;
+			if ((i + 1) == totalCount); m_flag.isLastPoint = true;
+
+			m_talon.pushMotionProfileTrajectory(m_flag);
+			
+			//System.out.println("Successful Push of Profile Point " + i /*m_talon.pushMotionProfileTrajectory(m_flag)*/);
+			//testWriteOutput.set(false);
+		}
+	}
+	
+	/**
+	 * spliceTrajectory
+	 * 		holds the current Motion Profile point,
+	 * 		clears the old trajectory from both buffers,
+	 * 		updates the Motion Profile Status,
+	 * 		and generates a new trajectory so long as the executer is not underrun,
+	 * 		and production has NOT been stopped
+	 * 
+	 * @param profile In the form of an ArrayList
+	 * @param totalCount Length of the profile
+	 * @param invert change the signs of all profile points
+	 */
+	public void spliceTrajectory(ArrayList <double[]> profile, int totalCount, boolean invert) {
+		m_profile = profile;
+		
+		holdMotionProfiling();
+		
+		clearMotionProfileTrajectories();
+		
+		upDateMotionProfileStatus();
+		
+		//Check if Underrun
+		if (m_status.isUnderrun); System.out.println("Motion Profiling is Underrun");
+		
+		m_talon.clearMotionProfileHasUnderrun();
+		
+		for (int i = 0; i < totalCount && !stopProduction; i++) {
+			m_flag.position = m_profile.get(i)[1] /*+ currentFlag.position*/;
+			m_flag.timeDurMs = (int) m_profile.get(i)[0];
+			
+			m_flag.profileSlotSelect = 0;
+			
+			System.out.println("Splice Points " + m_flag.position + " Time " + m_flag.timeDurMs);
+			
+			//Use Velocity?
+			m_flag.velocityOnly = false;
+			m_flag.zeroPos = false;
+			
+			//Checks
+			if (i == 0) {
+				m_flag.zeroPos = false;
+				m_flag.isLastPoint = false;
+			}
+			if ((i + 1) == totalCount); m_flag.isLastPoint = true;
+			if (m_status.isUnderrun) {
+				System.out.println("Profile Production Stopped");
+				stopProduction = true;
 			}
 			
-			m_talon.pushMotionProfileTrajectory(spliceFlag);
-				System.out.println("Successful Splice of Profile points");
+			m_talon.pushMotionProfileTrajectory(m_flag);
+			//System.out.println("Successful Splice of Profile points");
 			
-			if ((i + 1) <= 128) {
-				m_talon.processMotionProfileBuffer();
-				System.out.println("Successful");
-			}
-			
+			m_talon.processMotionProfileBuffer();
 		}
 	}
 
-	
 	public void testProfile() {
 		double[] test = {0, 0.625, 2.5, 5.625, 10, 15.625, 22.5, 30.625, 40, 50.625, 62.5, 75.625, 90, 105.625, 122.5, 140.625, 160, 180.625, 202.5, 225.625, 250, 275.625, 302.5, 330.625, 360, 390.625, 442.5, 455.625, 490, 525.625, 562.5, 600.625};
 		CANTalon.TrajectoryPoint testFlag = new CANTalon.TrajectoryPoint();

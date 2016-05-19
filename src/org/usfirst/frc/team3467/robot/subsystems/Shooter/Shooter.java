@@ -42,8 +42,7 @@ public class Shooter extends PIDSubsystem implements PowerConsumer, MotionProfil
 	//private AnalogPotentiometer m_resetAngle;
 	
 	//Motion Profile Trajectories
-	public BuildTrajectory upTrajectory;
-	public BuildTrajectory downTrajectory;
+	public BuildTrajectory shooterTrajectory;
 	
 	//PID Constants
 	private static final double SHOOT_P = 20.0;
@@ -109,13 +108,19 @@ public class Shooter extends PIDSubsystem implements PowerConsumer, MotionProfil
 		this.getPIDController().setPID(p, i, d);		
 		
 		// Register with Brownout subsystem
-		Brownout.getInstance().registerCallback(this);		
+		Brownout.getInstance().registerCallback(this);	
+		
+		//Instantiate trajectories
+		shooterTrajectory = new BuildTrajectory(429, 3, 3, 5, 10);
 	}
 
 	protected void initDefaultCommand() {
 		this.setDefaultCommand(new ShooterReset());	// Drive Manually by default
 	}
 	
+	public CANTalon returnCANTalon(){
+		return m_resetBar;
+	}
 	
 	//Set Shooter Modes
 	public void initManualMode() {
@@ -343,9 +348,19 @@ public class Shooter extends PIDSubsystem implements PowerConsumer, MotionProfil
 		shooterTalon.enableMotionProfiling();
 	}
 
+	public void startMPwithAddition(BuildTrajectory trajectory, boolean invert, int addition) {
+		shooterTalon.startFillingPlusSome(trajectory.getprofile(), trajectory.getTotalCount(), invert, addition);
+		
+		shooterTalon.changeMotionControlFramePeriod(20);
+		
+		shooterTalon.enableMotionProfiling();
+	}
+	
+	
 	public void publishValues() {
 		SmartDashboard.putNumber("Shooter top buffer", shooterTalon.topBuffercount());
 		SmartDashboard.putNumber("Shooter bottom buffer", shooterTalon.BottomBufferCount());
+		SmartDashboard.putBoolean("ShooterMP is Complete", shooterTalon.isComplete());
 		
 		SmartDashboard.putBoolean("Shooter is underrun", shooterTalon.isUnderrun());
 		SmartDashboard.putBoolean("Shooter has underrun", shooterTalon.hasUnderrun());

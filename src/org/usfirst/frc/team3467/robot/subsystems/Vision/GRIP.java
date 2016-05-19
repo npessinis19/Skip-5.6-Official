@@ -73,8 +73,8 @@ public class GRIP {
 					//Print values to SmartDashboard
 						SmartDashboard.putNumber("Vision: Centerx", Centerx);
 						SmartDashboard.putNumber("Vision: Centery", Centery);
-						SmartDashboard.putNumber("Vision: Width", Width);			
-						SmartDashboard.putNumber("Vision: Contours", centerx.length);				
+						//SmartDashboard.putNumber("Vision: Width", Width);			
+						//SmartDashboard.putNumber("Vision: Contours", centerx.length);				
 	}
 	
 	
@@ -143,7 +143,7 @@ public class GRIP {
 		
 		//Calculates The Distance From the Target
 			//distance_delta = (Target_Length_ft * M1013_FOVx_px)/(2 * Width * Math.tan(angle_theta));
-			distance_delta = (M1013_focus * Target_Height)/((Image_height - Height) * M1013_length/Image_height) + 0;
+		//	distance_delta = (M1013_focus * Target_Height)/((Image_height - Height) * M1013_length/Image_height) + 0;
 		
 		//Calculates The Angle of the Target
 			//angle_theta = ((Centerx - Image_length/2)/(Image_length/2)) * M1011_FOVx;
