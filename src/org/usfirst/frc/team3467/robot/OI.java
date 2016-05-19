@@ -222,6 +222,7 @@ public class OI {
 		SmartDashboard.putData("Vision: Target Goal", new TargetGoal());
 		SmartDashboard.putData("Vision: Calibrate", new VisionCalibrate());
 		SmartDashboard.putData("Vision: AimBot", new AimBot());
+		SmartDashboard.putData("Shooter MP", new ShootMP());
 		
 		//Test Buttons
 		SmartDashboard.putData("Test AutoTarget", new AutoTarget());

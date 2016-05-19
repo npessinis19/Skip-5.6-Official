@@ -234,6 +234,71 @@ public class MP_CANTalons {
 			System.out.println("Active Point " + m_name + getActivePoint().position + " Time " + getActivePoint().timeDurMs);
 		}
 	
+	/**
+	 * Add constant number to trajectory points
+	 * @param profile array list of trajectory data
+	 * @param totalCount total number of trajectory points
+	 * @param invert multiply points by -1
+	 * @param addition add a number to trajectory points
+	 */
+	
+	public void startFillingPlusSome(ArrayList <double[]> profile, int totalCount, boolean invert, int addition) {
+		m_profile = profile;
+
+		//Create an empty point
+		//CANTalon.TrajectoryPoint flag = new TrajectoryPoint();
+		
+		//Check if in Underrun Condition
+		if (m_status.isUnderrun); System.out.println("Motion Profiling Is Underrun");
+		
+		//Clear isUnderrun Flag
+		m_talon.clearMotionProfileHasUnderrun();
+		
+		for (int i = 0; i < totalCount; i++) {
+				upDateMotionProfileStatus();
+			
+				if (invert){
+					m_flag.position = m_profile.get(i)[1] * -1 + addition;
+					m_flag.timeDurMs = (int) m_profile.get(i)[0];
+				}		
+				else {
+					m_flag.position = m_profile.get(i)[1] + addition;
+					m_flag.timeDurMs = (int) m_profile.get(i)[0];
+				}
+				
+		/*if (m_debugging); testWriteOutput.set(true);
+			try {
+				Thread.sleep(50);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+			*/
+			
+			//Use PID Slot 0 for Motion Profiling
+			m_flag.profileSlotSelect = 0;
+		
+			System.out.println("Profile Points " + m_flag.position + " Time " + m_flag.timeDurMs + " Index " + i);
+			
+			//Only use velocities?
+			m_flag.velocityOnly = false;
+			m_flag.zeroPos = false;
+		
+			//Checks
+			if (i == 0) {
+				m_flag.zeroPos = false;
+				m_flag.isLastPoint = false;
+			}
+			if ((i + 1) == totalCount); m_flag.isLastPoint = true;
+
+			m_talon.pushMotionProfileTrajectory(m_flag);
+			
+			//System.out.println("Successful Push of Profile Point " + i /*m_talon.pushMotionProfileTrajectory(m_flag)*/);
+			//testWriteOutput.set(false);
+		}
+	}
+	
+	
 	
 	/**
 	 * startFilling generates a motion profile trajectory based on a profile.
