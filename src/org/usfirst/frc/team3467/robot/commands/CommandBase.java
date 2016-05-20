@@ -37,7 +37,7 @@ public abstract class CommandBase extends Command {
 	public static GRIP grip;
 	public static Video video;
 	
-		//Create vector with subsystemss as elements for global subsystem commands
+		//Create vector with subsystems as elements for global subsystem commands
 	public static Vector <Subsystem> subsystemList;
 	
 	
@@ -70,8 +70,8 @@ public abstract class CommandBase extends Command {
 		subsystemList.addElement(ballEject);
 		
 		//Non-Subsystem Classes
-		video = new Video();
-		grip = new GRIP();
+		//video = new Video();
+		//grip = new GRIP();
 		oi = new OI();
 
 		//Initial Commands
