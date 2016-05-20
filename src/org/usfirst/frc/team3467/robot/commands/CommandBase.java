@@ -37,7 +37,7 @@ public abstract class CommandBase extends Command {
 	public static GRIP grip;
 	public static Video video;
 	
-		//Create vector with subsystemss as elements for global subsystem commands
+		//Create vector with subsystems as elements for global subsystem commands
 	public static Vector <Subsystem> subsystemList;
 	
 	

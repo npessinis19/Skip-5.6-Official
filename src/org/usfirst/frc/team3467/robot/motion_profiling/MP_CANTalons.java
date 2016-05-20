@@ -185,7 +185,66 @@ public class MP_CANTalons {
 			}
 		}
 	}
+	
+	
+	/**
+	 * Add constant number to trajectory points
+	 * @param profile array list of trajectory data
+	 * @param totalCount total number of trajectory points
+	 * @param invert multiply points by -1
+	 * @param addition add a number to trajectory points
+	 */
+	public void startFillingPlusSome(ArrayList <double[]> profile, int totalCount, boolean invert, int addition) {
+		//Create an empty point
+		CANTalon.TrajectoryPoint flag = new TrajectoryPoint();
+		
+		//Check if in Underrun Condition
+		if (m_status.isUnderrun); System.out.println("Motion Profiling Is Underrun");
+		
+		//Clear isUnderrun Flag
+		m_talon.clearMotionProfileHasUnderrun();
+		
+		for (int i = 0; i < totalCount; i++) {
+				if (invert){
+					flag.position = profile.get(i)[1] * -1 + addition;
+					flag.timeDurMs = (int) profile.get(i)[0];
+				}		
+				else {
+					flag.position = profile.get(i)[1] + addition;
+					flag.timeDurMs = (int) profile.get(i)[0];
+				}
+				
+		/*if (m_debugging); testWriteOutput.set(true);
+			try {
+				Thread.sleep(50);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+			*/
+			
+			//Use PID Slot 0 for Motion Profiling
+			flag.profileSlotSelect = 0;
+		
+			System.out.println("Profile Points " + flag.position + " Time " + flag.timeDurMs + " Index " + i);
+			
+			//Only use velocities?
+			flag.velocityOnly = false;
+			flag.zeroPos = false;
+		
+			//Checks
+			if (i == 0) {
+				flag.zeroPos = false;
+				flag.isLastPoint = false;
+			}
+			if ((i + 1) == totalCount); flag.isLastPoint = true;
 
+			m_talon.pushMotionProfileTrajectory(flag);
+			
+			//System.out.println("Successful Push of Profile Point " + i /*m_talon.pushMotionProfileTrajectory(m_flag)*/);
+			//testWriteOutput.set(false);
+		}
+	}
 	
 	/**
 	 * startFilling generates a motion profile trajectory based on profile data in an ArrayList
@@ -277,30 +336,30 @@ public class MP_CANTalons {
 		
 		for (int i = 0; i < totalCount && !stopProduction; i++) {
 			if (invert) {
-				m_flag.position = m_profile.get(i)[1] * -1;
-				m_flag.timeDurMs = (int) m_profile.get(i)[0];
+				flag.position = profile.get(i)[1] * -1;
+				flag.timeDurMs = (int) profile.get(i)[0];
 			}
 			else {
-				flag.position = m_profile.get(i)[1] /*+ currentFlag.position*/;
-				flag.timeDurMs = (int) m_profile.get(i)[0];
+				flag.position = profile.get(i)[1] /*+ currentFlag.position*/;
+				flag.timeDurMs = (int) profile.get(i)[0];
 			}
 		
 			flag.profileSlotSelect = 0;
 			
-			System.out.println("Splice Points " + m_flag.position + " Time " + m_flag.timeDurMs);
+			System.out.println("Splice Points " + flag.position + " Time " + flag.timeDurMs);
 			
 			//Use Velocity?
-			m_flag.velocityOnly = false;
-			m_flag.zeroPos = false;
+			flag.velocityOnly = false;
+			flag.zeroPos = false;
 			
 			//Checks
 			if (i == 0) {
-				m_flag.zeroPos = false;
-				m_flag.isLastPoint = false;
+				flag.zeroPos = false;
+				flag.isLastPoint = false;
 			}
-			if ((i + 1) == totalCount); m_flag.isLastPoint = true;
+			if ((i + 1) == totalCount); flag.isLastPoint = true;
 			
-			m_talon.pushMotionProfileTrajectory(m_flag);
+			m_talon.pushMotionProfileTrajectory(flag);
 			//System.out.println("Successful Splice of Profile points");
 		}
 	}
