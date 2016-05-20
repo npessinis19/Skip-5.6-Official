@@ -8,19 +8,22 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.usfirst.frc.team3467.robot.RobotMap;
 import org.usfirst.frc.team3467.robot.commands.CommandBase;
-import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.TankDrive;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.ArcadeDrive;
 import org.usfirst.frc.team3467.robot.subsystems.Brownout.Brownout;
+import org.usfirst.frc.team3467.robot.motion_profiling.BuildTrajectory;
+import org.usfirst.frc.team3467.robot.motion_profiling.MP_CANTalons;
+import org.usfirst.frc.team3467.robot.motion_profiling.MotionProfile;
 import org.usfirst.frc.team3467.robot.subsystems.Brownout.Brownout.PowerLevel;
 import org.usfirst.frc.team3467.robot.subsystems.Brownout.PowerConsumer;
 
-public class DriveBase extends Subsystem implements PowerConsumer {
+public class DriveBase extends Subsystem implements PowerConsumer, MotionProfile {
 	
 	//Use to Toggle Arcade Drive, and t_useTank Drive
 	private boolean t_useTank = true;
 	
 	//CANTalons objects and RobotDrive object
 	private CANTalon 		leftTalon, rightTalon, leftTalon2, rightTalon2, leftTalon3, rightTalon3;
+	private MP_CANTalons	leftmp_drive, rightmp_drive;
 	private static RobotDrive 		t_drive;
 	private CANTalon.ControlMode 	t_controlMode;
 
@@ -59,6 +62,10 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 		rightTalon2 = new CANTalon(RobotMap.drivebase_RightTalon2);
 		leftTalon3 = new CANTalon(RobotMap.drivebase_LeftTalon3);
 		rightTalon3 = new CANTalon(RobotMap.drivebase_RightTalon3);
+		
+		//Instantiate MP_CANTalon
+		leftmp_drive = new MP_CANTalons("Left Drive", leftTalon, false);
+		rightmp_drive = new MP_CANTalons("Right Drive", rightTalon, false);
 		
 		//Slave extra Talons on each side
 		setSlaveMode(true);
@@ -223,5 +230,62 @@ public class DriveBase extends Subsystem implements PowerConsumer {
 		rightTalon2.enableBrakeMode(setBrake);
 		leftTalon3.enableBrakeMode(setBrake);
 		rightTalon3.enableBrakeMode(setBrake);
+	}
+
+	
+	//Motion Profile Interface Buffer
+	public void resetMP() {
+		leftmp_drive.clearMotionProfileTrajectories();
+		rightmp_drive.clearMotionProfileTrajectories();
+		
+		leftmp_drive.disableMotionProfiling();
+		rightmp_drive.disableMotionProfiling();
+	}
+
+	public void startMP(BuildTrajectory trajectory) {
+		leftmp_drive.startFilling(trajectory.getprofile(), trajectory.getTotalCount(), false);
+		rightmp_drive.startFilling(trajectory.getprofile(), trajectory.getTotalCount(), false);
+		
+		leftmp_drive.changeMotionControlFramePeriod(20);
+		rightmp_drive.changeMotionControlFramePeriod(20);
+		
+		leftmp_drive.enableMotionProfiling();
+		rightmp_drive.enableMotionProfiling();
+	}
+
+	public void publishValues() {
+		SmartDashboard.putNumber("Left Top Buffer", leftmp_drive.topBuffercount());
+		SmartDashboard.putNumber("Right Top Buffer", rightmp_drive.topBuffercount());
+		
+		SmartDashboard.putNumber("Left Bottom Buffer", leftmp_drive.BottomBufferCount());
+		SmartDashboard.putNumber("Right Bottom Buffer", rightmp_drive.BottomBufferCount());
+		
+		SmartDashboard.putBoolean("Left Is Underrun", leftmp_drive.isUnderrun());
+		SmartDashboard.putBoolean("Right Is Underrun", rightmp_drive.isUnderrun());
+		
+		SmartDashboard.putBoolean("Left Has Underrun", leftmp_drive.hasUnderrun());
+		SmartDashboard.putBoolean("Right Has Underrun", rightmp_drive.hasUnderrun());
+	}
+
+	public void processMotionProfileBuffer() {
+		leftmp_drive.processMotionProfileBuffer();
+		rightmp_drive.processMotionProfileBuffer();
+	}
+
+	public void updateMotionProfileStatus() {
+		leftmp_drive.upDateMotionProfileStatus();
+		rightmp_drive.upDateMotionProfileStatus();
+	}
+
+	/**
+	 * Checks if the motion profile is complete
+	 */
+	public boolean isComplete() {
+		if (leftmp_drive.isComplete() && rightmp_drive.isComplete()) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 }
