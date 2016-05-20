@@ -18,6 +18,7 @@ public class MP_CANTalons {
 	//Constructor Objects
 	private String m_name;
 	private CANTalon m_talon;
+	//private Notifier m_notifier;
 	
 	//Debugging IO outputs
 	private static DigitalOutput testWriteOutput;
@@ -33,18 +34,14 @@ public class MP_CANTalons {
 	//Motion Profile Status Object
 	private MotionProfileStatus m_status;
 	
-	//Motion Profiling Objects 
-	private ArrayList <double[]> m_profile;;
-	private TrajectoryPoint m_flag;
-	
 	
 	public MP_CANTalons(String name, CANTalon talon, boolean debugging) {
 		this.m_name = name;
 		this.m_talon = talon;
 		this.m_debugging = debugging;
 		
-		m_flag = new TrajectoryPoint();
 		m_status = new MotionProfileStatus();
+		//m_notifier = new Notifier(new PeriodicRunable());
 		
 		if (m_debugging) {
 			testWriteOutput = new DigitalOutput(1);
@@ -58,6 +55,12 @@ public class MP_CANTalons {
 		m_talon.clearMotionProfileTrajectories();
 	}
 
+	class PeriodicRunable implements java.lang.Runnable {
+		public void run() {
+			processMotionProfileBuffer();
+		}
+	}
+	
 	
 	public void initSmartDashboard() {
 		SmartDashboard.putBoolean(m_name + "isUnderrun ", m_status.isUnderrun);
@@ -128,7 +131,7 @@ public class MP_CANTalons {
 	}
 
 	
-	//Retrieve Values from the Motion Profile Status Object Instance
+	//Retrieve Values from the Motion Profile Status Object
 	public synchronized boolean isUnderrun() {
 		return m_status.isUnderrun;
 	}
@@ -184,56 +187,6 @@ public class MP_CANTalons {
 	}
 	
 	
-	
-	//Interface Methods
-	public void resetMP() { 
-		clearMotionProfileTrajectories();
-		disableMotionProfiling();
-		
-		//notifier.stop();
-		
-		System.out.println("MP Reset");
-	}
-	
-	public void startMP(BuildTrajectory trajectory) {
-		SmartDashboard.putString("TestProfiling Message", "startMP Called");
-		
-		resetMP();
-		
-		System.out.println("Starting Motion Profiling");
-		
-		startFilling(trajectory.getprofile(), trajectory.getTotalCount(), false);
-		
-		changeMotionControlFramePeriod(20);
-		
-		//notifier.startPeriodic(.005);
-				
-		try {
-			Thread.sleep(2000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		
-		upDateMotionProfileStatus();
-		
-		SmartDashboard.putNumber("Init Left Botttom Buffer", BottomBufferCount());
-		
-		enableMotionProfiling();
-	}
-	
-	public void publishValues() {
-			upDateMotionProfileStatus();
-			
-			SmartDashboard.putNumber(m_name + " Top Buffer", TopbufferCount());
-			SmartDashboard.putNumber(m_name + " Bottom Buffer", BottomBufferCount());
-			SmartDashboard.putBoolean(m_name + " Is Underrun", isUnderrun());
-
-			
-			SmartDashboard.putBoolean(m_name + " Has Underrun", hasUnderrun());
-			
-			System.out.println("Active Point " + m_name + getActivePoint().position + " Time " + getActivePoint().timeDurMs);
-		}
-	
 	/**
 	 * Add constant number to trajectory points
 	 * @param profile array list of trajectory data
@@ -241,12 +194,9 @@ public class MP_CANTalons {
 	 * @param invert multiply points by -1
 	 * @param addition add a number to trajectory points
 	 */
-	
 	public void startFillingPlusSome(ArrayList <double[]> profile, int totalCount, boolean invert, int addition) {
-		m_profile = profile;
-
 		//Create an empty point
-		//CANTalon.TrajectoryPoint flag = new TrajectoryPoint();
+		CANTalon.TrajectoryPoint flag = new TrajectoryPoint();
 		
 		//Check if in Underrun Condition
 		if (m_status.isUnderrun); System.out.println("Motion Profiling Is Underrun");
@@ -255,15 +205,13 @@ public class MP_CANTalons {
 		m_talon.clearMotionProfileHasUnderrun();
 		
 		for (int i = 0; i < totalCount; i++) {
-				upDateMotionProfileStatus();
-			
 				if (invert){
-					m_flag.position = m_profile.get(i)[1] * -1 + addition;
-					m_flag.timeDurMs = (int) m_profile.get(i)[0];
+					flag.position = profile.get(i)[1] * -1 + addition;
+					flag.timeDurMs = (int) profile.get(i)[0];
 				}		
 				else {
-					m_flag.position = m_profile.get(i)[1] + addition;
-					m_flag.timeDurMs = (int) m_profile.get(i)[0];
+					flag.position = profile.get(i)[1] + addition;
+					flag.timeDurMs = (int) profile.get(i)[0];
 				}
 				
 		/*if (m_debugging); testWriteOutput.set(true);
@@ -276,42 +224,39 @@ public class MP_CANTalons {
 			*/
 			
 			//Use PID Slot 0 for Motion Profiling
-			m_flag.profileSlotSelect = 0;
+			flag.profileSlotSelect = 0;
 		
-			System.out.println("Profile Points " + m_flag.position + " Time " + m_flag.timeDurMs + " Index " + i);
+			System.out.println("Profile Points " + flag.position + " Time " + flag.timeDurMs + " Index " + i);
 			
 			//Only use velocities?
-			m_flag.velocityOnly = false;
-			m_flag.zeroPos = false;
+			flag.velocityOnly = false;
+			flag.zeroPos = false;
 		
 			//Checks
 			if (i == 0) {
-				m_flag.zeroPos = false;
-				m_flag.isLastPoint = false;
+				flag.zeroPos = false;
+				flag.isLastPoint = false;
 			}
-			if ((i + 1) == totalCount); m_flag.isLastPoint = true;
+			if ((i + 1) == totalCount); flag.isLastPoint = true;
 
-			m_talon.pushMotionProfileTrajectory(m_flag);
+			m_talon.pushMotionProfileTrajectory(flag);
 			
 			//System.out.println("Successful Push of Profile Point " + i /*m_talon.pushMotionProfileTrajectory(m_flag)*/);
 			//testWriteOutput.set(false);
 		}
 	}
 	
-	
-	
 	/**
-	 * startFilling generates a motion profile trajectory based on a profile.
+	 * startFilling generates a motion profile trajectory based on profile data in an ArrayList
 	 * 
 	 * @param Profile In the form of an Array List
 	 * @param totalCount Length of profile
 	 * @param invert Change the sign of all profile points
 	 */
 	public void startFilling(ArrayList <double[]> Profile, int totalCount, boolean invert) {
-		m_profile = Profile;
 
 		//Create an empty point
-		//CANTalon.TrajectoryPoint flag = new TrajectoryPoint();
+		CANTalon.TrajectoryPoint flag = new TrajectoryPoint();
 		
 		//Check if in Underrun Condition
 		if (m_status.isUnderrun); System.out.println("Motion Profiling Is Underrun");
@@ -320,11 +265,15 @@ public class MP_CANTalons {
 		m_talon.clearMotionProfileHasUnderrun();
 		
 		for (int i = 0; i < totalCount; i++) {
-				upDateMotionProfileStatus();
+			if (invert) {
+				flag.position = Profile.get(i)[1] * -1;
+				flag.timeDurMs = (int) Profile.get(i)[0];
+			}
+			else {
+				flag.position = Profile.get(i)[1];
+				flag.timeDurMs = (int) Profile.get(i)[0];
+			}
 			
-				m_flag.position = m_profile.get(i)[1];
-				m_flag.timeDurMs = (int) m_profile.get(i)[0];
-		
 		/*if (m_debugging); testWriteOutput.set(true);
 			try {
 				Thread.sleep(50);
@@ -335,22 +284,22 @@ public class MP_CANTalons {
 			*/
 			
 			//Use PID Slot 0 for Motion Profiling
-			m_flag.profileSlotSelect = 0;
+			flag.profileSlotSelect = 0;
 		
-			System.out.println("Profile Points " + m_flag.position + " Time " + m_flag.timeDurMs + " Index " + i);
+			System.out.println("Profile Points " + flag.position + " Time " + flag.timeDurMs + " Index " + i);
 			
 			//Only use velocities?
-			m_flag.velocityOnly = false;
-			m_flag.zeroPos = false;
+			flag.velocityOnly = false;
+			flag.zeroPos = false;
 		
 			//Checks
 			if (i == 0) {
-				m_flag.zeroPos = false;
-				m_flag.isLastPoint = false;
+				flag.zeroPos = false;
+				flag.isLastPoint = false;
 			}
-			if ((i + 1) == totalCount); m_flag.isLastPoint = true;
+			if ((i + 1) == totalCount); flag.isLastPoint = true;
 
-			m_talon.pushMotionProfileTrajectory(m_flag);
+			m_talon.pushMotionProfileTrajectory(flag);
 			
 			//System.out.println("Successful Push of Profile Point " + i /*m_talon.pushMotionProfileTrajectory(m_flag)*/);
 			//testWriteOutput.set(false);
@@ -362,54 +311,56 @@ public class MP_CANTalons {
 	 * 		holds the current Motion Profile point,
 	 * 		clears the old trajectory from both buffers,
 	 * 		updates the Motion Profile Status,
+	 * 		starts the motion profile executer and separate thread motion profile processor,
 	 * 		and generates a new trajectory so long as the executer is not underrun,
-	 * 		and production has NOT been stopped
+	 * 		and production has NOT been stopped manually
 	 * 
 	 * @param profile In the form of an ArrayList
 	 * @param totalCount Length of the profile
 	 * @param invert change the signs of all profile points
 	 */
 	public void spliceTrajectory(ArrayList <double[]> profile, int totalCount, boolean invert) {
-		m_profile = profile;
-		
+		//Preparation for new Profile
 		holdMotionProfiling();
-		
 		clearMotionProfileTrajectories();
-		
 		upDateMotionProfileStatus();
+		TrajectoryPoint flag = new TrajectoryPoint();
 		
 		//Check if Underrun
 		if (m_status.isUnderrun); System.out.println("Motion Profiling is Underrun");
-		
 		m_talon.clearMotionProfileHasUnderrun();
 		
+		//Start executer and external thread processer
+		enableMotionProfiling();
+		//m_notifier.startPeriodic(0.005);
+		
 		for (int i = 0; i < totalCount && !stopProduction; i++) {
-			m_flag.position = m_profile.get(i)[1] /*+ currentFlag.position*/;
-			m_flag.timeDurMs = (int) m_profile.get(i)[0];
+			if (invert) {
+				flag.position = profile.get(i)[1] * -1;
+				flag.timeDurMs = (int) profile.get(i)[0];
+			}
+			else {
+				flag.position = profile.get(i)[1] /*+ currentFlag.position*/;
+				flag.timeDurMs = (int) profile.get(i)[0];
+			}
+		
+			flag.profileSlotSelect = 0;
 			
-			m_flag.profileSlotSelect = 0;
-			
-			System.out.println("Splice Points " + m_flag.position + " Time " + m_flag.timeDurMs);
+			System.out.println("Splice Points " + flag.position + " Time " + flag.timeDurMs);
 			
 			//Use Velocity?
-			m_flag.velocityOnly = false;
-			m_flag.zeroPos = false;
+			flag.velocityOnly = false;
+			flag.zeroPos = false;
 			
 			//Checks
 			if (i == 0) {
-				m_flag.zeroPos = false;
-				m_flag.isLastPoint = false;
+				flag.zeroPos = false;
+				flag.isLastPoint = false;
 			}
-			if ((i + 1) == totalCount); m_flag.isLastPoint = true;
-			if (m_status.isUnderrun) {
-				System.out.println("Profile Production Stopped");
-				stopProduction = true;
-			}
+			if ((i + 1) == totalCount); flag.isLastPoint = true;
 			
-			m_talon.pushMotionProfileTrajectory(m_flag);
+			m_talon.pushMotionProfileTrajectory(flag);
 			//System.out.println("Successful Splice of Profile points");
-			
-			m_talon.processMotionProfileBuffer();
 		}
 	}
 

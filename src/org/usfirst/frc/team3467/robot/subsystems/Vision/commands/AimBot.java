@@ -146,10 +146,10 @@ public class AimBot extends CommandBase {
 
 		protected void end() {
 		//	leftmp_drive.clearMotionProfileTrajectories();
-		//	rightmp_drive.clearMotionProfileTrajectories();
+			//rightmp_drive.clearMotionProfileTrajectories();
 			
-		//	resetMP();
-		//	
+			//resetMP();
+			
 			driveBase.initDrive();
 			driveBase.driveArcade(0, 0, false);
 		}
