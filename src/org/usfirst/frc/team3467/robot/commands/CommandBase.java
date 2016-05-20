@@ -70,8 +70,8 @@ public abstract class CommandBase extends Command {
 		subsystemList.addElement(ballEject);
 		
 		//Non-Subsystem Classes
-		video = new Video();
-		grip = new GRIP();
+		//video = new Video();
+		//grip = new GRIP();
 		oi = new OI();
 
 		//Initial Commands
