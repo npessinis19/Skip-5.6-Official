@@ -13,6 +13,7 @@ import org.usfirst.frc.team3467.robot.commands.autonomous.AutoTarget;
 import org.usfirst.frc.team3467.robot.commands.autonomous.LowBarAndShoot;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.ArcadeDrive;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.DriveMotionProfiling;
+import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.DriveMotionProfilingOld;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.PreciseRotateToAngle;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.ResetDriveEncoders;
 import org.usfirst.frc.team3467.robot.subsystems.DriveBase.commands.SetBrakeMode;
@@ -226,7 +227,7 @@ public class OI {
 		
 		//Test Buttons
 		SmartDashboard.putData("Test AutoTarget", new AutoTarget());
-		SmartDashboard.putData("Test Motion Profiling", new DriveMotionProfiling(20, 0.1, 0.1, 3, true));
+		SmartDashboard.putData("Test Motion Profiling", new DriveMotionProfilingOld(90, 0.1, 0.1, 3, true));
 	}
 }
 
