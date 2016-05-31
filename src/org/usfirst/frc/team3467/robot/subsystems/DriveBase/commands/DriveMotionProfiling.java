@@ -18,13 +18,14 @@ public class DriveMotionProfiling extends CommandBase {
 	private boolean m_reset;
 	
 	
-	/**
-	 * @param Distance
-	 * @param Acceleration
-	 * @param Deceleration
-	 * @param Cruise Velocity
-	 * @param Period
-	 * @param Reset Encoders
+	/** Use this command to generate and drive a motion profile for both the left, and right CANTalons
+	 * 
+	 * @param xnet Distance in encoder ticks
+	 * @param accel Acceleration in ticks per millisecond squared
+	 * @param Deceleration in ticks per millisecond squared
+	 * @param Cruise Velocity in ticks per millisecond
+	 * @param Period between each profile point in milliseconds
+	 * @param Reset Encoders before using profile?
 	 */
 	public DriveMotionProfiling(int xnet, double accel, double decel, double cruise, double step, boolean reset) {
 		requires(driveBase);
@@ -38,13 +39,13 @@ public class DriveMotionProfiling extends CommandBase {
 	}
  
 	/**
-	 * Drive a created motion profile based on input data
-	 * 
-	 * @param Angle of rotation
-	 * @param Acceleration
-	 * @param Deceleration
-	 * @param Cruise velocity
-	 * @param Reset Encoders 
+	 * Create and drive a motion profile based on an input angle
+	 *  
+	 * @param Angle of rotation in degrees
+	 * @param accel Acceleration in encoder ticks per millisecond squared
+	 * @param decel Deceleration in ticks per millisecond squared
+	 * @param Cruise velocity in ticks per millisecond
+	 * @param Reset Encoders before using profile?
 	 */
 	public DriveMotionProfiling(double angle, double accel, double decel, double cruise, boolean reset) {
 		requires(driveBase);
@@ -53,7 +54,7 @@ public class DriveMotionProfiling extends CommandBase {
 		m_reset = reset;
 		this.setInterruptible(false);
 		
-		setTimeout(10);
+		//setTimeout(10);
 		
 		SmartDashboard.putString("TestProfiling Mode", "angle");
 		
@@ -68,16 +69,9 @@ public class DriveMotionProfiling extends CommandBase {
 		}
 	}
 	
-	/*
-	public DriveMotionProfiling(){
-		leftmp_drive.changeMotionControlFramePeriod(1);
-		//rightmp_drive.changeMotionControlFramePeriod(1);
-		notifier.startPeriodic(.001);
-	}
-	*/
-	
 	Notifier notifier = new Notifier(new PeriodicRunnable());
-
+	
+	
 	protected void initialize() {
 		driveBase.setControlMode(TalonControlMode.MotionProfile);
 		
@@ -88,8 +82,9 @@ public class DriveMotionProfiling extends CommandBase {
 		
 		ahrs.gyroReset();
 		
-		notifier.startPeriodic(0.005);
 		driveBase.startMP(trajectory);
+		
+		notifier.startPeriodic(0.001);
 	}
 
 	protected void execute() {
@@ -97,6 +92,9 @@ public class DriveMotionProfiling extends CommandBase {
 		driveBase.reportEncoders();
 		
 		driveBase.setControlMode(TalonControlMode.MotionProfile);
+		
+		//Sloppily turn on Motion Profile Executer
+		driveBase.enableMP();
 		
 		driveBase.updateMotionProfileStatus();
 		

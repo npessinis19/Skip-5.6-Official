@@ -47,7 +47,7 @@ public class DriveBase extends Subsystem implements PowerConsumer, MotionProfile
 	
 	//Initializing the Default Command
 	public void initDefaultCommand() {
-		this.setDefaultCommand(new ArcadeDrive());
+		//this.setDefaultCommand(new ArcadeDrive());
 		System.out.println("DriveBase: Set to ArcadeDrive");
 	}
 	
@@ -158,7 +158,12 @@ public class DriveBase extends Subsystem implements PowerConsumer, MotionProfile
 		t_drive.drive(outputMagnitude, curve);
 	}
 
-	
+	/**
+	 * Toggles the following and PercentVbus control modes of ALL BUT THE
+	 * left and right master CANTalons
+	 * 
+	 * @param enslave Enslave the CANTalons?
+	 */
 	public void setSlaveMode(boolean enslave) {
 		if (enslave == false) {
 			leftTalon2.changeControlMode(TalonControlMode.PercentVbus);
@@ -184,17 +189,21 @@ public class DriveBase extends Subsystem implements PowerConsumer, MotionProfile
 		}
 	}
 	
+	/**
+	 * @param controlMode Set the control mode of the left and
+	 * right master CANTalons
+	 */
 	public void setControlMode(TalonControlMode controlMode) {
 		leftTalon.changeControlMode(controlMode);
 		rightTalon.changeControlMode(controlMode);
-		
-		leftTalon.changeControlMode(TalonControlMode.Current);
-		leftTalon.set(0);
 		
 		// Save control mode so we will know if we have to set it back later
 		t_controlMode = controlMode;
 	}
 	
+	/**
+	 * @return The current CANTalon control mode
+	 */
 	public String getTalonControlMode() {
 		if (t_controlMode == TalonControlMode.PercentVbus) {
 			return "PercentVbus";
@@ -208,7 +217,9 @@ public class DriveBase extends Subsystem implements PowerConsumer, MotionProfile
 		else; return "Problem";
 	}
 	
-	// return the distance driven (average of left and right encoders).
+	/**
+	 * @return Average of the encoder values from the left and right encoders
+	 */
 	public double getDistance() {
 		return ((leftTalon.getPosition()) + (rightTalon.getPosition() * -1.0))/2;
 	}
@@ -223,6 +234,10 @@ public class DriveBase extends Subsystem implements PowerConsumer, MotionProfile
 		rightTalon.setPosition(0);
 	}
 	
+	/**
+	 * Sets the brake mode for ALL CANTalons
+	 * @param setBrake Enable brake mode?
+	 */
 	public void setTalonBrakes(boolean setBrake) {
 		leftTalon.enableBrakeMode(setBrake);
 		rightTalon.enableBrakeMode(setBrake);
@@ -234,6 +249,10 @@ public class DriveBase extends Subsystem implements PowerConsumer, MotionProfile
 
 	
 	//Motion Profile Interface Buffer
+	/**
+	 * Clears motion profile trajectories from the top and bottom buffers,
+	 * and stop the motion profile executer
+	 */
 	public void resetMP() {
 		leftmp_drive.clearMotionProfileTrajectories();
 		rightmp_drive.clearMotionProfileTrajectories();
@@ -242,13 +261,22 @@ public class DriveBase extends Subsystem implements PowerConsumer, MotionProfile
 		rightmp_drive.disableMotionProfiling();
 	}
 
+	/**
+	 * Creates motion profile trajectory from a BuildTrajectory object, and setting the rate of processing
+	 * (moving trajectory points from top to bottom buffer)
+	 */
 	public void startMP(BuildTrajectory trajectory) {
 		leftmp_drive.startFilling(trajectory.getprofile(), trajectory.getTotalCount(), false);
 		rightmp_drive.startFilling(trajectory.getprofile(), trajectory.getTotalCount(), false);
 		
 		leftmp_drive.changeMotionControlFramePeriod(20);
 		rightmp_drive.changeMotionControlFramePeriod(20);
-		
+	}
+	
+	/**
+	 * Starts the motion profile executer
+	 */
+	public void enableMP() {
 		leftmp_drive.enableMotionProfiling();
 		rightmp_drive.enableMotionProfiling();
 	}
@@ -265,13 +293,24 @@ public class DriveBase extends Subsystem implements PowerConsumer, MotionProfile
 		
 		SmartDashboard.putBoolean("Left Has Underrun", leftmp_drive.hasUnderrun());
 		SmartDashboard.putBoolean("Right Has Underrun", rightmp_drive.hasUnderrun());
+	
+		System.out.println("Left Active Point" + leftmp_drive.getActivePoint().position);
+		//"Right Active Point", rightmp_drive.getActivePoint().position);
 	}
 
+	/**
+	 * Move 1 motion profile trajectory point from the top API buffer
+	 * to the bottom CANTalon buffer
+	 */
 	public void processMotionProfileBuffer() {
 		leftmp_drive.processMotionProfileBuffer();
 		rightmp_drive.processMotionProfileBuffer();
 	}
 
+	/**
+	 * Update motion profile status object to retrieve motion profile data from
+	 * the CANTalon
+	 */
 	public void updateMotionProfileStatus() {
 		leftmp_drive.upDateMotionProfileStatus();
 		rightmp_drive.upDateMotionProfileStatus();
