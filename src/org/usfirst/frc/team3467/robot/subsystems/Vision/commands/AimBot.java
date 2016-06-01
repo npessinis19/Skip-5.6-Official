@@ -10,58 +10,150 @@ import edu.wpi.first.wpilibj.Notifier;
 
 
 public class AimBot extends CommandBase {
-	
+
+		private MP_CANTalons leftmp_drive, rightmp_drive;
 		private BuildTrajectory trajectory;
 		
 		private int aimState = 1;
 		private boolean finished = false;
 		private static boolean debugging = true;
-		
+		private static final double TOLERANCE = 0.1;
+		private double m_angle;
+			
 		
 		public AimBot() {
 			requires(driveBase);
 			this.setInterruptible(true);
+			setTimeout(1.5);
 			
-			//setTimeout(3);
+			buildControllers();
+		}
+
+		public void buildControllers() {
+			leftmp_drive = new MP_CANTalons("Left Drive", driveBase.getLeftTalon(), false);
+			rightmp_drive = new MP_CANTalons("Right Drive", driveBase.getRightTalon(), false);
 		}
 		
-		
-		//Separate Thread that Processes points to Bottom Buffer
 		class PeriodicRunnable implements java.lang.Runnable {
-			public void run() { 
-				driveBase.processMotionProfileBuffer();
+			public void run() {
+				leftmp_drive.processMotionProfileBuffer();
+				rightmp_drive.processMotionProfileBuffer();
 			}
 		}
 		
-		
-		/*
-		public DriveMotionProfiling(){
-			leftmp_drive.changeMotionControlFramePeriod(1);
-			//rightmp_drive.changeMotionControlFramePeriod(1);
-			notifier.startPeriodic(.001);
-		}
-		*/
-		
 		Notifier notifier = new Notifier(new PeriodicRunnable());
+		
+		
+		public void startMP() {
+			SmartDashboard.putString("TestProfiling Message", "startMP Called");
+			
+			resetMP();
+			
+			System.out.println("Starting Motion Profiling");
+			
+			leftmp_drive.startFilling(trajectory.getprofile(), trajectory.getTotalCount(), false);
+			rightmp_drive.startFilling(trajectory.getprofile(), trajectory.getTotalCount(), false);
+		
+			leftmp_drive.changeMotionControlFramePeriod(5);
+			rightmp_drive.changeMotionControlFramePeriod(5);
+
+			notifier.startPeriodic(0.005);
+			
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
+			leftmp_drive.upDateMotionProfileStatus();
+			rightmp_drive.upDateMotionProfileStatus();
+			
+			SmartDashboard.putNumber("Init Left Bottom Buffer", leftmp_drive.BottomBufferCount());
+			SmartDashboard.putNumber("Init Right Bottom Buffer", rightmp_drive.BottomBufferCount());
+			
+			leftmp_drive.enableMotionProfiling();
+			rightmp_drive.enableMotionProfiling();
+		}
+		
+		public void resetMP() {
+			leftmp_drive.upDateMotionProfileStatus();
+			rightmp_drive.upDateMotionProfileStatus();
+			int increment = 0;
+			
+			while (leftmp_drive.BottomBufferCount() > 0 && rightmp_drive.BottomBufferCount() > 0 || increment > 400) {
+				leftmp_drive.clearMotionProfileTrajectories();
+				rightmp_drive.clearMotionProfileTrajectories();
+
+				increment++;
+				
+				leftmp_drive.upDateMotionProfileStatus();
+				rightmp_drive.upDateMotionProfileStatus();
+				System.out.println("Incrmenet " + leftmp_drive.BottomBufferCount());
+				if (increment == 400) {
+					break;
+				}
+			}
+			
+			
+			
+			
+			leftmp_drive.disableMotionProfiling();
+			rightmp_drive.disableMotionProfiling();
+			
+			notifier.stop();
+			
+			System.out.println("MP Reset");
+		}
+		
+		public void publishValues() {
+			leftmp_drive.upDateMotionProfileStatus();
+			rightmp_drive.upDateMotionProfileStatus();
+			
+			SmartDashboard.putNumber("Left Top Buffer",leftmp_drive.topBuffercount());
+			SmartDashboard.putNumber("Right Top Buffer", rightmp_drive.topBuffercount());
+			
+			SmartDashboard.putNumber("Left Bottom Buffer", leftmp_drive.BottomBufferCount());
+			SmartDashboard.putNumber("Right Bottom Buffer", rightmp_drive.BottomBufferCount());
+			
+			SmartDashboard.putBoolean("Left Is Underrun", leftmp_drive.isUnderrun());
+			SmartDashboard.putBoolean("Right Is Underrun", rightmp_drive.isUnderrun());
+			
+			SmartDashboard.putBoolean("Left Has Underrun", leftmp_drive.hasUnderrun());
+			SmartDashboard.putBoolean("Right Has Underrun", rightmp_drive.hasUnderrun());
+		
+			SmartDashboard.putString("Talon Mode", driveBase.getTalonControlMode());
+		}
+		
+		public void TalonOutput() {
+			if (m_angle < 0) {
+				driveBase.getLeftTalon().reverseOutput(false);
+				driveBase.getRightTalon().reverseOutput(false);
+			}
+			else if (m_angle > 0){
+				driveBase.getLeftTalon().reverseOutput(true);
+				driveBase.getRightTalon().reverseOutput(true);
+			}
+			else {
+				driveBase.getLeftTalon().reverseOutput(true);
+				driveBase.getRightTalon().reverseOutput(false);
+			}
+		}
 		
 		public void autoAim() {
 			switch (aimState) {
 			//State 1, search for a good image
 			case 1: 
-					grip.createImage();
+					m_angle = camera.convert();
 					
 					System.out.println("AimBot Found Good Image");
 					
 					aimState = 2;
 				break;
-			//State 2, Calculate target Data
+			//State 2, Build Trajectory
 			case 2:
-						grip.calculateTargetData();
-						grip.printData();
+						System.out.println("Aimbot found Change in Angle" + m_angle);
 						
-						System.out.println("Aimbot found Change in Angle" + grip.getChangeinAngle());
-						
-						trajectory = new BuildTrajectory((int) (grip.getChangeinAngle() - 1) * 14, 0.05, 0.05, 2, 10);
+						trajectory = new BuildTrajectory((int) ((m_angle) * 14), 0.02, 0.02 , 4, 10);
 
 					if (trajectory != null) {
 						System.out.println("AimBot Calculated");
@@ -76,7 +168,7 @@ public class AimBot extends CommandBase {
 			case 3:
 					light.lightOff();
 					
-					driveBase.startMP(trajectory);
+					startMP();
 					
 					System.out.println("AimBot moving");
 					
@@ -84,18 +176,19 @@ public class AimBot extends CommandBase {
 				break;
 			//State 4, wait for move to finish	
 			case 4:
-				
-					if (driveBase.isComplete()) {
+					if (leftmp_drive.isComplete() || rightmp_drive.isComplete()) {
+						finished = true;
 						System.out.println("AimBot moved");
-						aimState = 5;
 					}
+					else {
+						finished = false;
+						}
 				break;
 			//State 5, check if we're on Target (if not, go to aimState 1)
 			case 5: 
-					grip.createImage();
-					grip.calculateTargetData();
+					double testAngle = camera.convert();
 					
-					if (!grip.isOnTarget()) {
+					if (Math.abs(testAngle) >= TOLERANCE) {
 						aimState = 1;
 					}
 					else {
@@ -105,26 +198,53 @@ public class AimBot extends CommandBase {
 				break;
 			//State 6: Ends the command
 			case 6:
-					finished = true;
+				finished = true;
+				break;
 			}
 		}
 		
+		public void removeSlack() {
+			if (m_angle < 3 && m_angle > 0) {
+				driveBase.setControlMode(TalonControlMode.PercentVbus);
+				
+				driveBase.getLeftTalon().set(0.03);
+				driveBase.getRightTalon().set(0.03);
+			}
+			else if (m_angle > -3 && m_angle < 0)  {
+				driveBase.setControlMode(TalonControlMode.PercentVbus);
+			
+				driveBase.getLeftTalon().set(-0.03);
+				driveBase.getRightTalon().set(-0.03);
+			}
+		}
 		
 		protected void initialize() {
 			driveBase.setControlMode(TalonControlMode.MotionProfile);
 			driveBase.resetEncoders();
-			
+				
 			driveBase.getLeftTalon().reverseOutput(true);
 			driveBase.getRightTalon().reverseOutput(true);
 			
-			driveBase.resetMP();
+			removeSlack();
 			
-			aimState = 1;
+			driveBase.getLeftTalon().clearIAccum();
+			driveBase.getRightTalon().clearIAccum();
+			
+			leftmp_drive.clearMotionProfileTrajectories();
+			rightmp_drive.clearMotionProfileTrajectories();
+			
+			driveBase.setTalonBrakes(false);
+			driveBase.setSlaveMode(true);
 			
 			ahrs.gyroReset();
+			
+			aimState = 1;
+			finished = false;
 		}
-
+		
 		protected void execute() {
+			autoAim();
+			
 			ahrs.reportGyroValues();
 			driveBase.reportEncoders();
 			
@@ -132,28 +252,36 @@ public class AimBot extends CommandBase {
 			
 			//publishValues();
 			
-			autoAim();
+			SmartDashboard.putNumber("Auto Aim Angle", m_angle);
+			SmartDashboard.putNumber("Aim State", aimState);
 			
-			//leftmp_drive.stallOnLastPoint();
-			//rightmp_drive.stallOnLastPoint();
-			
-			SmartDashboard.putString("Talon Mode", driveBase.getTalonControlMode());
+			leftmp_drive.enableMotionProfiling();
+			rightmp_drive.enableMotionProfiling();
 		}
-
+		
 		protected boolean isFinished() {
-			return finished || isTimedOut();
+			double error = Math.abs(m_angle - ahrs.getGyroAngle());
+			boolean complete = (leftmp_drive.isComplete() || rightmp_drive.isComplete());
+			
+			return ( error <= TOLERANCE || finished || isTimedOut());
+			//return error <= TOLERANCE || isTimedOut();
 		}
 
 		protected void end() {
-		//	leftmp_drive.clearMotionProfileTrajectories();
-			//rightmp_drive.clearMotionProfileTrajectories();
+			resetMP();
 			
-			//resetMP();
+			if (Math.abs(camera.convert()) < TOLERANCE) {
+				light.lightOn();
+			}
 			
 			driveBase.initDrive();
-			driveBase.driveArcade(0, 0, false);
+			//light.lightOn();
 		}
+		
+		//Separate Thread that Processes points to Bottom Buffer
 
+
+	
 		protected void interrupted() {
 		//	resetMP();
 		}
