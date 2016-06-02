@@ -43,10 +43,13 @@ public class MP_CANTalons {
 		m_status = new MotionProfileStatus();
 		//m_notifier = new Notifier(new PeriodicRunable());
 		
+		setPID(3, 0.05, 0);
+		m_talon.setIZone(25);
+		
 		if (m_debugging) {
-			testWriteOutput = new DigitalOutput(1);
-			testExecuteOutput = new DigitalOutput(2);
-			testProcessOutput = new DigitalOutput(3);
+		//	testWriteOutput = new DigitalOutput(1);
+		//	testExecuteOutput = new DigitalOutput(2);
+		//	testProcessOutput = new DigitalOutput(3);
 		}
 		
 		m_talon.changeControlMode(TalonControlMode.MotionProfile);

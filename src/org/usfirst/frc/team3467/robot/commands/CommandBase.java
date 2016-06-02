@@ -14,8 +14,8 @@ import org.usfirst.frc.team3467.robot.subsystems.utilitybar.UtilityBar;
 import org.usfirst.frc.team3467.robot.subsystems.Intake.Intake;
 import org.usfirst.frc.team3467.robot.subsystems.Shooter.Shooter;
 import org.usfirst.frc.team3467.robot.subsystems.Vision.Flashlight;
-import org.usfirst.frc.team3467.robot.subsystems.Vision.GRIP;
-import org.usfirst.frc.team3467.robot.subsystems.Vision.Video;
+import org.usfirst.frc.team3467.robot.subsystems.Vision.PixyCam;
+//import org.usfirst.frc.team3467.robot.subsystems.Vision.Video;
 import org.usfirst.frc.team3467.robot.subsystems.compressor.Pneumatics;
 
 public abstract class CommandBase extends Command {
@@ -30,12 +30,12 @@ public abstract class CommandBase extends Command {
 	public static UtilityBar utilitybar;
 	public static Shooter pultaCat;
 	public static Intake intake;
+	public static PixyCam camera;
 	public static BallEject ballEject;
 	
 	//Vision Classes
 	public static Flashlight light;
-	public static GRIP grip;
-	public static Video video;
+//	public static Video video;
 	
 		//Create vector with subsystems as elements for global subsystem commands
 	public static Vector <Subsystem> subsystemList;
@@ -70,8 +70,8 @@ public abstract class CommandBase extends Command {
 		subsystemList.addElement(ballEject);
 		
 		//Non-Subsystem Classes
+		camera = new PixyCam();
 		//video = new Video();
-		//grip = new GRIP();
 		oi = new OI();
 
 		//Initial Commands
