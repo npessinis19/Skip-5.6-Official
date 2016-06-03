@@ -24,7 +24,7 @@ public class AimBot extends CommandBase {
 		public AimBot() {
 			requires(driveBase);
 			this.setInterruptible(true);
-			setTimeout(1.5);
+			setTimeout(20);
 			
 			buildControllers();
 		}
@@ -121,6 +121,8 @@ public class AimBot extends CommandBase {
 			SmartDashboard.putBoolean("Left Has Underrun", leftmp_drive.hasUnderrun());
 			SmartDashboard.putBoolean("Right Has Underrun", rightmp_drive.hasUnderrun());
 		
+			System.out.println("Active Point" + rightmp_drive.getActivePoint().position);
+			
 			SmartDashboard.putString("Talon Mode", driveBase.getTalonControlMode());
 		}
 		
@@ -250,7 +252,7 @@ public class AimBot extends CommandBase {
 			
 			driveBase.setControlMode(TalonControlMode.MotionProfile);
 			
-			//publishValues();
+			publishValues();
 			
 			SmartDashboard.putNumber("Auto Aim Angle", m_angle);
 			SmartDashboard.putNumber("Aim State", aimState);
@@ -263,7 +265,7 @@ public class AimBot extends CommandBase {
 			double error = Math.abs(m_angle - ahrs.getGyroAngle());
 			boolean complete = (leftmp_drive.isComplete() || rightmp_drive.isComplete());
 			
-			return ( error <= TOLERANCE || finished || isTimedOut());
+			return isTimedOut();
 			//return error <= TOLERANCE || isTimedOut();
 		}
 
@@ -283,6 +285,6 @@ public class AimBot extends CommandBase {
 
 	
 		protected void interrupted() {
-		//	resetMP();
+			end();
 		}
 	}

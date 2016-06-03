@@ -268,14 +268,8 @@ public class MP_CANTalons {
 		m_talon.clearMotionProfileHasUnderrun();
 		
 		for (int i = 0; i < totalCount; i++) {
-			if (invert) {
-				flag.position = Profile.get(i)[1] * -1;
-				flag.timeDurMs = (int) Profile.get(i)[0];
-			}
-			else {
 				flag.position = Profile.get(i)[1];
 				flag.timeDurMs = (int) Profile.get(i)[0];
-			}
 			
 		/*if (m_debugging); testWriteOutput.set(true);
 			try {
@@ -338,14 +332,8 @@ public class MP_CANTalons {
 		//m_notifier.startPeriodic(0.005);
 		
 		for (int i = 0; i < totalCount && !stopProduction; i++) {
-			if (invert) {
-				flag.position = profile.get(i)[1] * -1;
-				flag.timeDurMs = (int) profile.get(i)[0];
-			}
-			else {
 				flag.position = profile.get(i)[1] /*+ currentFlag.position*/;
 				flag.timeDurMs = (int) profile.get(i)[0];
-			}
 		
 			flag.profileSlotSelect = 0;
 			
