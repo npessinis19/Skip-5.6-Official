@@ -82,7 +82,7 @@ public class Shooter extends PIDSubsystem implements PowerConsumer, MotionProfil
 		//m_resetAngle = new AnalogPotentiometer(new AnalogInput(RobotMap.catapult_potentiometer_port));
 		m_resetBar = new CANTalon(RobotMap.catapult_Talon);
 		
-		shooterTalon = new MP_CANTalons("Shooter", m_resetBar, false);
+		//shooterTalon = new MP_CANTalons("Shooter", m_resetBar, false);
 		
 		m_resetBar.enableBrakeMode(true);
 		m_resetBar.setFeedbackDevice(CANTalon.FeedbackDevice.AnalogPot);
@@ -343,7 +343,7 @@ public class Shooter extends PIDSubsystem implements PowerConsumer, MotionProfil
 	public void startMP(BuildTrajectory trajectory) {
 		shooterTalon.startFilling(trajectory.getprofile(), trajectory.getTotalCount(), false);
 		
-		shooterTalon.changeMotionControlFramePeriod(20);
+		shooterTalon.changeMotionControlFramePeriod(5);
 		
 		shooterTalon.enableMotionProfiling();
 	}
@@ -356,6 +356,9 @@ public class Shooter extends PIDSubsystem implements PowerConsumer, MotionProfil
 		shooterTalon.enableMotionProfiling();
 	}
 	
+	public void enableMP() {
+		shooterTalon.enableMotionProfiling();
+	}
 	
 	public void publishValues() {
 		SmartDashboard.putNumber("Shooter top buffer", shooterTalon.topBuffercount());

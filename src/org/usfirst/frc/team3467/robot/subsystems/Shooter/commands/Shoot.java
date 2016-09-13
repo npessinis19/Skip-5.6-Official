@@ -32,6 +32,7 @@ public class Shoot extends CommandBase {
 	
 	public void end() {
 		pultaCat.cataStop();
+		light.lightOff();
         System.out.println("Shoot has ended");
 
 	}

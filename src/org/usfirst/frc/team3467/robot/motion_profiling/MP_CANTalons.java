@@ -43,10 +43,13 @@ public class MP_CANTalons {
 		m_status = new MotionProfileStatus();
 		//m_notifier = new Notifier(new PeriodicRunable());
 		
+		setPID(3, 0.05, 0);
+		m_talon.setIZone(25);
+		
 		if (m_debugging) {
-			testWriteOutput = new DigitalOutput(1);
-			testExecuteOutput = new DigitalOutput(2);
-			testProcessOutput = new DigitalOutput(3);
+		//	testWriteOutput = new DigitalOutput(1);
+		//	testExecuteOutput = new DigitalOutput(2);
+		//	testProcessOutput = new DigitalOutput(3);
 		}
 		
 		m_talon.changeControlMode(TalonControlMode.MotionProfile);
@@ -265,14 +268,8 @@ public class MP_CANTalons {
 		m_talon.clearMotionProfileHasUnderrun();
 		
 		for (int i = 0; i < totalCount; i++) {
-			if (invert) {
-				flag.position = Profile.get(i)[1] * -1;
-				flag.timeDurMs = (int) Profile.get(i)[0];
-			}
-			else {
 				flag.position = Profile.get(i)[1];
 				flag.timeDurMs = (int) Profile.get(i)[0];
-			}
 			
 		/*if (m_debugging); testWriteOutput.set(true);
 			try {
@@ -335,14 +332,8 @@ public class MP_CANTalons {
 		//m_notifier.startPeriodic(0.005);
 		
 		for (int i = 0; i < totalCount && !stopProduction; i++) {
-			if (invert) {
-				flag.position = profile.get(i)[1] * -1;
-				flag.timeDurMs = (int) profile.get(i)[0];
-			}
-			else {
 				flag.position = profile.get(i)[1] /*+ currentFlag.position*/;
 				flag.timeDurMs = (int) profile.get(i)[0];
-			}
 		
 			flag.profileSlotSelect = 0;
 			

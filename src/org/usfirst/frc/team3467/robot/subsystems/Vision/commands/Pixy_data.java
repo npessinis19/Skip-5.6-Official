@@ -10,8 +10,8 @@ public class Pixy_data extends CommandBase{
 
 	@Override
 	protected void initialize() {
-		pixy.WritePixy();
-		pixy.GetPixy();
+//		pixy.WritePixy();
+//		pixy.GetPixy();
 		
 	}
 

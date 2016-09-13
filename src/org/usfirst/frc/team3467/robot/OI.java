@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.usfirst.frc.team3467.robot.subsystems.Vision.commands.AimBot;
 import org.usfirst.frc.team3467.robot.subsystems.Vision.commands.LightSwitch;
 import org.usfirst.frc.team3467.robot.subsystems.Vision.commands.TargetGoal;
-import org.usfirst.frc.team3467.robot.subsystems.Vision.commands.VisionCalibrate;
 import org.usfirst.frc.team3467.robot.commands.CommandBase;
 import org.usfirst.frc.team3467.robot.commands.autonomous.AutoTarget;
 import org.usfirst.frc.team3467.robot.commands.autonomous.LowBarAndShoot;
@@ -114,7 +113,7 @@ public class OI {
 		
 		//Toggle in and out of AimBot
 		new JoystickButton(PrimaryStick, 1)
-			.whenPressed(new AimBot());
+			.whileHeld(new AimBot());
 		
 		new JoystickButton(PrimaryStick, 2)
 			.whenPressed(new ArcadeDrive());
@@ -221,13 +220,12 @@ public class OI {
 		SmartDashboard.putData("Shooter: Calibrate", new ShooterOneWayCalibrate());
 		SmartDashboard.putData("AHRS: Reset Gyro", new ResetGyro());
 		SmartDashboard.putData("Vision: Target Goal", new TargetGoal());
-		SmartDashboard.putData("Vision: Calibrate", new VisionCalibrate());
 		SmartDashboard.putData("Vision: AimBot", new AimBot());
 		SmartDashboard.putData("Shooter MP", new ShootMP());
 		
 		//Test Buttons
 		SmartDashboard.putData("Test AutoTarget", new AutoTarget());
-		SmartDashboard.putData("Test Motion Profiling", new DriveMotionProfilingOld(90, 0.1, 0.1, 3, true));
+		SmartDashboard.putData("Test Motion Profiling", new DriveMotionProfiling(90, 0.1, 0.1, 3, true));
 	}
 }
 
